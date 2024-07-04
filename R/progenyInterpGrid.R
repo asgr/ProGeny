@@ -1,0 +1,131 @@
+progenyInterpGrid = function(loc, info, rescale, radius=3, weight_pow=2){
+  setDT(loc)
+  setDT(info)
+
+  col_keep = Teff = logG = logZ = NULL
+
+  if(rescale$Teff != -999){
+    has_Teff = TRUE
+    col_keep = c(col_keep, 'Teff')
+  }else{
+    has_Teff = FALSE
+  }
+
+  if(rescale$logG != -999){
+    has_logG = TRUE
+    col_keep = c(col_keep, 'logG')
+  }else{
+    has_logG = FALSE
+  }
+
+  if(rescale$logZ != -999){
+    has_logZ = TRUE
+    col_keep = c(col_keep, 'logZ')
+  }else{
+    has_logZ = FALSE
+  }
+
+  loc_local = copy(loc[,..col_keep])
+  info_local = copy(info[,..col_keep])
+
+  if(has_Teff){
+    loc_local[,Teff:=Teff/rescale$Teff]
+    info_local[,Teff:=Teff/rescale$Teff]
+  }
+
+  if(has_logG){
+    loc_local[,logG:=logG/rescale$logG]
+    info_local[,logG:=logG/rescale$logG]
+  }
+
+  if(has_logZ){
+    loc_local[,logZ:=logZ/rescale$logZ]
+    info_local[,logZ:=logZ/rescale$logZ]
+  }
+
+  # if(length(rescale) == 3){
+  #   loc = loc[,list(Teff/rescale[1], logG/rescale[2], logZ/rescale[3])]
+  #   info = info[,list(Teff/rescale[1], logG/rescale[2], logZ/rescale[3])]
+  # }else if(length(rescale) == 2){
+  #   loc = loc[,list(Teff/rescale[1], logG/rescale[2])]
+  #   info = info[,list(Teff/rescale[1], logG/rescale[2])]
+  # }else if(length(rescale) == 1){
+  #   loc = loc[,list(Teff/rescale[1])]
+  #   info = info[,list(Teff/rescale[1])]
+  # }
+
+  temp = nn2(info_local, loc_local, k=8, radius=radius, searchtype = 'radius')
+  temp$weights = 1/(temp$nn.dists^weight_pow)
+  temp$weights = temp$weights / rowSums(temp$weights)
+  temp$weights[is.na(temp$weights)] = 1
+  temp$nn.dists[temp$nn.idx == 0L] = NA
+  temp$weights[temp$nn.idx == 0L] = NA
+  return(temp)
+}
+
+progenyInterpGrid_All = function(Iso, Spec_combine, radius=3, weight_pow=2){
+  setDT(Iso)
+
+  Interp_base = progenyInterpGrid(Iso, Spec_combine$base$info, Spec_combine$base$rescale, radius=radius, weight_pow=weight_pow)
+
+  if(!is.null(Spec_combine$extend)){
+    Interp_extend = progenyInterpGrid(Iso, Spec_combine$extend$info, Spec_combine$extend$rescale, radius=radius, weight_pow=weight_pow)
+  }else{
+    Interp_extend = NULL
+  }
+
+  if(!is.null(Spec_combine$hot)){
+    Interp_hot = progenyInterpGrid(Iso, Spec_combine$hot$info, Spec_combine$hot$rescale, radius=radius, weight_pow=weight_pow)
+  }else{
+    Interp_hot = NULL
+  }
+
+  if(!is.null(Spec_combine$AGB)){
+    Interp_AGB = progenyInterpGrid(Iso, Spec_combine$AGB$info, Spec_combine$AGB$rescale, radius=radius, weight_pow=weight_pow)
+  }else{
+    Interp_AGB = NULL
+  }
+
+  if(!is.null(Spec_combine$white)){
+    Interp_white = progenyInterpGrid(Iso, Spec_combine$white$info, Spec_combine$white$rescale, radius=radius, weight_pow=weight_pow)
+  }else{
+    Interp_white = NULL
+  }
+
+  Interp_combine = list(
+    base = Interp_base,
+    extend = Interp_extend,
+    hot = Interp_hot,
+    AGB = Interp_AGB,
+    white = Interp_white
+  )
+
+  return(Interp_combine)
+}
+
+progenyInterpBest = function(Iso, Interp_combine, do_base=TRUE, do_extend=TRUE, do_hot=TRUE,
+                             do_AGB=TRUE, do_white=TRUE, label_AGN=7:8, label_white=9){
+  setDT(Iso)
+
+  best = NULL
+
+  best_spec = rep(NA_integer_, dim(Iso)[1])
+  if(do_base){
+    best_spec[is.na(best_spec) & Interp_combine$base$nn.idx[,1] > 0] = 1L
+  }
+  if(do_extend & !is.null(Interp_combine$extend)){
+    best_spec[is.na(best_spec) & Interp_combine$extend$nn.idx[,1] > 0] = 2L
+  }
+  if(do_hot & !is.null(Interp_combine$hot)){
+    best_spec[is.na(best_spec) & Interp_combine$hot$nn.idx[,1] > 0] = 3L
+  }
+  if(do_AGB & !is.null(Interp_combine$AGB)){
+    best_spec[Interp_combine$AGB$nn.idx[,1] > 0 & Iso$label %in% label_AGN] = 4L
+  }
+  if(do_white & !is.null(Interp_combine$white)){
+    best_spec[is.na(best_spec) & Interp_combine$white$nn.idx[,1] > 0 & Iso$label %in% label_white] = 5L
+  }
+  best_spec[is.na(best_spec)] = 0L
+
+  Iso[,best:=best_spec]
+}

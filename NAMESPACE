@@ -1,0 +1,12 @@
+exportPattern("^[[:alpha:]]+")
+
+import("fst")
+import("foreach")
+import("doParallel")
+import('data.table')
+import("Rfits")
+import("RANN")
+import("NISTunits")
+import('celestial')
+
+importFrom("utils", "download.file", "url.show")

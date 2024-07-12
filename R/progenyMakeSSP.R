@@ -8,31 +8,37 @@ progenyMakeSSP = function(Iso, IMFfunc, masslow = 0.1, massmax = 100, ..., Spec_
 
   setDT(Iso)
 
+  Iso_temp = copy(Iso)
+
   logZ = logAge = Mini = Mass = NULL
 
-  IMFint = progenyUpdateIMF(Iso, IMFfunc, masslow=masslow, massmax=massmax, ...)$IMFint
+  Iso_temp[,IMFint:= progenyUpdateIMF(Iso_temp, IMFfunc, masslow=masslow, massmax=massmax, ...)$IMFint]
 
   registerDoParallel(cores=cores)
 
   logAge_step = NULL
   logZ_step = NULL
 
+  message('Generating spec grids:')
+
   Zspec = foreach(logZ_step = logZ_steps)%dopar%{
     message('  ',logZ_step)
     foreach(logAge_step = logAge_steps, .combine='rbind')%do%{
-      message('    ',logAge_step)
-      progenyIso2Spec(logAge_step, logZ_step, Iso=Iso, IMFint, Spec_combine, Interp_combine)
+      #message('    ',logAge_step)
+      progenyIso2Spec(logAge_step, logZ_step, Iso=Iso_temp, Iso_temp$IMFint, Spec_combine, Interp_combine)
     }
   }
 
   #need to check this a bit more carefully!
 
+  message('Generating evo grids:')
+
   Zevo = foreach(logZ_step = logZ_steps)%dopar%{
     message('  ',logZ_step)
-    SMstart = Iso[logZ == logZ_step & logAge == logAge_steps[1],sum(Mini*IMFint)]
     foreach(logAge_step = logAge_steps, .combine='rbind')%do%{
       message('    ',logAge_step)
-      SMstar = Iso[logZ == logZ_step & logAge == logAge_step, sum(Mass*IMFint)]/SMstart
+      SMstar = Iso_temp[logZ == logZ_step & logAge == logAge_step, sum(Mass*IMFint)]
+      SMstar[SMstar > 1] = 1
       SMgas = 1 - SMstar
       SMtot = 1
       SFR = rep(0, length(SMstar))

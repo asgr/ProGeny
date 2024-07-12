@@ -10,12 +10,12 @@ Interpolate Isochrone Grids onto Stellar Atmosphere Grids
 Fast interpolation between target isochrone stellar paramaters and spectra from stellar atmospheres. Interpolation can use any combination of \option{Teff} (Kelvin), \option{logG} (log10(SurfaceGravity / [cm/s^2])) and \option{logZ} (log10(Z / 0.02).
 }
 \usage{
-progenyInterpGrid(loc, info, rescale, radius = 3, weight_pow = 2)
+progenyInterpGrid(loc, info, rescale, radius = 2, weight_pow = 2)
 
-progenyInterpGrid_All(Iso, Spec_combine, radius = 3, weight_pow = 2)
+progenyInterpGrid_All(Iso, Spec_combine, radius = 2, weight_pow = 2)
 
 progenyInterpBest(Iso, Interp_combine, do_base = TRUE, do_extend = TRUE, do_hot = TRUE,
-  do_AGB = TRUE, do_white = TRUE, label_AGN = 7:8, label_white = 9)
+  do_AGB = TRUE, do_white = TRUE, b2e = 1.5, label_AGN = 7:8, label_white = 9)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -57,6 +57,9 @@ Logical; should the 'AGB' spectra be considered when trying to determine the bes
 }
   \item{do_white}{
 Logical; should the 'white' dwarf spectra be considered when trying to determine the best interpolated spectra solution?
+}
+  \item{b2e}{
+Numeric scalar; how much closer in re-scaled grid space does the 'extend' spectral atmosphere need to be before it is used instead of the 'base'. Values larger than \option{b2e} = 1 mean we are biased to preferring the 'base' solution even if it is not as close.
 }
   \item{label_AGN}{
 Integer vector; the \option{Iso} column \option{label} value that corresponds specifically to AGN periods (where the AGn spectra is then preferred).

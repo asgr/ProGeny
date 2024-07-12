@@ -1,4 +1,4 @@
-progenyInterpGrid = function(loc, info, rescale, radius=3, weight_pow=2){
+progenyInterpGrid = function(loc, info, rescale, radius=2, weight_pow=2){
   setDT(loc)
   setDT(info)
 
@@ -63,7 +63,7 @@ progenyInterpGrid = function(loc, info, rescale, radius=3, weight_pow=2){
   return(temp)
 }
 
-progenyInterpGrid_All = function(Iso, Spec_combine, radius=3, weight_pow=2){
+progenyInterpGrid_All = function(Iso, Spec_combine, radius=2, weight_pow=2){
   setDT(Iso)
 
   Interp_base = progenyInterpGrid(Iso, Spec_combine$base$info, Spec_combine$base$rescale, radius=radius, weight_pow=weight_pow)
@@ -104,14 +104,14 @@ progenyInterpGrid_All = function(Iso, Spec_combine, radius=3, weight_pow=2){
 }
 
 progenyInterpBest = function(Iso, Interp_combine, do_base=TRUE, do_extend=TRUE, do_hot=TRUE,
-                             do_AGB=TRUE, do_white=TRUE, label_AGN=7:8, label_white=9){
+                             do_AGB=TRUE, do_white=TRUE, b2e=1.5, label_AGN=7:8, label_white=9){
   setDT(Iso)
 
   best = NULL
 
   best_spec = rep(NA_integer_, dim(Iso)[1])
   if(do_base){
-    best_spec[is.na(best_spec) & Interp_combine$base$nn.idx[,1] > 0] = 1L
+    best_spec[is.na(best_spec) & Interp_combine$base$nn.idx[,1] > 0 & (Interp_combine$base$nn.dists[,1] < Interp_combine$extend$nn.dists[,1]*b2e)] = 1L
   }
   if(do_extend & !is.null(Interp_combine$extend)){
     best_spec[is.na(best_spec) & Interp_combine$extend$nn.idx[,1] > 0] = 2L

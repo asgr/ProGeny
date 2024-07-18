@@ -10,9 +10,9 @@ Interpolate Isochrone Grids onto Stellar Atmosphere Grids
 Fast interpolation between target isochrone stellar paramaters and spectra from stellar atmospheres. Interpolation can use any combination of \option{Teff} (Kelvin), \option{logG} (log10(SurfaceGravity / [cm/s^2])) and \option{logZ} (log10(Z / 0.02).
 }
 \usage{
-progenyInterpGrid(loc, info, rescale, radius = 2, weight_pow = 2)
+progenyInterpGrid(loc, info, rescale, radius = 2, weight_pow = 2, k = 8)
 
-progenyInterpGrid_All(Iso, Spec_combine, radius = 2, weight_pow = 2)
+progenyInterpGrid_All(Iso, Spec_combine, radius = 2, weight_pow = 2, k = 8)
 
 progenyInterpBest(Iso, Interp_combine, do_base = TRUE, do_extend = TRUE, do_hot = TRUE,
   do_AGB = TRUE, do_white = TRUE, b2e = 1.5, label_AGN = 7:8, label_white = 9)
@@ -39,6 +39,9 @@ Numeric scalar; the post \option{rescale} search radius to use when interpolatin
 }
   \item{weight_pow}{
 Numeric scalar; the interpolation weighting to apply. 1/distance^\option{weight_pow} becomes the per value weighting, where the sum of all \option{rescale} grid values within the specified \option{radius} are normalised to 1 using this scheme. A larger weight mean we bias out interpolated solution even more to closer grid values. A value between 1-2 (inclusive) is probably about optimal.
+}
+  \item{k}{
+Integer scalar; the maximum number of parameter nearest neighbours to compute. Setting this lower is an additional method for limiting interpolation grid positions (beyond the \option{radius}). The default of 8 reflects the vertices in a 3D cube, so is reasonable for a 3D search. For a 2D search \option{k} = 4 might be more appropriate.
 }
   \item{Interp_combine}{
 List; the output of \code{progenyInterpGrid_All}.

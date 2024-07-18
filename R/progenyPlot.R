@@ -10,27 +10,27 @@ progenyAtmosPlot = function(Spec_combine, add=FALSE,
     magplot(NA, NA, xlim=xlim, ylim=ylim, log=log, xlab='Teff / K', ylab=expression(log(g / cm.s^{-2})))
   }
 
-  if(do_white){
+  if(do_white & !is.null(Spec_combine$white)){
     points(Spec_combine$white$info[,list(Teff, logG)], col=col[5], pch=pch, cex=cex, ...)
     legvec = c(legvec, 'white')
   }
 
-  if(do_AGB){
+  if(do_AGB & !is.null(Spec_combine$AGB)){
     points(Spec_combine$AGB$info[,list(Teff, -1)], col=col[4], pch=pch, cex=cex, ...)
     legvec = c(legvec, 'AGB')
   }
 
-  if(do_hot){
+  if(do_hot & !is.null(Spec_combine$hot)){
     points(Spec_combine$hot$info[,list(Teff, logG)], col=col[3], pch=pch, cex=cex, ...)
     legvec = c(legvec, 'hot')
   }
 
-  if(do_extend){
+  if(do_extend & !is.null(Spec_combine$extend)){
     points(Spec_combine$extend$info[,list(Teff, logG + logZ*0.05)], pch=pch, col=col[2], cex=cex, ...)
     legvec = c(legvec, 'extend')
   }
 
-  if(do_base){
+  if(do_base & !is.null(Spec_combine$base)){
     points(Spec_combine$base$info[,list(Teff, logG + logZ*0.05)], pch=pch, col=col[1], cex=cex, ...)
     legvec = c(legvec, 'base')
   }

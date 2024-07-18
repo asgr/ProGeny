@@ -14,6 +14,7 @@ progenyMakeSSP = function(Iso, IMFfunc, masslow = 0.1, massmax = 100, ..., Spec_
 
   Iso_temp[,IMFint:= progenyUpdateIMF(Iso_temp, IMFfunc, masslow=masslow, massmax=massmax, ...)$IMFint]
 
+  cores = min(cores, length(logZ_steps))
   registerDoParallel(cores=cores)
 
   logAge_step = NULL

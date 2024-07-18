@@ -7,7 +7,10 @@ progenyIso2Spec = function(logAge=8.4, logZ=0, Iso, IMFint, Spec_combine, Interp
   wave_grid = Spec_combine$base$wave
   spec_stack = rep(0, length(wave_grid))
 
-  for(i in 1:5){
+  use = unique(Iso$best)
+  use = use[use > 0]
+
+  for(i in use){
     subset = which(Iso$logZ == logZ & Iso$logAge == logAge & Iso$best == i)
     Interp_combine[[i]]$nn.idx[subset,]
 

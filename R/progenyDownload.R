@@ -31,7 +31,7 @@ progenyAtmosLoad = function(destpath= '',
                       extend = 'combine_PHOENIX_allard',
                       hot = 'combine_TMAP_werner',
                       AGB = 'combine_AGB',
-                      white = 'combine_white'){
+                      white = NULL){
   if(is.character(base)){
     base = Rfits_read(paste0(destpath,'/',base,'.fits'), pointer=F, header=F)
     if(anyNA(base$spec)){
@@ -39,7 +39,7 @@ progenyAtmosLoad = function(destpath= '',
     }
     base$spec[base$spec < 0] = 0
   }else{
-    base = NA
+    base = NULL
   }
 
   if(is.character(extend)){
@@ -49,7 +49,7 @@ progenyAtmosLoad = function(destpath= '',
     }
     extend$spec[extend$spec < 0] = 0
   }else{
-    extend = NA
+    extend = NULL
   }
 
   if(is.character(hot)){
@@ -59,7 +59,7 @@ progenyAtmosLoad = function(destpath= '',
     }
     hot$spec[hot$spec < 0] = 0
   }else{
-    hot = NA
+    hot = NULL
   }
 
   if(is.character(AGB)){
@@ -69,7 +69,7 @@ progenyAtmosLoad = function(destpath= '',
     }
     AGB$spec[AGB$spec < 0] = 0
   }else{
-    AGB = NA
+    AGB = NULL
   }
 
   if(is.character(white)){
@@ -79,7 +79,7 @@ progenyAtmosLoad = function(destpath= '',
     }
     white$spec[white$spec < 0] = 0
   }else{
-    white = NA
+    white = NULL
   }
 
   Spec_combine = list(

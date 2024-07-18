@@ -18,7 +18,7 @@ progenyAtmosDownload(atmos = "avail", destpath = "",
 
 progenyAtmosLoad(destpath= '', base = 'combine_PHOENIX_husser',
   extend = 'combine_PHOENIX_allard', hot = 'combine_TMAP_werner',
-  AGB = 'combine_AGB', white = 'combine_white')
+  AGB = 'combine_AGB', white = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -35,19 +35,19 @@ Character scalar; where the target ProGeny isochrones / atmospheres should be do
 Character scalar; location of the ProGeny isochrones / atmospheres libraries. This should not need to be altered by the user.
 }
   \item{base}{
-Character scalar/logical; for \code{progenyAtmosLoad} name of the 'base' stellar atmosphere library to use. The 'base' library will be the primary (i.e. preferred) \option{Teff}, \option{logG} and \option{logZ} solution when interpolating the atmopsheres onto the isochrone grids. See \code{\link{progenyInterpGrid}}. For \code{progenyAtmosPlot} should the 'base' grid of Teff versus logG be plotts?
+Character scalar/logical; for \code{progenyAtmosLoad} name of the 'base' stellar atmosphere library to use. The 'base' library will be the primary (i.e. preferred) \option{Teff}, \option{logG} and \option{logZ} solution when interpolating the atmopsheres onto the isochrone grids. See \code{\link{progenyInterpGrid}}. For \code{progenyAtmosPlot} should the 'base' grid of Teff versus logG be plotted?
 }
   \item{extend}{
-Character scalar/logical; for \code{progenyAtmosLoad}  name of the 'extend' stellar atmosphere library to use. The 'extend' library will be the secondary (i.e. used when \option{base} does not have a good match) \option{Teff}, \option{logG} and \option{logZ} solution when interpolating the atmopsheres onto the isochrone grids. See \code{\link{progenyInterpGrid}}. For \code{progenyAtmosPlot} should the 'extend' grid of Teff versus logG be plotts?
+Character scalar/logical; for \code{progenyAtmosLoad}  name of the 'extend' stellar atmosphere library to use. The 'extend' library will be the secondary (i.e. used when \option{base} does not have a good match) \option{Teff}, \option{logG} and \option{logZ} solution when interpolating the atmopsheres onto the isochrone grids. See \code{\link{progenyInterpGrid}}. For \code{progenyAtmosPlot} should the 'extend' grid of Teff versus logG be plotted?
 }
   \item{hot}{
-Character scalar/logical; for \code{progenyAtmosLoad}  name of the 'hot' stellar atmosphere library to use. The 'hot' library will be the preferred option for the hot star spectra \option{Teff}, \option{logG} and \option{logZ} solution when interpolating the atmopsheres onto the isochrone grids. See \code{\link{progenyInterpGrid}}. For \code{progenyAtmosPlot} should the 'hot' grid of Teff versus logG be plotts?
+Character scalar/logical; for \code{progenyAtmosLoad}  name of the 'hot' stellar atmosphere library to use. The 'hot' library will be the preferred option for the hot star spectra \option{Teff}, \option{logG} and \option{logZ} solution when interpolating the atmopsheres onto the isochrone grids. See \code{\link{progenyInterpGrid}}. For \code{progenyAtmosPlot} should the 'hot' grid of Teff versus logG be plotted?
 }
   \item{AGB}{
 Character scalar/logical; for \code{progenyAtmosLoad}  name of the 'AGB' stellar atmosphere library to use. The 'AGB' library will be the preferred option for the AGB spectra \option{Teff}, \option{logG} and \option{logZ} solution when interpolating the atmopsheres onto the isochrone grids. See \code{\link{progenyInterpGrid}}. This can be flagged in the isochrones with the \option{label} column, see \code{\link{progenyInterpBest}}. For \code{progenyAtmosPlot} should the 'AGB' grid of Teff versus logG be plotts?
 }
   \item{white}{
-Character scalar/logical; for \code{progenyAtmosLoad}  name of the 'white' dwarf stellar atmosphere library to use. The 'white' dwarf library will be the preferred option for the white dwarf spectra \option{Teff}, \option{logG} and \option{logZ} solution when interpolating the atmopsheres onto the isochrone grids. See \code{\link{progenyInterpGrid}}. This can be flagged in the isochrones with the \option{label} column, see \code{\link{progenyInterpBest}}. For \code{progenyAtmosPlot} should the 'white' grid of Teff versus logG be plotts?
+Character scalar/logical; for \code{progenyAtmosLoad}  name of the 'white' dwarf stellar atmosphere library to use. The 'white' dwarf library will be the preferred option for the white dwarf spectra \option{Teff}, \option{logG} and \option{logZ} solution when interpolating the atmopsheres onto the isochrone grids. See \code{\link{progenyInterpGrid}}. This can be flagged in the isochrones with the \option{label} column, see \code{\link{progenyInterpBest}}. For \code{progenyAtmosPlot} should the 'white' grid of Teff versus logG be plotted?
 }
 }
 \details{

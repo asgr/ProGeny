@@ -7,6 +7,7 @@ progenyMakeSSP = function(Iso, IMFfunc, masslow = 0.1, massmax = 100, ..., Spec_
   logAge_steps = unique(Iso$logAge)
 
   setDT(Iso)
+  setkeyv(Iso, c('logZ', 'logAge', 'best'))
 
   Iso_temp = copy(Iso)
 

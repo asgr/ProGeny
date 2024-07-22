@@ -18,7 +18,7 @@ progenyAtmosDownload(atmos = "avail", destpath = "",
 
 progenyAtmosLoad(destpath= '', base = 'combine_PHOENIX_husser',
   extend = 'combine_PHOENIX_allard', hot = 'combine_TMAP_werner',
-  AGB = 'combine_AGB', white = NULL)
+  AGB = 'combine_AGB_lancon', white = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

@@ -30,7 +30,7 @@ progenyAtmosLoad = function(destpath= '',
                       base = 'combine_PHOENIX_husser',
                       extend = 'combine_PHOENIX_allard',
                       hot = 'combine_TMAP_werner',
-                      AGB = 'combine_AGB',
+                      AGB = 'combine_AGB_lancon',
                       white = NULL){
   if(is.character(base)){
     base = Rfits_read(paste0(destpath,'/',base,'.fits'), pointer=F, header=F)

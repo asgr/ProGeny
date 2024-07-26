@@ -39,7 +39,7 @@ progenyAtmosPlot = function(Spec_combine, add=FALSE,
 }
 
 progenyIsoPlot = function(Iso, add=FALSE, sampleN=1e4, zsel='Lum', zunit='Lsol', zstretch = 'log',
-                          col = hcl.colors(1000, 'geyser'), pch=16, cex=0.5,
+                          col = hcl.colors(101, 'geyser'), pch=16, cex=0.5,
                           xlim=c(2e3,4e5), ylim=c(-1,9), log='x', ...){
 
   if(add == FALSE){
@@ -53,10 +53,13 @@ progenyIsoPlot = function(Iso, add=FALSE, sampleN=1e4, zsel='Lum', zunit='Lsol',
     Iso_use = copy(Iso[sample(dim(Iso)[1], sampleN),])
   }
 
-  zlim = range(unlist(Iso_use[,..zsel]))
+  zext = max(ceiling(abs(log10(range(unlist(Iso_use[,..zsel]))))))
+  zlim = c(10^(-zext), 10^zext)
 
-  points(Iso_use[,list(Teff, logG)],
-         col=col[magmap(unlist(Iso_use[,..zsel]), range=c(1,1e3), stretch=zstretch)$map],
-         pch=pch, cex=cex, ...)
-  magbar('bottomright', range=zlim, col=col, log=(zstretch=='log'), title = paste(zsel,zunit,sep=' / '))
+  ParmOff(plot.xy, .args = list(xy=Iso_use[,list(Teff, logG)], type='p',
+         col=col[magmap(unlist(Iso_use[,..zsel]), range=c(1,101), stretch=zstretch)$map],
+         pch=pch, cex=cex), .pass_dots=FALSE, ...)
+
+  ParmOff(magbar, .args = list(position='bottomright', range=zlim, col=col, log=(zstretch=='log'), title = paste(zsel,zunit,sep=' / ')), .pass_dots=FALSE, ...)
+  #magbar('bottomright', range=zlim, col=col, log=(zstretch=='log'), title = paste(zsel,zunit,sep=' / '))
 }

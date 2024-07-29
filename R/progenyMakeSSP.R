@@ -15,25 +15,26 @@ progenyMakeSSP = function(Iso, IMFfunc, masslow = 0.1, massmax = 100, ..., Spec_
 
   Iso_temp[,IMFint:= progenyUpdateIMF(Iso_temp, IMFfunc, masslow=masslow, massmax=massmax, ...)$IMFint]
 
-  cores = min(cores, length(logZ_steps))
+  cores = min(cores, detectCores(), length(logZ_steps))
   registerDoParallel(cores=cores)
 
   logAge_step = NULL
   logZ_step = NULL
 
-  message('Generating spec grids:')
+  message('Generating spec grids')
 
   Zspec = foreach(logZ_step = logZ_steps)%dopar%{
     message('  ',logZ_step)
-    foreach(logAge_step = logAge_steps, .combine='rbind')%do%{
-      #message('    ',logAge_step)
-      progenyIso2Spec(logAge_step, logZ_step, Iso=Iso_temp, Iso_temp$IMFint, Spec_combine, Interp_combine)
+    #output = matrix(0, length(logAge_steps), length(Spec_combine[[1]]$wave))
+    output = foreach(i = seq_along(logAge_steps))%do%{
+      progenyIso2Spec(logAge_steps[i], logZ_step, Iso=Iso_temp, Iso_temp$IMFint, Spec_combine, Interp_combine)
     }
+    return(do.call(rbind, output))
   }
 
   #need to check this a bit more carefully!
 
-  message('Generating evo grids:')
+  message('Generating evo grids')
 
   Zevo = foreach(logZ_step = logZ_steps)%dopar%{
     message('  ',logZ_step)

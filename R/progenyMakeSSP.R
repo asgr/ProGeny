@@ -1,40 +1,47 @@
 progenyMakeSSP = function(Iso, IMFfunc, masslow = 0.1, massmax = 100, ..., Spec_combine,
                           Interp_combine, Zsol=0.02, cores=8, Labels = list(
-  Zlab = "Metallicity", Agelab = "Time since ZAM / Yrs", Wavelab = "Wavelength / Ang",
-  Lumlab = "Lsun / Ang (for 1 Msun SF)", LumAgelab = "Lsun / Ang (for 1 Msun/Yr SFR)")){
+                            Zlab = "Metallicity", Agelab = "Time since ZAM / Yrs", Wavelab = "Wavelength / Ang",
+                            Lumlab = "Lsun / Ang (for 1 Msun SF)", LumAgelab = "Lsun / Ang (for 1 Msun/Yr SFR)")){
   #currently takes about a minute or two to generate a target SSP on 8 cores
   logZ_steps = unique(Iso$logZ)
   logAge_steps = unique(Iso$logAge)
 
   setDT(Iso)
-  setkeyv(Iso, c('logZ', 'logAge', 'best'))
 
   Iso_temp = copy(Iso)
+  setkeyv(Iso_temp, c('logZ', 'logAge', 'Mini'))
 
   logZ = logAge = Mini = Mass = NULL
 
   Iso_temp[,IMFint:= progenyUpdateIMF(Iso_temp, IMFfunc, masslow=masslow, massmax=massmax, ...)$IMFint]
+  #Iso_temp[,ID:= 1:dim(Iso_temp)[1]]
 
-  cores = min(cores, detectCores(), length(logZ_steps))
+  cores = min(cores, length(logZ_steps), detectCores())
   registerDoParallel(cores=cores)
-
+  #
   logAge_step = NULL
   logZ_step = NULL
-
-  message('Generating spec grids')
+  #
+  message('Generating spec grids:')
 
   Zspec = foreach(logZ_step = logZ_steps)%dopar%{
     message('  ',logZ_step)
-    #output = matrix(0, length(logAge_steps), length(Spec_combine[[1]]$wave))
-    output = foreach(i = seq_along(logAge_steps))%do%{
-      progenyIso2Spec(logAge_steps[i], logZ_step, Iso=Iso_temp, Iso_temp$IMFint, Spec_combine, Interp_combine)
+    output = foreach(logAge_step = logAge_steps)%do%{
+      #message('    ',logAge_step)
+      progenyIso2Spec(logAge_step, logZ_step, Iso=Iso_temp, Iso_temp$IMFint, Spec_combine, Interp_combine)
     }
     return(do.call(rbind, output))
   }
 
+  # Iso_stack = Iso_temp[,list(ID=list(ID)), by=list(logAge,logZ)]
+  #
+  # Zspec = foreach(i = 1:dim(Iso_stack))%dopar%{
+  #   #for(i in 1:dim(Iso_stack)[1]){
+  #   .progenyIso2SpecSub(subset=unlist(Iso_stack[i,ID]), Iso=Iso_temp, Iso_temp$IMFint, Spec_combine, Interp_combine)
+  # }
   #need to check this a bit more carefully!
 
-  message('Generating evo grids')
+  message('Generating evo grids:')
 
   Zevo = foreach(logZ_step = logZ_steps)%dopar%{
     message('  ',logZ_step)

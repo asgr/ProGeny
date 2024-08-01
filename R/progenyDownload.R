@@ -1,29 +1,27 @@
-progenyIsoDownload = function(Iso = 'avail',
-                          destpath = '',
-                          URL = 'https://tinyurl.com/progeny_isochrone/') {
-  if (Iso == 'avail') {
-    url.show(paste0(URL, 'avail.txt?raw=1'))
-  } else{
-    Iso = paste0(Iso, '.fst')
-
-    download.file(paste0(URL, Iso, '?raw=1'),
-                  destfile = paste0(destpath, Iso))
-    return(paste0(destpath, Iso))
-  }
+progenyIsoDownload = function(URL = 'https://tinyurl.com/progeny-isochrone/', ...) {
+  # if (Iso == 'avail') {
+  #   url.show(paste0(URL, 'avail.txt?raw=1'))
+  # } else{
+  #   Iso = paste0(Iso, '.fst')
+  #
+  #   download.file(paste0(URL, Iso, '?raw=1'),
+  #                 destfile = paste0(destpath, Iso))
+  #   return(paste0(destpath, Iso))
+  # }
+  browseURL(URL, ...)
 }
 
-progenyAtmosDownload = function(atmos = 'avail',
-                            destpath = '',
-                            URL = 'https://tinyurl.com/progeny_atmos/') {
-  if (atmos == 'avail') {
-    url.show(paste0(URL, 'avail.txt?raw=1'))
-  } else{
-    atmos = paste0(atmos, '.fits')
-
-    download.file(paste0(URL, atmos, '?raw=1'),
-                  destfile = paste0(destpath, atmos))
-    return(paste0(destpath, atmos))
-  }
+progenyAtmosDownload = function(URL = 'https://tinyurl.com/progeny-atmos/', ...) {
+  # if (atmos == 'avail') {
+  #   url.show(paste0(URL, 'avail.txt?raw=1'))
+  # } else{
+  #   atmos = paste0(atmos, '.fits')
+  #
+  #   download.file(paste0(URL, atmos, '?raw=1'),
+  #                 destfile = paste0(destpath, atmos))
+  #   return(paste0(destpath, atmos))
+  # }
+  browseURL(URL, ...)
 }
 
 progenyAtmosLoad = function(destpath= '',

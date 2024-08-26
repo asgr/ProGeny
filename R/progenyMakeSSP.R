@@ -13,7 +13,7 @@ progenyMakeSSP = function(Iso, IMFfunc, masslow = 0.1, massmax = 100, ..., Spec_
 
   logZ = logAge = Mini = Mass = NULL
 
-  Iso_temp[,IMFint:= progenyUpdateIMF(Iso_temp, IMFfunc, masslow=masslow, massmax=massmax, ...)$IMFint]
+  IMFint = progenyUpdateIMF(Iso_temp, IMFfunc, ...)$IMFint
   #Iso_temp[,ID:= 1:dim(Iso_temp)[1]]
 
   cores = min(cores, length(logZ_steps), detectCores())
@@ -28,7 +28,7 @@ progenyMakeSSP = function(Iso, IMFfunc, masslow = 0.1, massmax = 100, ..., Spec_
     message('  ',logZ_step)
     output = foreach(logAge_step = logAge_steps)%do%{
       #message('    ',logAge_step)
-      progenyIso2Spec(logAge_step, logZ_step, Iso=Iso_temp, Iso_temp$IMFint, Spec_combine, Interp_combine)
+      progenyIso2Spec(logAge_step, logZ_step, Iso=Iso_temp, IMFint=IMFint, Spec_combine, Interp_combine)
     }
     return(do.call(rbind, output))
   }

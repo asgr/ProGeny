@@ -13,4 +13,6 @@ import("ParmOff")
 
 importFrom("utils", "browseURL")
 importFrom("grDevices", "hcl.colors")
-importFrom("graphics", "legend", "points")
+importFrom("graphics", "legend", "points", "plot.xy")
+importFrom("parallel", "detectCores")
+importFrom("stats", "approxfun", "integrate")

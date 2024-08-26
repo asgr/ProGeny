@@ -8,7 +8,7 @@ Integrate IMF Between Mass Limits
 This function only needs to be run when generating a ProGeny output for a new combination of Isochrones and/or IMF.
 }
 \usage{
-progenyUpdateIMF(Iso, IMFfunc, masslow = 0.1, massmax = 100, ...)
+progenyUpdateIMF(Iso, IMFfunc, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -17,12 +17,6 @@ Data.frame / data.table; the input table of Isochrones. This must have a particu
 }
   \item{IMFfunc}{
 Function; the IMF to be analysed. \code{ProSpect} comes with IMF_Chabrier and IMF_Kroupa, which are good starting points. Must accept a \option{masslow}/\option{massmax} arguments as input.
-}
-  \item{masslow}{
-Numeric scalar; the extreme low mass limit (Msol), where mass < masslow = 0. massform is then the mass formed between \option{masslow} and \option{massmax}.
-}
-  \item{massmax}{
-Numeric scalar; the max mass limit (Msol), where mass > massmax = 0. massform is then the mass formed between \option{masslow} and \option{massmax}.
 }
   \item{\dots}{
 Other arguments that can be accepted by the input \option{IMFfunc}.
@@ -44,7 +38,7 @@ Nothing yet
 Aaron Robotham
 }
 \seealso{
-\code{\link{progenyMakeSSP}}
+\code{\link{progenyMakeSSP}}, \code{\link{IMF_evo}}
 }
 \examples{
 ## Nothing yet

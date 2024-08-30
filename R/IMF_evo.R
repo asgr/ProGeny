@@ -18,10 +18,10 @@
 IMF_Kroupa_evo = function(mass, Age = 0, Age_lim = c(0,13.8),
                           alpha1_lim = c(0.3,0.3), alpha2_lim = c(1.3,1.3), alpha3_lim = c(2.3,2),
                           masslow_lim = c(0.01,0.01), mass1_lim = c(0.08,0.08), mass2_lim = c(0.5,0.5),
-                          massmax_lim = c(150,150), Lockback_Age = 0, massform = 1,
+                          massmax_lim = c(150,150), Lookback_Age = 0, massform = 1,
                           massmult = FALSE, rel.tol = .Machine$double.eps^0.25, method = 'linear', ...){
 
-  Age = .interval(Age + Lockback_Age, Age_lim)
+  Age = .interval(Age + Lookback_Age, Age_lim)
 
   alpha1 = approxfun(Age_lim, alpha1_lim, method=method, ...)(Age)
   alpha2 = approxfun(Age_lim, alpha2_lim, method=method, ...)(Age)
@@ -57,7 +57,7 @@ IMF_Kroupa_evo = function(mass, Age = 0, Age_lim = c(0,13.8),
 IMF_Lacey_evo = function(mass, Age = 0, Age_lim = c(0, 10), alpha1_lim = c(0.4, 2),
               alpha2_lim = c(0.4, 2), alpha3_lim = c(2.3, 2), masslow_lim = c(0.1, 0.1),
               mass1_lim = c(0.1, 0.1), mass2_lim = c(1, 1), massmax_lim = c(100, 100),
-              Lockback_Age = 0, massform = 1, massmult = FALSE, rel.tol = .Machine$double.eps^0.25,
+              Lookback_Age = 0, massform = 1, massmult = FALSE, rel.tol = .Machine$double.eps^0.25,
               method = 'constant', ...){
   return(IMF_Kroupa_evo(
     mass = mass,
@@ -70,7 +70,7 @@ IMF_Lacey_evo = function(mass, Age = 0, Age_lim = c(0, 10), alpha1_lim = c(0.4, 
     mass1_lim = mass1_lim,
     mass2_lim = mass2_lim,
     massmax_lim = massmax_lim,
-    Lockback_Age = Lockback_Age,
+    Lookback_Age = Lookback_Age,
     massform = massform,
     massmult = massmult,
     rel.tol = rel.tol,

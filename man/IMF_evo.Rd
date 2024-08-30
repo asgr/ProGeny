@@ -13,13 +13,13 @@ An evolving form of the differential Kroupa IMF. This can be used to encode a ev
 IMF_Kroupa_evo(mass, Age = 0, Age_lim = c(0, 13.8), alpha1_lim = c(0.3, 0.3),
   alpha2_lim = c(1.3, 1.3), alpha3_lim = c(2.3, 2), masslow_lim = c(0.01, 0.01),
   mass1_lim = c(0.08, 0.08), mass2_lim = c(0.5, 0.5), massmax_lim = c(150, 150),
-  Lockback_Age = 0, massform = 1, massmult = FALSE, rel.tol = .Machine$double.eps^0.25,
+  Lookback_Age = 0, massform = 1, massmult = FALSE, rel.tol = .Machine$double.eps^0.25,
   method = 'linear', ...)
 
 IMF_Lacey_evo(mass, Age = 0, Age_lim = c(0, 10), alpha1_lim = c(0.4, 2),
   alpha2_lim = c(0.4, 2), alpha3_lim = c(2.3, 2), masslow_lim = c(0.1, 0.1),
   mass1_lim = c(0.1, 0.1), mass2_lim = c(1, 1), massmax_lim = c(100, 100),
-  Lockback_Age = 0, massform = 1, massmult = FALSE, rel.tol = .Machine$double.eps^0.25,
+  Lookback_Age = 0, massform = 1, massmult = FALSE, rel.tol = .Machine$double.eps^0.25,
   method = 'constant', ...)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -54,7 +54,7 @@ Numeric vector; the mid mass limit (Msol), of the Kroupa IMF at \option{Age_lim}
   \item{massmax_lim}{
 Numeric vector; the max mass limit (Msol), where mass > massmax = 0, of the Kroupa IMF at \option{Age_lim}. \option{massform} is then the mass formed between \option{masslow} and \option{massmax}. We interpolate over this domain using the specified \option{Age}.
 }
-  \item{Lockback_Age}{
+  \item{Lookback_Age}{
 Numeric scalar' the age of the Universe at the observation of interest in Gyrs. The default of 0 means we are observing the galaxy 'today', or at least at very low redshift.
 }
   \item{massform}{

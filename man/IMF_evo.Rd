@@ -92,16 +92,16 @@ Aaron Robotham
 \code{\link{progenyUpdateIMF}}
 }
 \examples{
-curve(IMF_Kroupa_evo(x, Age=0), 0.01, 150, log='xy', lty=1)
-curve(IMF_Kroupa_evo(x, Age=6.9), 0.01, 150, log='xy', lty=2, add=TRUE)
-curve(IMF_Kroupa_evo(x, Age=13.8), 0.01, 150, log='xy', lty=3, add=TRUE)
+magcurve(IMF_Kroupa_evo(x, Age=0), 0.01, 150, log='xy', lty=1, lwd=2, xlab = 'Star Mass / Msol', ylab='Relative Number Density')
+curve(IMF_Kroupa_evo(x, Age=6.9), 0.01, 150, log='xy', lty=2, add=TRUE, lwd=2)
+curve(IMF_Kroupa_evo(x, Age=13.8), 0.01, 150, log='xy', lty=3, add=TRUE, lwd=2)
 
-curve(IMF_Lacey_evo(x, Age=0), 0.01, 150, log='xy', lty=1, col='red')
-curve(IMF_Lacey_evo(x, Age=6.9), 0.01, 150, log='xy', lty=2, add=TRUE, col='red')
-curve(IMF_Lacey_evo(x, Age=13.8), 0.01, 150, log='xy', lty=3, add=TRUE, col='red')
+curve(IMF_Lacey_evo(x, Age=0), 0.01, 150, log='xy', lty=1, add=TRUE, col='red', lwd=2)
+curve(IMF_Lacey_evo(x, Age=6.9), 0.01, 150, log='xy', lty=2, add=TRUE, col='red', lwd=2)
+curve(IMF_Lacey_evo(x, Age=13.8), 0.01, 150, log='xy', lty=3, add=TRUE, col='red', lwd=2)
 
 legend('topright', legend=c('Kroupa Evo', 'Lacey Evo'), pch=16, col=c('black', 'red'))
-legend('bottomleft', legend=c('0 Gyrs', '6.9 Gyrs', '13.8 Gyrs'), lty=1:3)
+legend('bottomleft', legend=c('0 Gyrs', '6.9 Gyrs', '13.8 Gyrs'), lty=1:3, lwd=2)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory (show via RShowDoc("KEYWORDS")):

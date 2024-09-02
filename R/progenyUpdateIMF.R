@@ -27,7 +27,7 @@ progenyUpdateIMF = function(Iso, IMFfunc, ...){
 
   split_lib = split(Iso, by=c('logZ', 'logAge'), flatten=FALSE)
 
-  if(any(c('Age', 'redshift') %in% names(formals(IMFfunc)))){
+  if(any(c('Age', 'redshift', 'logZ') %in% names(formals(IMFfunc)))){
     #If we are using an evolving form of the IMF then we need to compute
     output = foreach(i = 1:length(split_lib), .combine='rbind')%do%{
       foreach(j = 1:length(split_lib[[i]]), .combine='rbind')%do%{
@@ -36,6 +36,8 @@ progenyUpdateIMF = function(Iso, IMFfunc, ...){
           return(data.table(lo=sub_bins$lo, hi=sub_bins$hi, IMFint=(sub_bins$hi - sub_bins$lo)*IMFfunc(split_lib[[i]][[j]]$Mini, Age=10^split_lib[[i]][[j]]$logAge[1]/1e9, ...)))
         }else if('redshift' %in% names(formals(IMFfunc))){
           return(data.table(lo=sub_bins$lo, hi=sub_bins$hi, IMFint=(sub_bins$hi - sub_bins$lo)*IMFfunc(split_lib[[i]][[j]]$Mini, redshift=split_lib[[i]][[j]]$redshift[1], ...)))
+        }else if('logZ' %in% names(formals(IMFfunc))){
+          return(data.table(lo=sub_bins$lo, hi=sub_bins$hi, IMFint=(sub_bins$hi - sub_bins$lo)*IMFfunc(split_lib[[i]][[j]]$Mini, logZ=split_lib[[i]][[j]]$logZ[1], ...)))
         }
       }
     }

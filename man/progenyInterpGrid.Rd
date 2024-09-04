@@ -15,7 +15,7 @@ progenyInterpGrid(loc, info, rescale, radius = 2, weight_pow = 2, k = 8)
 progenyInterpGrid_All(Iso, Spec_combine, radius = 2, weight_pow = 2, k = 8)
 
 progenyInterpBest(Iso, Interp_combine, do_base = TRUE, do_extend = TRUE, do_hot = TRUE,
-  do_AGB = TRUE, do_white = TRUE, b2e = 1.5, label_AGN = 7:8, label_white = 9)
+  do_AGB = TRUE, do_white = TRUE, b2e = 1.5, label_AGB = 7:8, label_white = 9)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -64,15 +64,31 @@ Logical; should the 'white' dwarf spectra be considered when trying to determine
   \item{b2e}{
 Numeric scalar; how much closer in re-scaled grid space does the 'extend' spectral atmosphere need to be before it is used instead of the 'base'. Values larger than \option{b2e} = 1 mean we are biased to preferring the 'base' solution even if it is not as close.
 }
-  \item{label_AGN}{
-Integer vector; the \option{Iso} column \option{label} value that corresponds specifically to AGN periods (where the AGn spectra is then preferred).
+  \item{label_AGB}{
+Integer vector; the \option{Iso} column \option{label} value that corresponds specifically to AGB periods (where the AGB spectra is then preferred). For MIST the setting should probably be 4:5, and for PARSEC it should probably be 7:8.
 }
   \item{label_white}{
-Integer vector; the \option{Iso} column \option{label} value that corresponds specifically to white dwarf periods (where the white dwarf spectra is then preferred).
+Integer vector; the \option{Iso} column \option{label} value that corresponds specifically to white dwarf periods (where the white dwarf spectra is then preferred). For MIST the setting should probably be 6:8, and for PARSEC it should probably be 9.
 }
 }
 \details{
 TBD
+}
+\note{
+In MIST the isochrones labels are provided as: -1 = PreMS, 0 = MS, 2 = RGB, 3 = CHeB, 4 = eAGB, 5 = TP-AGB, 6-8 = PostAGB, 9 = WR.
+
+In PARSEC the isochrones labels are provided as: 0 = PreMS, 1 = MS, 2 = SubGB, 3 = RGB, 4-6 = CHeB, 7 = eAGB, 8 = TP-AGB, 9 = PostAGB.
+
+In general:
+PMS: pre main sequence
+MS: main sequence
+WR: Wolf Rayet (generally only a few million years old)
+SubGB: subgiant branch, or Hertzsprung gap for more intermediate+massive stars
+RGB: red giant branch, or the quick stage of red giant for intermediate+massive stars
+CHEB: core He-burning for low mass stars, or the very initial stage of CHeB for intermediate+massive stars
+eAGB: the early asymptotic giant branch, or a quick stage of red giant for massive stars
+TP-AGB: the thermally pulsing asymptotic giant branch
+Post-AGB: post asymptotic giant branch
 }
 \value{
 \code{progenyInterpGrid} returns a list output that contain the various outputs of \code{\link{nn2}}, with an additional weights list item that contains our bespokely scaled weights that will be used when interpolating an Isochrone vs Atmosphere solution.

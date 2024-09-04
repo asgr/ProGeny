@@ -92,7 +92,9 @@ Aaron Robotham
 \code{\link{progenyUpdateIMF}}
 }
 \examples{
-magcurve(IMF_Kroupa_evo(x, Age=0), 0.01, 150, log='xy', lty=1, lwd=2, xlab = 'Star Mass / Msol', ylab='Relative Number Density')
+library(magicaxis)
+magcurve(IMF_Kroupa_evo(x, Age=0), 0.01, 150, log='xy', lty=1, lwd=2,
+  xlab='Star Mass / Msol', ylab='dN/dM (1 Msol)')
 curve(IMF_Kroupa_evo(x, Age=6.9), 0.01, 150, log='xy', lty=2, add=TRUE, lwd=2)
 curve(IMF_Kroupa_evo(x, Age=13.8), 0.01, 150, log='xy', lty=3, add=TRUE, lwd=2)
 

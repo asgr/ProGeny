@@ -104,7 +104,7 @@ progenyInterpGrid_All = function(Iso, Spec_combine, radius=2, weight_pow=2, k=8)
 }
 
 progenyInterpBest = function(Iso, Interp_combine, do_base=TRUE, do_extend=TRUE, do_hot=TRUE,
-                             do_AGB=TRUE, do_white=TRUE, b2e=1.5, label_AGN=7:8, label_white=9){
+                             do_AGB=TRUE, do_white=TRUE, b2e=1.5, label_AGB=7:8, label_white=9){
   setDT(Iso)
 
   best_spec = rep(0L, dim(Iso)[1])
@@ -119,7 +119,7 @@ progenyInterpBest = function(Iso, Interp_combine, do_base=TRUE, do_extend=TRUE, 
     best_spec[best_spec == 0L & Interp_combine$hot$nn.idx[,1] > 0] = 3L
   }
   if(do_AGB & !is.null(Interp_combine$AGB)){
-    best_spec[Interp_combine$AGB$nn.idx[,1] > 0 & Iso$label %in% label_AGN] = 4L
+    best_spec[Interp_combine$AGB$nn.idx[,1] > 0 & Iso$label %in% label_AGB] = 4L
   }
   if(do_white & !is.null(Interp_combine$white)){
     best_spec[best_spec == 0L & Interp_combine$white$nn.idx[,1] > 0 & Iso$label %in% label_white] = 5L

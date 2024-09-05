@@ -8,8 +8,8 @@ High Level SSP Creator
 The main interface via which users will likely use ProGeny to create SSPs.
 }
 \usage{
-progenyMakeSSP(Iso, IMFfunc, ..., Spec_combine, Interp_combine, Zsol = 0.02, cores = 8,
-  Labels = list(Zlab = "Metallicity", Agelab = "Time since ZAM / Yrs",
+progenyMakeSSP(Iso, IMFfunc, ..., Spec_combine, Interp_combine, Zsol = 0.02,
+  cores = 8, Labels = list(Zlab = "Metallicity", Agelab = "Time since ZAM / Yrs",
   Wavelab = "Wavelength / Ang", Lumlab = "Lsun / Ang (for 1 Msun SF)",
   LumAgelab = "Lsun / Ang (for 1 Msun/Yr SFR)"))
 }

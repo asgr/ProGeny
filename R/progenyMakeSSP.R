@@ -53,7 +53,6 @@ progenyMakeSSP = function(Iso, IMFfunc, ..., Spec_combine,
 
     message('  ',logZ_step)
     temp_out = foreach(logAge_step = logAge_steps, .combine='rbind')%do%{
-      message('    ',logAge_step)
       mass_lim = Iso_temp[logZ == logZ_step & logAge == logAge_step, max(Mini)]
       SMrem_miss = missing_func(mass_lim)
       SMstar = Iso_temp[logZ == logZ_step & logAge == logAge_step, sum(Mass*IMFint)] + SMrem_miss
@@ -64,8 +63,7 @@ progenyMakeSSP = function(Iso, IMFfunc, ..., Spec_combine,
       SMrem = 0
       return(data.frame(SMstar=SMstar, SMgas=SMgas, SMtot=SMtot, SFR=SFR, SMrem=SMrem))
     }
-
-    temp_out[1,SFR] = 1
+    temp_out[1,'SFR'] = 1
     return(temp_out)
   }
 

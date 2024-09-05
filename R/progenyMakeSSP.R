@@ -44,18 +44,29 @@ progenyMakeSSP = function(Iso, IMFfunc, ..., Spec_combine,
   message('Generating evo grids:')
 
   Zevo = foreach(logZ_step = logZ_steps)%dopar%{
+    temp_cut = Iso_temp[logZ == logZ_step & logAge >= 8,data.table(Mini,Mass/Mini)[which.max(Mini),],by=logAge]
+    temp_func = approxfun(temp_cut[,Mini], temp_cut[,V2], rule=2)
+
+    missing_func = function(lo_lim){
+        integrate(function(x){IMFfunc(x, massmult=TRUE, ...)*temp_func(x)}, lower=lo_lim, upper=Inf)$value
+    }
+
     message('  ',logZ_step)
-    foreach(logAge_step = logAge_steps, .combine='rbind')%do%{
+    temp_out = foreach(logAge_step = logAge_steps, .combine='rbind')%do%{
       message('    ',logAge_step)
-      SMstar = Iso_temp[logZ == logZ_step & logAge == logAge_step, sum(Mass*IMFint)]
+      mass_lim = Iso_temp[logZ == logZ_step & logAge == logAge_step, max(Mini)]
+      SMrem_miss = missing_func(mass_lim)
+      SMstar = Iso_temp[logZ == logZ_step & logAge == logAge_step, sum(Mass*IMFint)] + SMrem_miss
       SMstar[SMstar > 1] = 1
       SMgas = 1 - SMstar
       SMtot = 1
-      SFR = rep(0, length(SMstar))
-      SFR[1] = 1
+      SFR = 0
       SMrem = 0
       return(data.frame(SMstar=SMstar, SMgas=SMgas, SMtot=SMtot, SFR=SFR, SMrem=SMrem))
     }
+
+    temp_out[1,SFR] = 1
+    return(temp_out)
   }
 
   Age_lims = .binlims(10^logAge_steps, log=T)

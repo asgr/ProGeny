@@ -60,7 +60,7 @@ progenyMakeSSP = function(Iso, IMFfunc, ..., Spec_combine,
       SMgas = 1 - SMstar
       SMtot = 1
       SFR = 0
-      SMrem = 0
+      SMrem = SMrem_miss #might be missing some for some isochrones though (this is literally remnants we stop tracking, hence SM_rem_miss)
       return(data.frame(SMstar=SMstar, SMgas=SMgas, SMtot=SMtot, SFR=SFR, SMrem=SMrem))
     }
     temp_out[1,'SFR'] = 1

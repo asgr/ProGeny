@@ -1,0 +1,71 @@
+---
+title: "ProGeny: The Children of Stars"
+author: "Aaron Robotham"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ProGeny: The Children of Stars}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+Load what we will need:
+
+```{r}
+library(ProGeny)
+library(ProSpect)
+library(data.table)
+library(Rfits)
+library(fst)
+```
+
+The main thing **ProGeny** does (and the reason it was designed at all) is create Simple Stellar Poopulation (SSP) models that can directly few into **ProSpect**. This is useful because it gives us full control over what isochrones and stellar atmospheres we use, and how we map them together. We can also control our initial mass function (IMF).
+
+The basic path to doing this is to firstly load our desired isochrone (MIST, in this case). On my machine this is at:
+
+```{r}
+Iso  = read.fst('~/Dropbox (Personal)/ProGeny_isochrone/MistIso.fst')
+#Iso  = read.fst('~/Dropbox (Personal)/ProGeny_isochrone/ParsecIso.fst')
+```
+
+If you do not have one already, you can get them using the *progenyIsoDownload* function. Currently we provide MIST (preferred, for reasons we shall get to) and PARSEC isochrones.
+
+```{r}
+Spec_combine = progenyAtmosLoad('~/Dropbox (Personal)/ProGeny_atmos/')
+```
+
+```{r}
+Interp_combine = progenyInterpGrid_All(Iso = Iso,
+                                       Spec_combine = SpecCombine)
+```
+
+```{r}
+Iso = progenyInterpBest(Iso = Iso,
+                        Interp_combine = Interp_combine,
+                        label_AGB = 4:5, #7:8 [PC] / 4:5 [Mist]
+                        label_white = 6:8 # 9 [PC] / 6:8 [Mist]
+                        )
+```
+
+```{r}
+PG_Ch = progenyMakeSSP(Iso = Iso,
+               IMFfunc = IMF_Chabrier,
+               masslow = 0.1,
+               massmax = 100,
+               Spec_combine = Spec_combine,
+               Interp_combine = Interp_combine
+               )
+```
+
+```{r}
+speclib_check(PG_Mi_Ch)
+```
+
+
+```{r}
+data(BC03lr)
+
+magplot(BC03lr$Age, BC03lr$Zevo[[5]][,"SMstar"], type='l', ylim=c(0,1),
+        log='x', xlab='Age / Yr', ylab = 'SMfrac')
+lines(PG_Ch$Age, PG_Ch$Zevo[[which(PG_Ch$Z==0.02)]]$SMstar, col='red')
+```

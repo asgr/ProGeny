@@ -65,10 +65,10 @@ Logical; should the 'white' dwarf spectra be considered when trying to determine
 Numeric scalar; how much closer in re-scaled grid space does the 'extend' spectral atmosphere need to be before it is used instead of the 'base'. Values larger than \option{b2e} = 1 mean we are biased to preferring the 'base' solution even if it is not as close.
 }
   \item{label_AGB}{
-Integer vector; the \option{Iso} column \option{label} value that corresponds specifically to AGB periods (where the AGB spectra is then preferred). For MIST the setting should probably be 4:5, and for PARSEC it should probably be 7:8.
+Integer vector; the \option{Iso} column \option{label} value that corresponds specifically to AGB periods (where the AGB spectra is then preferred). For MIST the setting should probably be 4:5, for PARSEC it should probably be 7:8, and for BaSTI it should probably be 3:5. If left as the default NULL then it will try to match the AGBs purely based of Teff and logG (ignoring any specific isochrone labels).
 }
   \item{label_white}{
-Integer vector; the \option{Iso} column \option{label} value that corresponds specifically to white dwarf periods (where the white dwarf spectra is then preferred). For MIST the setting should probably be 6:8, and for PARSEC it should probably be 9.
+Integer vector; the \option{Iso} column \option{label} value that corresponds specifically to white dwarf periods (where the white dwarf spectra is then preferred). For MIST the setting should probably be 6:8 (note 9 is WR [Wolf-Rayet], which is a very different and very early phase of star formation, so avoid this!), for PARSEC it should probably be 9, and for BaSTI it should probably be 6. If left as the default NULL then it will try to match the AGBs purely based of Teff and logG (ignoring any specific isochrone labels).
 }
 }
 \details{
@@ -79,10 +79,12 @@ In MIST the isochrones labels are provided as: -1 = PreMS, 0 = MS, 2 = RGB, 3 = 
 
 In PARSEC the isochrones labels are provided as: 0 = PreMS, 1 = MS, 2 = SubGB, 3 = RGB, 4-6 = CHeB, 7 = eAGB, 8 = TP-AGB, 9 = PostAGB.
 
+In BaSTI the isochrones labels are provided as: -1 = PreMS, 0 = MS, 1 = RGB, 2 = CHeB, 3 = eAGB, 4-5 = AGB, 6 = PostAGB
+
 In general:
 PMS: pre main sequence
 MS: main sequence
-WR: Wolf Rayet (generally only a few million years old)
+WR: Wolf-Rayet (generally only a few million years old)
 SubGB: subgiant branch, or Hertzsprung gap for more intermediate+massive stars
 RGB: red giant branch, or the quick stage of red giant for intermediate+massive stars
 CHEB: core He-burning for low mass stars, or the very initial stage of CHeB for intermediate+massive stars

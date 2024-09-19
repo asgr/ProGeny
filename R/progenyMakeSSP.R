@@ -13,7 +13,17 @@ progenyMakeSSP = function(Iso, IMFfunc, ..., Spec_combine,
 
   logZ = logAge = Mini = Mass = NULL
 
-  Iso_temp[,IMFint := progenyUpdateIMF(Iso_temp, IMFfunc, ...)$IMFint]
+  Iso_temp[,IMFint := 0]
+
+  if(any(Iso$label == -1)){ #are we using MIST?
+    #If so continue as normal
+    Iso_temp[,IMFint := progenyUpdateIMF(Iso_temp, IMFfunc, ...)$IMFint]
+  }else{
+    #Else we are using PARSEC and need to correct for remnants.
+    #The below is to avoid the issue where we have a massive gap to the remnant
+    #Which means the integral bin limit for the AGB before this gains way too much IMF integral.
+    Iso_temp[label < 9,IMFint := progenyUpdateIMF(Iso_temp[label < 9,], IMFfunc, ...)$IMFint]
+  }
   #Iso_temp[,ID:= 1:dim(Iso_temp)[1]]
 
   cores = min(cores, length(logZ_steps), detectCores())

@@ -23,8 +23,18 @@
 progenyUpdateIMF = function(Iso, IMFfunc, ...){
   setDT(Iso)
 
+  order_check = order(Iso$logZ, Iso$logAge)
+  
+  if(any(diff(order_check) != 1L)){
+    reorder = order(order_check) #this will reorder the results correctly
+    reorder_flag = TRUE
+  }else{
+    reorder_flag = FALSE
+  }
+  
   i = j = k = NULL
 
+  
   split_lib = split(Iso, by=c('logZ', 'logAge'), flatten=FALSE)
 
   if(any(c('Age', 'redshift', 'logZ') %in% names(formals(IMFfunc)))){
@@ -33,27 +43,33 @@ progenyUpdateIMF = function(Iso, IMFfunc, ...){
       foreach(j = 1:length(split_lib[[i]]), .combine='rbind')%do%{
         sub_bins = data.frame(.binlims(split_lib[[i]][[j]]$Mini, log=TRUE))
         if('Age' %in% names(formals(IMFfunc))){
-          return(data.table(lo=sub_bins$lo, hi=sub_bins$hi, IMFint=(sub_bins$hi - sub_bins$lo)*IMFfunc(split_lib[[i]][[j]]$Mini, Age=10^split_lib[[i]][[j]]$logAge[1]/1e9, ...)))
+          sub_bins$IMFint = (sub_bins$hi - sub_bins$lo)*IMFfunc(split_lib[[i]][[j]]$Mini, Age=10^split_lib[[i]][[j]]$logAge[1]/1e9, ...)
         }else if('redshift' %in% names(formals(IMFfunc))){
-          return(data.table(lo=sub_bins$lo, hi=sub_bins$hi, IMFint=(sub_bins$hi - sub_bins$lo)*IMFfunc(split_lib[[i]][[j]]$Mini, redshift=split_lib[[i]][[j]]$redshift[1], ...)))
+          sub_bins$IMFint = (sub_bins$hi - sub_bins$lo)*IMFfunc(split_lib[[i]][[j]]$Mini, redshift=split_lib[[i]][[j]]$redshift[1], ...)
         }else if('logZ' %in% names(formals(IMFfunc))){
-          return(data.table(lo=sub_bins$lo, hi=sub_bins$hi, IMFint=(sub_bins$hi - sub_bins$lo)*IMFfunc(split_lib[[i]][[j]]$Mini, logZ=split_lib[[i]][[j]]$logZ[1], ...)))
+          sub_bins$IMFint = (sub_bins$hi - sub_bins$lo)*IMFfunc(split_lib[[i]][[j]]$Mini, logZ=split_lib[[i]][[j]]$logZ[1], ...)
         }
+        return(sub_bins)
       }
     }
   }else{
     #about a second
-    all_bins = foreach(i = 1:length(split_lib), .combine='rbind')%do%{
+    output = foreach(i = 1:length(split_lib), .combine='rbind')%do%{
       foreach(j = 1:length(split_lib[[i]]), .combine='rbind')%do%{
-        data.frame(.binlims(split_lib[[i]][[j]]$Mini, log=TRUE))
+        sub_bins = data.frame(.binlims(split_lib[[i]][[j]]$Mini, log=TRUE))
+        sub_bins$IMFint = (sub_bins$hi - sub_bins$lo)*IMFfunc(split_lib[[i]][[j]]$Mini, ...)
+        return(sub_bins)
       }
     }
-    #very fast
-    output = data.table(lo=all_bins$lo, hi=all_bins$hi, IMFint=(all_bins$hi - all_bins$lo)*IMFfunc(Iso$Mini, ...))
   }
     #Old, more accurate than we need (and slow)
     #this takes about 20 seconds
     #all_IMF_int = IMFfunc(all_bins, ...) #this will be the number count of stars for a total mass of 1 Msol of star formation
-
+  
+  if(reorder_flag){
+    #This is to reorder the output in case our isochrones are not logZ, logAge ordered
+    output = output[reorder,]
+  }
+  
   return(output)
 }

@@ -7,7 +7,7 @@ progenyIso2Spec = function(logAge=8.4, logZ=0, Iso, IMFint, Spec_combine, Interp
   wave_grid = Spec_combine$base$wave
   spec_stack = rep(0, length(wave_grid))
 
-  use = unique(Iso$best)
+  use = sort(unique(Iso$best))
   use = use[use > 0]
 
   logAge_step = logAge

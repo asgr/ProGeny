@@ -9,3 +9,5 @@ License: LGPL-3
 Imports: fst, foreach, doParallel, data.table, Rfits, RANN, NISTunits, celestial, magicaxis, ParmOff
 Encoding: UTF-8
 LazyData: true
+LazyDataCompression: gzip
+VignetteBuilder: knitr

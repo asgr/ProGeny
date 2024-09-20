@@ -15,7 +15,7 @@ progenyInterpGrid(loc, info, rescale, radius = 2, weight_pow = 2, k = 8)
 progenyInterpGrid_All(Iso, Spec_combine, radius = 2, weight_pow = 2, k = 8)
 
 progenyInterpBest(Iso, Interp_combine, do_base = TRUE, do_extend = TRUE, do_hot = TRUE,
-  do_AGB = TRUE, do_white = TRUE, b2e = 1.5, label_AGB = 7:8, label_white = 9)
+  do_AGB = TRUE, do_white = TRUE, b2e = 1.5, label_AGB = NULL, label_white = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -65,10 +65,10 @@ Logical; should the 'white' dwarf spectra be considered when trying to determine
 Numeric scalar; how much closer in re-scaled grid space does the 'extend' spectral atmosphere need to be before it is used instead of the 'base'. Values larger than \option{b2e} = 1 mean we are biased to preferring the 'base' solution even if it is not as close.
 }
   \item{label_AGB}{
-Integer vector; the \option{Iso} column \option{label} value that corresponds specifically to AGB periods (where the AGB spectra is then preferred). For MIST the setting should probably be 4:5, for PARSEC it should probably be 7:8, and for BaSTI it should probably be 3:5. If left as the default NULL then it will try to match the AGBs purely based of Teff and logG (ignoring any specific isochrone labels).
+Integer vector; the \option{Iso} column \option{label} value that corresponds specifically to AGB periods (where the AGB spectra is then preferred). For MIST the setting should probably be 4:5, for PARSEC it should probably be 7:8, and for BaSTI_FSPS it should probably be 3:5. If left as the default NULL then it will try to match the AGBs purely based of Teff and logG (ignoring any specific isochrone labels), this is appropriate for BaSTI_New (which has no labels).
 }
   \item{label_white}{
-Integer vector; the \option{Iso} column \option{label} value that corresponds specifically to white dwarf periods (where the white dwarf spectra is then preferred). For MIST the setting should probably be 6:8 (note 9 is WR [Wolf-Rayet], which is a very different and very early phase of star formation, so avoid this!), for PARSEC it should probably be 9, and for BaSTI it should probably be 6. If left as the default NULL then it will try to match the AGBs purely based of Teff and logG (ignoring any specific isochrone labels).
+Integer vector; the \option{Iso} column \option{label} value that corresponds specifically to white dwarf periods (where the white dwarf spectra is then preferred). For MIST the setting should probably be 6:8 (note 9 is WR [Wolf-Rayet], which is a very different and very early phase of star formation, so avoid this!), for PARSEC it should probably be 9, and for BaSTI_FSPS it should probably be 6. If left as the default NULL then it will try to match the AGBs purely based of Teff and logG (ignoring any specific isochrone labels), this is appropriate for BaSTI_New (which has no labels).
 }
 }
 \details{

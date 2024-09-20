@@ -1,0 +1,212 @@
+---
+title: "ProGeny: The Children of Stars"
+author: "Aaron Robotham"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ProGeny: The Children of Stars}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+Load what we will need:
+
+```{r}
+library(ProGeny)
+library(ProSpect)
+library(data.table)
+library(Rfits)
+library(fst)
+```
+
+
+```{r}
+data(BC03lr) #we shall use this later!
+```
+
+The main thing **ProGeny** does (and the reason it was designed at all) is create Simple Stellar Poopulation (SSP) models that can directly few into **ProSpect**. This is useful because it gives us full control over what isochrones and stellar atmospheres we use, and how we map them together. We can also control our initial mass function (IMF).
+
+The basic path to doing this is to firstly load our desired isochrone (MIST, in this case). On my machine this is at:
+
+```{r}
+Iso  = read.fst('~/Dropbox (Personal)/ProGeny_isochrone/MistIso.fst', as.data.table=TRUE)
+#Iso  = read.fst('~/Dropbox (Personal)/ProGeny_isochrone/ParsecIso.fst')
+#Iso  = read.fst('~/Dropbox (Personal)/ProGeny_isochrone/BastiIso.fst')
+```
+
+If you do not have one already, you can get them using the *progenyIsoDownload* function. Currently we provide MIST (preferred, for reasons we shall get to), PARSEC and BaSTI isochrones.
+
+Here we load four different base spectra options: PHOENIX, C3K, MILES and BASEL. To get these locally you will need to run *progenyAtmosDownload*. The below might take about a minute to run (depending on the speed of your HDD or SSD).
+
+```{r}
+Spec_PHOENIX = progenyAtmosLoad('~/Dropbox (Personal)/ProGeny_atmos/', base='combine_PHOENIX_husser')
+Spec_C3K = progenyAtmosLoad('~/Dropbox (Personal)/ProGeny_atmos/', base='combine_C3K_conroy')
+Spec_MILES = progenyAtmosLoad('~/Dropbox (Personal)/ProGeny_atmos/', base='combine_MILES_vazdekis')
+Spec_BASEL = progenyAtmosLoad('~/Dropbox (Personal)/ProGeny_atmos/', base='combine_BASEL_wlbc')
+```
+
+Below we interpolate our spectra onto the isochrone grid of Teff, logG and logZ. The below might take a minute or two to run (depending on your CPU speed).
+
+```{r}
+Interp_PHOENIX = progenyInterpGrid_All(Iso = Iso, Spec_combine = Spec_PHOENIX)
+Interp_C3K = progenyInterpGrid_All(Iso = Iso, Spec_combine = Spec_C3K)
+Interp_MILES = progenyInterpGrid_All(Iso = Iso, Spec_combine = Spec_MILES)
+Interp_BASEL = progenyInterpGrid_All(Iso = Iso, Spec_combine = Spec_BASEL)
+```
+
+We need to update the isochrones with the origin of the 'best' spectra (since we can only have one per isochrone element). The below should be very fast. Note re need the explicit copies of Iso here because of how **data.table** works- the default is to modify by reference, which means they would all end up using the same isochrone 'best' solutions!
+
+```{r}
+Iso_PHOENIX = progenyInterpBest(Iso = copy(Iso),
+                        Interp_combine = Interp_PHOENIX,
+                        label_AGB = 4:5, #7:8 [PC] / 4:5 [Mist]
+                        label_white = 6:8 # 9 [PC] / 6:8 [Mist]
+                        )
+
+Iso_C3K = progenyInterpBest(Iso = copy(Iso),
+                        Interp_combine = Interp_C3K,
+                        label_AGB = 4:5, #7:8 [PC] / 4:5 [Mist]
+                        label_white = 6:8 # 9 [PC] / 6:8 [Mist]
+                        )
+
+Iso_MILES = progenyInterpBest(Iso = copy(Iso),
+                        Interp_combine = Interp_MILES,
+                        label_AGB = 4:5, #7:8 [PC] / 4:5 [Mist]
+                        label_white = 6:8 # 9 [PC] / 6:8 [Mist]
+                        )
+
+Iso_BASEL = progenyInterpBest(Iso = copy(Iso),
+                        Interp_combine = Interp_BASEL,
+                        label_AGB = 4:5, #7:8 [PC] / 4:5 [Mist]
+                        label_white = 6:8 # 9 [PC] / 6:8 [Mist]
+                        )
+```
+
+And finally we can put these steps together to generate our SSPs with our desired target IMF (Chabrier in this case). The below will take a good few minutes to run (depending on your CPU speed and number of cores).
+
+```{r}
+PG_Ch_PHOENIX = progenyMakeSSP(Iso = Iso_PHOENIX,
+                               IMFfunc = IMF_Chabrier,
+                               masslow = 0.1,
+                               massmax = 100,
+                               Spec_combine = Spec_PHOENIX,
+                               Interp_combine = Interp_PHOENIX
+               )
+
+PG_Ch_C3K = progenyMakeSSP(Iso = Iso_C3K,
+                               IMFfunc = IMF_Chabrier,
+                               masslow = 0.1,
+                               massmax = 100,
+                               Spec_combine = Spec_C3K,
+                               Interp_combine = Interp_C3K
+               )
+
+PG_Ch_MILES = progenyMakeSSP(Iso = Iso_MILES,
+                               IMFfunc = IMF_Chabrier,
+                               masslow = 0.1,
+                               massmax = 100,
+                               Spec_combine = Spec_MILES,
+                               Interp_combine = Interp_MILES
+               )
+
+PG_Ch_BASEL = progenyMakeSSP(Iso = Iso_BASEL,
+                               IMFfunc = IMF_Chabrier,
+                               masslow = 0.1,
+                               massmax = 100,
+                               Spec_combine = Spec_BASEL,
+                               Interp_combine = Interp_BASEL
+               )
+```
+
+We can check this with our **ProSpect** *speclib_check* function:
+
+```{r}
+speclib_check(PG_Ch_PHOENIX)
+```
+
+Hopefully it all passes! I won't do this for all of the SSPs here though (too much clutter).
+
+Now for some plots. Below we can compare a specific target metallicity (Z) and age (in log(Age/Years) units). Here we loop around the metallicities available in BC03, and ages 10^5^ -- 10^10^ Years in 1 dex spacing:
+
+```{r, fig.width=8, fig.height=6}
+for(Z in BC03hr$Z){
+  for(logAge in 7:10){
+    temp_PHOENIX = specReBin(PG_Ch_PHOENIX$Wave, PG_Ch_PHOENIX$Zspec[[min(which(PG_Ch_PHOENIX$Z >= Z))]][min(which(PG_Ch_PHOENIX$Age >= 10^logAge)),], BC03lr$Wave)
+    temp_C3K = specReBin(PG_Ch_C3K$Wave, PG_Ch_C3K$Zspec[[min(which(PG_Ch_C3K$Z >= Z))]][min(which(PG_Ch_C3K$Age >= 10^logAge)),], BC03lr$Wave)
+    temp_MILES = specReBin(PG_Ch_MILES$Wave, PG_Ch_MILES$Zspec[[min(which(PG_Ch_MILES$Z >= Z))]][min(which(PG_Ch_MILES$Age >= 10^logAge)),], BC03lr$Wave)
+    temp_BASEL = specReBin(PG_Ch_BASEL$Wave, PG_Ch_BASEL$Zspec[[min(which(PG_Ch_BASEL$Z >= Z))]][min(which(PG_Ch_BASEL$Age >= 10^logAge)),], BC03lr$Wave)
+    
+    magplot(NA, NA, log='xy', xlim=c(1e2,1e5), ylim=c(1e-8,3))
+    lines(temp_PHOENIX, col='blue')
+    lines(temp_C3K, col='darkgreen')
+    lines(temp_MILES, col='red')
+    lines(temp_BASEL, col='orange')
+    lines(BC03lr$Wave, BC03lr$Zspec[[min(which(BC03lr$Z >= Z))]][min(which(BC03lr$Age >= 10^logAge)),], col='black')
+    legend('topleft', legend=c('PG_Ch_PHOENIX', 'PG_Ch_C3K', 'PG_Ch_MILES', 'PG_Ch_BASEL', 'BC03'), col=c('blue', 'darkgreen', 'red', 'orange', 'black'), lty=1)
+    legend('topright', legend=c(paste('Z:',Z), paste('log(Age/Yr):',logAge)))
+  }
+}
+```
+
+The four different 'base' stellar atmosphere sets included with ProGeny show remarkable consistency for the most part. The main differences are caused by their differing native resolution (where PHOENIX is the highest).
+
+It is also interesting to compare the stellar evolutionary tracks, in particular the mass remaining in stars with time, which is relevant for calculating standard stellar masses (which needs mass in stars, not total mass formed). Here we use PG_Ch_PHOENIX, but all four will be the same since we are using the same MIST isochrones in all cases.
+
+```{r, fig.width=8, fig.height=6}
+for(Z in BC03hr$Z){
+  magplot(PG_Ch_PHOENIX$Age, PG_Ch_PHOENIX$Zevo[[min(which(PG_Ch$Z >= Z))]]$SMstar, type='l', ylim=c(0,1),
+          log='x', xlab='Age / Yr', ylab = 'SMfrac', col='blue')
+  lines(BC03hr$Age, BC03hr$Zevo[[min(which(BC03hr$Z >= Z))]]$SMstar, col='black')
+  legend('bottomleft', legend=c('ProGeny [MIST]', 'BC03'), col=c('blue', 'black'), lty=1)
+  legend('topright', legend=paste('Z:',Z))
+}
+```
+
+
+```{r, fig.width=8, fig.height=6}
+NUV_filt = getfilt('NUV')
+r_filt = getfilt('r_VST')
+Ks_filt = getfilt('Ks_VISTA')
+    
+for(Z in BC03hr$Z){
+  mag_NUV_r_PHOENIX = {}
+  mag_r_Ks_PHOENIX = {}
+  mag_NUV_r_C3K = {}
+  mag_r_Ks_C3K = {}
+  mag_NUV_r_MILES = {}
+  mag_r_Ks_MILES = {}
+  mag_NUV_r_BASEL = {}
+  mag_r_Ks_BASEL = {}
+  for(logAge in 6:10){
+    temp_PHOENIX = specReBin(PG_Ch_PHOENIX$Wave, PG_Ch_PHOENIX$Zspec[[min(which(PG_Ch_PHOENIX$Z >= Z))]][min(which(PG_Ch_PHOENIX$Age >= 10^logAge)),], BC03lr$Wave)
+    temp_C3K = specReBin(PG_Ch_C3K$Wave, PG_Ch_C3K$Zspec[[min(which(PG_Ch_C3K$Z >= Z))]][min(which(PG_Ch_C3K$Age >= 10^logAge)),], BC03lr$Wave)
+    temp_MILES = specReBin(PG_Ch_MILES$Wave, PG_Ch_MILES$Zspec[[min(which(PG_Ch_MILES$Z >= Z))]][min(which(PG_Ch_MILES$Age >= 10^logAge)),], BC03lr$Wave)
+    temp_BASEL = specReBin(PG_Ch_BASEL$Wave, PG_Ch_BASEL$Zspec[[min(which(PG_Ch_BASEL$Z >= Z))]][min(which(PG_Ch_BASEL$Age >= 10^logAge)),], BC03lr$Wave)
+    
+    mag_NUV_r_PHOENIX = c(mag_NUV_r_PHOENIX, magABcalc(temp_PHOENIX, filter=NUV_filt) - magABcalc(temp_PHOENIX, filter=r_filt))
+    mag_r_Ks_PHOENIX = c(mag_r_Ks_PHOENIX, magABcalc(temp_PHOENIX, filter=r_filt) - magABcalc(temp_PHOENIX, filter=Ks_filt))
+    mag_NUV_r_C3K = c(mag_NUV_r_C3K, magABcalc(temp_C3K, filter=NUV_filt) - magABcalc(temp_C3K, filter=r_filt))
+    mag_r_Ks_C3K = c(mag_r_Ks_C3K, magABcalc(temp_C3K, filter=r_filt) - magABcalc(temp_C3K, filter=Ks_filt))
+    mag_NUV_r_MILES = c(mag_NUV_r_MILES, magABcalc(temp_MILES, filter=NUV_filt) - magABcalc(temp_MILES, filter=r_filt))
+    mag_r_Ks_MILES = c(mag_r_Ks_MILES, magABcalc(temp_MILES, filter=r_filt) - magABcalc(temp_MILES, filter=Ks_filt))
+    mag_NUV_r_BASEL = c(mag_NUV_r_BASEL, magABcalc(temp_BASEL, filter=NUV_filt) - magABcalc(temp_BASEL, filter=r_filt))
+    mag_r_Ks_BASEL = c(mag_r_Ks_BASEL, magABcalc(temp_BASEL, filter=r_filt) - magABcalc(temp_BASEL, filter=Ks_filt))
+  }
+  
+  magplot(mag_NUV_r_PHOENIX, mag_r_Ks_PHOENIX, type='l', col='blue', xlim=c(-2,8), ylim=c(-2.5,2), xlab='NUV - r', ylab='r - Ks')
+  points(mag_NUV_r_PHOENIX, mag_r_Ks_PHOENIX, cex=seq(0.5,2,len=5), col='blue')
+  lines(mag_NUV_r_C3K, mag_r_Ks_C3K, col='darkgreen')
+  points(mag_NUV_r_C3K, mag_r_Ks_C3K, cex=seq(0.5,2,len=5), col='darkgreen')
+  lines(mag_NUV_r_MILES, mag_r_Ks_MILES, col='red')
+  points(mag_NUV_r_MILES, mag_r_Ks_MILES, cex=seq(0.5,2,len=5), col='red')
+  lines(mag_NUV_r_BASEL, mag_r_Ks_BASEL, col='orange')
+  points(mag_NUV_r_BASEL, mag_r_Ks_BASEL, cex=seq(0.5,2,len=5), col='orange')
+  legend('bottomright', legend=c('PG_Ch_PHOENIX', 'PG_Ch_C3K', 'PG_Ch_MILES', 'PG_Ch_BASEL', 'BC03'), col=c('blue', 'darkgreen', 'red', 'orange', 'black'), lty=1)
+  legend('topright', legend=paste('Z:',Z))
+  legend('bottom', legend=c(expression(10^6*' [Yr]'), expression(10^7*' [Yr]'), expression(10^8*' [Yr]'), expression(10^9*' [Yr]'), expression(10^10*' [Yr]')), pt.cex=seq(0.5,2,len=5), pch=1)
+}
+```

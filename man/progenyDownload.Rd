@@ -17,11 +17,17 @@ progenyAtmosDownload(URL = "https://tinyurl.com/progeny-atmos/", ...)
 progenyAtmosLoad(destpath= '', base = 'combine_PHOENIX_husser',
   extend = 'combine_PHOENIX_allard', hot = 'combine_TMAP_werner',
   AGB = 'combine_AGB_lancon', white = NULL)
+
+progenyIsoFormat(Iso)
 }
+
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{URL}{
 Character scalar; location of the ProGeny isochrones / atmospheres libraries. This should not need to be altered by the user.
+}
+  \item{Iso}{
+Data.frame / data.table; the input table of Isochrones.
 }
   \item{\dots}{
 Other arguments to pass to \code{\link{browseURL}}.
@@ -54,6 +60,8 @@ The download functions are currently just re-directs to the DropBox page hosting
 \code{progenyAtmosLoad} creates the list sturcture used by \code{ProGeny} for combinations of stellar atomospheres. This will be the \option{Spec_combine} input for other functions.
 
 \code{progenyAtmosPlot} creates a plot of all the Teff versus logG atmosphere grid components. This is really to check for isochrone versus spectral atmosphere coverage, where a particular target isochrone can easily be overplotted. Ideally you want all parts of an isochrone to fall inside the grid. Anything entirely outside will need to be approximated with a pure black body (which is rarely ideal).
+
+\code{progenyIsoFormat} will correctly sort the columns of the isochrone: should be logZ, logAge, Mini ordered [slowest to fastest changing]). Returns the new Iso as the output.
 }
 \references{
 Nothing yet

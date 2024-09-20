@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Aaron Robotham" />
+
+<meta name="date" content="2024-09-20" />
+
+<title>ProGeny: The Children of Stars</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">ProGeny: The Children of Stars</h1>
+<h4 class="author">Aaron Robotham</h4>
+<h4 class="date">2024-09-20</h4>
+
+
+
+<p>Load what we will need:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(ProGeny)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(ProSpect)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">library</span>(Rfits)</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="fu">library</span>(fst)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">data</span>(BC03lr) <span class="co">#we shall use this later!</span></span></code></pre></div>
+<p>The main thing <strong>ProGeny</strong> does (and the reason it was
+designed at all) is create Simple Stellar Poopulation (SSP) models that
+can directly few into <strong>ProSpect</strong>. This is useful because
+it gives us full control over what isochrones and stellar atmospheres we
+use, and how we map them together. We can also control our initial mass
+function (IMF).</p>
+<p>The basic path to doing this is to firstly load our desired isochrone
+(MIST, in this case). On my machine this is at:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>Iso  <span class="ot">=</span> <span class="fu">read.fst</span>(<span class="st">&#39;~/Dropbox (Personal)/ProGeny_isochrone/MistIso.fst&#39;</span>, <span class="at">as.data.table=</span><span class="cn">TRUE</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co">#Iso  = read.fst(&#39;~/Dropbox (Personal)/ProGeny_isochrone/ParsecIso.fst&#39;)</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#Iso  = read.fst(&#39;~/Dropbox (Personal)/ProGeny_isochrone/BastiIso.fst&#39;)</span></span></code></pre></div>
+<p>If you do not have one already, you can get them using the
+<em>progenyIsoDownload</em> function. Currently we provide MIST
+(preferred, for reasons we shall get to), PARSEC and BaSTI
+isochrones.</p>
+<p>Here we load four different base spectra options: PHOENIX, C3K, MILES
+and BASEL. To get these locally you will need to run
+<em>progenyAtmosDownload</em>. The below might take about a minute to
+run (depending on the speed of your HDD or SSD).</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>Spec_PHOENIX <span class="ot">=</span> <span class="fu">progenyAtmosLoad</span>(<span class="st">&#39;~/Dropbox (Personal)/ProGeny_atmos/&#39;</span>, <span class="at">base=</span><span class="st">&#39;combine_PHOENIX_husser&#39;</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>Spec_C3K <span class="ot">=</span> <span class="fu">progenyAtmosLoad</span>(<span class="st">&#39;~/Dropbox (Personal)/ProGeny_atmos/&#39;</span>, <span class="at">base=</span><span class="st">&#39;combine_C3K_conroy&#39;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>Spec_MILES <span class="ot">=</span> <span class="fu">progenyAtmosLoad</span>(<span class="st">&#39;~/Dropbox (Personal)/ProGeny_atmos/&#39;</span>, <span class="at">base=</span><span class="st">&#39;combine_MILES_vazdekis&#39;</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>Spec_BASEL <span class="ot">=</span> <span class="fu">progenyAtmosLoad</span>(<span class="st">&#39;~/Dropbox (Personal)/ProGeny_atmos/&#39;</span>, <span class="at">base=</span><span class="st">&#39;combine_BASEL_wlbc&#39;</span>)</span></code></pre></div>
+<p>Below we interpolate our spectra onto the isochrone grid of Teff,
+logG and logZ. The below might take a minute or two to run (depending on
+your CPU speed).</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>Interp_PHOENIX <span class="ot">=</span> <span class="fu">progenyInterpGrid_All</span>(<span class="at">Iso =</span> Iso, <span class="at">Spec_combine =</span> Spec_PHOENIX)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>Interp_C3K <span class="ot">=</span> <span class="fu">progenyInterpGrid_All</span>(<span class="at">Iso =</span> Iso, <span class="at">Spec_combine =</span> Spec_C3K)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>Interp_MILES <span class="ot">=</span> <span class="fu">progenyInterpGrid_All</span>(<span class="at">Iso =</span> Iso, <span class="at">Spec_combine =</span> Spec_MILES)</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>Interp_BASEL <span class="ot">=</span> <span class="fu">progenyInterpGrid_All</span>(<span class="at">Iso =</span> Iso, <span class="at">Spec_combine =</span> Spec_BASEL)</span></code></pre></div>
+<p>We need to update the isochrones with the origin of the ‘best’
+spectra (since we can only have one per isochrone element). The below
+should be very fast. Note re need the explicit copies of Iso here
+because of how <strong>data.table</strong> works- the default is to
+modify by reference, which means they would all end up using the same
+isochrone ‘best’ solutions!</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>Iso_PHOENIX <span class="ot">=</span> <span class="fu">progenyInterpBest</span>(<span class="at">Iso =</span> <span class="fu">copy</span>(Iso),</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>                        <span class="at">Interp_combine =</span> Interp_PHOENIX,</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>                        <span class="at">label_AGB =</span> <span class="dv">4</span><span class="sc">:</span><span class="dv">5</span>, <span class="co">#7:8 [PC] / 4:5 [Mist]</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>                        <span class="at">label_white =</span> <span class="dv">6</span><span class="sc">:</span><span class="dv">8</span> <span class="co"># 9 [PC] / 6:8 [Mist]</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>                        )</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>Iso_C3K <span class="ot">=</span> <span class="fu">progenyInterpBest</span>(<span class="at">Iso =</span> <span class="fu">copy</span>(Iso),</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>                        <span class="at">Interp_combine =</span> Interp_C3K,</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>                        <span class="at">label_AGB =</span> <span class="dv">4</span><span class="sc">:</span><span class="dv">5</span>, <span class="co">#7:8 [PC] / 4:5 [Mist]</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>                        <span class="at">label_white =</span> <span class="dv">6</span><span class="sc">:</span><span class="dv">8</span> <span class="co"># 9 [PC] / 6:8 [Mist]</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>                        )</span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>Iso_MILES <span class="ot">=</span> <span class="fu">progenyInterpBest</span>(<span class="at">Iso =</span> <span class="fu">copy</span>(Iso),</span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>                        <span class="at">Interp_combine =</span> Interp_MILES,</span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>                        <span class="at">label_AGB =</span> <span class="dv">4</span><span class="sc">:</span><span class="dv">5</span>, <span class="co">#7:8 [PC] / 4:5 [Mist]</span></span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a>                        <span class="at">label_white =</span> <span class="dv">6</span><span class="sc">:</span><span class="dv">8</span> <span class="co"># 9 [PC] / 6:8 [Mist]</span></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a>                        )</span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a></span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a>Iso_BASEL <span class="ot">=</span> <span class="fu">progenyInterpBest</span>(<span class="at">Iso =</span> <span class="fu">copy</span>(Iso),</span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a>                        <span class="at">Interp_combine =</span> Interp_BASEL,</span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a>                        <span class="at">label_AGB =</span> <span class="dv">4</span><span class="sc">:</span><span class="dv">5</span>, <span class="co">#7:8 [PC] / 4:5 [Mist]</span></span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a>                        <span class="at">label_white =</span> <span class="dv">6</span><span class="sc">:</span><span class="dv">8</span> <span class="co"># 9 [PC] / 6:8 [Mist]</span></span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a>                        )</span></code></pre></div>
+<p>And finally we can put these steps together to generate our SSPs with
+our desired target IMF (Chabrier in this case). The below will take a
+good few minutes to run (depending on your CPU speed and number of
+cores).</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>PG_Ch_PHOENIX <span class="ot">=</span> <span class="fu">progenyMakeSSP</span>(<span class="at">Iso =</span> Iso_PHOENIX,</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>                               <span class="at">IMFfunc =</span> IMF_Chabrier,</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>                               <span class="at">masslow =</span> <span class="fl">0.1</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>                               <span class="at">massmax =</span> <span class="dv">100</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>                               <span class="at">Spec_combine =</span> Spec_PHOENIX,</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>                               <span class="at">Interp_combine =</span> Interp_PHOENIX</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>               )</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>PG_Ch_C3K <span class="ot">=</span> <span class="fu">progenyMakeSSP</span>(<span class="at">Iso =</span> Iso_C3K,</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>                               <span class="at">IMFfunc =</span> IMF_Chabrier,</span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>                               <span class="at">masslow =</span> <span class="fl">0.1</span>,</span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>                               <span class="at">massmax =</span> <span class="dv">100</span>,</span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>                               <span class="at">Spec_combine =</span> Spec_C3K,</span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a>                               <span class="at">Interp_combine =</span> Interp_C3K</span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>               )</span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a></span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a>PG_Ch_MILES <span class="ot">=</span> <span class="fu">progenyMakeSSP</span>(<span class="at">Iso =</span> Iso_MILES,</span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>                               <span class="at">IMFfunc =</span> IMF_Chabrier,</span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a>                               <span class="at">masslow =</span> <span class="fl">0.1</span>,</span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a>                               <span class="at">massmax =</span> <span class="dv">100</span>,</span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a>                               <span class="at">Spec_combine =</span> Spec_MILES,</span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a>                               <span class="at">Interp_combine =</span> Interp_MILES</span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a>               )</span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a></span>
+<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a>PG_Ch_BASEL <span class="ot">=</span> <span class="fu">progenyMakeSSP</span>(<span class="at">Iso =</span> Iso_BASEL,</span>
+<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a>                               <span class="at">IMFfunc =</span> IMF_Chabrier,</span>
+<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a>                               <span class="at">masslow =</span> <span class="fl">0.1</span>,</span>
+<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a>                               <span class="at">massmax =</span> <span class="dv">100</span>,</span>
+<span id="cb7-29"><a href="#cb7-29" tabindex="-1"></a>                               <span class="at">Spec_combine =</span> Spec_BASEL,</span>
+<span id="cb7-30"><a href="#cb7-30" tabindex="-1"></a>                               <span class="at">Interp_combine =</span> Interp_BASEL</span>
+<span id="cb7-31"><a href="#cb7-31" tabindex="-1"></a>               )</span></code></pre></div>
+<p>We can check this with our <strong>ProSpect</strong>
+<em>speclib_check</em> function:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">speclib_check</span>(PG_Ch_PHOENIX)</span></code></pre></div>
+<p>Hopefully it all passes! I won’t do this for all of the SSPs here
+though (too much clutter).</p>
+<p>Now for some plots. Below we can compare a specific target
+metallicity (Z) and age (in log(Age/Years) units). Here we loop around
+the metallicities available in BC03, and ages 10<sup>5</sup> –
+10<sup>10</sup> Years in 1 dex spacing:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="cf">for</span>(Z <span class="cf">in</span> BC03hr<span class="sc">$</span>Z){</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  <span class="cf">for</span>(logAge <span class="cf">in</span> <span class="dv">7</span><span class="sc">:</span><span class="dv">10</span>){</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>    temp_PHOENIX <span class="ot">=</span> <span class="fu">specReBin</span>(PG_Ch_PHOENIX<span class="sc">$</span>Wave, PG_Ch_PHOENIX<span class="sc">$</span>Zspec[[<span class="fu">min</span>(<span class="fu">which</span>(PG_Ch_PHOENIX<span class="sc">$</span>Z <span class="sc">&gt;=</span> Z))]][<span class="fu">min</span>(<span class="fu">which</span>(PG_Ch_PHOENIX<span class="sc">$</span>Age <span class="sc">&gt;=</span> <span class="dv">10</span><span class="sc">^</span>logAge)),], BC03lr<span class="sc">$</span>Wave)</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>    temp_C3K <span class="ot">=</span> <span class="fu">specReBin</span>(PG_Ch_C3K<span class="sc">$</span>Wave, PG_Ch_C3K<span class="sc">$</span>Zspec[[<span class="fu">min</span>(<span class="fu">which</span>(PG_Ch_C3K<span class="sc">$</span>Z <span class="sc">&gt;=</span> Z))]][<span class="fu">min</span>(<span class="fu">which</span>(PG_Ch_C3K<span class="sc">$</span>Age <span class="sc">&gt;=</span> <span class="dv">10</span><span class="sc">^</span>logAge)),], BC03lr<span class="sc">$</span>Wave)</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>    temp_MILES <span class="ot">=</span> <span class="fu">specReBin</span>(PG_Ch_MILES<span class="sc">$</span>Wave, PG_Ch_MILES<span class="sc">$</span>Zspec[[<span class="fu">min</span>(<span class="fu">which</span>(PG_Ch_MILES<span class="sc">$</span>Z <span class="sc">&gt;=</span> Z))]][<span class="fu">min</span>(<span class="fu">which</span>(PG_Ch_MILES<span class="sc">$</span>Age <span class="sc">&gt;=</span> <span class="dv">10</span><span class="sc">^</span>logAge)),], BC03lr<span class="sc">$</span>Wave)</span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>    temp_BASEL <span class="ot">=</span> <span class="fu">specReBin</span>(PG_Ch_BASEL<span class="sc">$</span>Wave, PG_Ch_BASEL<span class="sc">$</span>Zspec[[<span class="fu">min</span>(<span class="fu">which</span>(PG_Ch_BASEL<span class="sc">$</span>Z <span class="sc">&gt;=</span> Z))]][<span class="fu">min</span>(<span class="fu">which</span>(PG_Ch_BASEL<span class="sc">$</span>Age <span class="sc">&gt;=</span> <span class="dv">10</span><span class="sc">^</span>logAge)),], BC03lr<span class="sc">$</span>Wave)</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>    </span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>    <span class="fu">magplot</span>(<span class="cn">NA</span>, <span class="cn">NA</span>, <span class="at">log=</span><span class="st">&#39;xy&#39;</span>, <span class="at">xlim=</span><span class="fu">c</span>(<span class="fl">1e2</span>,<span class="fl">1e5</span>), <span class="at">ylim=</span><span class="fu">c</span>(<span class="fl">1e-8</span>,<span class="dv">3</span>))</span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>    <span class="fu">lines</span>(temp_PHOENIX, <span class="at">col=</span><span class="st">&#39;blue&#39;</span>)</span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>    <span class="fu">lines</span>(temp_C3K, <span class="at">col=</span><span class="st">&#39;darkgreen&#39;</span>)</span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>    <span class="fu">lines</span>(temp_MILES, <span class="at">col=</span><span class="st">&#39;red&#39;</span>)</span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a>    <span class="fu">lines</span>(temp_BASEL, <span class="at">col=</span><span class="st">&#39;orange&#39;</span>)</span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a>    <span class="fu">lines</span>(BC03lr<span class="sc">$</span>Wave, BC03lr<span class="sc">$</span>Zspec[[<span class="fu">min</span>(<span class="fu">which</span>(BC03lr<span class="sc">$</span>Z <span class="sc">&gt;=</span> Z))]][<span class="fu">min</span>(<span class="fu">which</span>(BC03lr<span class="sc">$</span>Age <span class="sc">&gt;=</span> <span class="dv">10</span><span class="sc">^</span>logAge)),], <span class="at">col=</span><span class="st">&#39;black&#39;</span>)</span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a>    <span class="fu">legend</span>(<span class="st">&#39;topleft&#39;</span>, <span class="at">legend=</span><span class="fu">c</span>(<span class="st">&#39;PG_Ch_PHOENIX&#39;</span>, <span class="st">&#39;PG_Ch_C3K&#39;</span>, <span class="st">&#39;PG_Ch_MILES&#39;</span>, <span class="st">&#39;PG_Ch_BASEL&#39;</span>, <span class="st">&#39;BC03&#39;</span>), <span class="at">col=</span><span class="fu">c</span>(<span class="st">&#39;blue&#39;</span>, <span class="st">&#39;darkgreen&#39;</span>, <span class="st">&#39;red&#39;</span>, <span class="st">&#39;orange&#39;</span>, <span class="st">&#39;black&#39;</span>), <span class="at">lty=</span><span class="dv">1</span>)</span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a>    <span class="fu">legend</span>(<span class="st">&#39;topright&#39;</span>, <span class="at">legend=</span><span class="fu">c</span>(<span class="fu">paste</span>(<span class="st">&#39;Z:&#39;</span>,Z), <span class="fu">paste</span>(<span class="st">&#39;log(Age/Yr):&#39;</span>,logAge)))</span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a>  }</span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a>}</span></code></pre></div>
+<p>The four different ‘base’ stellar atmosphere sets included with
+ProGeny show remarkable consistency for the most part. The main
+differences are caused by their differing native resolution (where
+PHOENIX is the highest).</p>
+<p>It is also interesting to compare the stellar evolutionary tracks, in
+particular the mass remaining in stars with time, which is relevant for
+calculating standard stellar masses (which needs mass in stars, not
+total mass formed). Here we use PG_Ch_PHOENIX, but all four will be the
+same since we are using the same MIST isochrones in all cases.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="cf">for</span>(Z <span class="cf">in</span> BC03hr<span class="sc">$</span>Z){</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  <span class="fu">magplot</span>(PG_Ch_PHOENIX<span class="sc">$</span>Age, PG_Ch_PHOENIX<span class="sc">$</span>Zevo[[<span class="fu">min</span>(<span class="fu">which</span>(PG_Ch<span class="sc">$</span>Z <span class="sc">&gt;=</span> Z))]]<span class="sc">$</span>SMstar, <span class="at">type=</span><span class="st">&#39;l&#39;</span>, <span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>          <span class="at">log=</span><span class="st">&#39;x&#39;</span>, <span class="at">xlab=</span><span class="st">&#39;Age / Yr&#39;</span>, <span class="at">ylab =</span> <span class="st">&#39;SMfrac&#39;</span>, <span class="at">col=</span><span class="st">&#39;blue&#39;</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>  <span class="fu">lines</span>(BC03hr<span class="sc">$</span>Age, BC03hr<span class="sc">$</span>Zevo[[<span class="fu">min</span>(<span class="fu">which</span>(BC03hr<span class="sc">$</span>Z <span class="sc">&gt;=</span> Z))]]<span class="sc">$</span>SMstar, <span class="at">col=</span><span class="st">&#39;black&#39;</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>  <span class="fu">legend</span>(<span class="st">&#39;bottomleft&#39;</span>, <span class="at">legend=</span><span class="fu">c</span>(<span class="st">&#39;ProGeny [MIST]&#39;</span>, <span class="st">&#39;BC03&#39;</span>), <span class="at">col=</span><span class="fu">c</span>(<span class="st">&#39;blue&#39;</span>, <span class="st">&#39;black&#39;</span>), <span class="at">lty=</span><span class="dv">1</span>)</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>  <span class="fu">legend</span>(<span class="st">&#39;topright&#39;</span>, <span class="at">legend=</span><span class="fu">paste</span>(<span class="st">&#39;Z:&#39;</span>,Z))</span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>NUV_filt <span class="ot">=</span> <span class="fu">getfilt</span>(<span class="st">&#39;NUV&#39;</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>r_filt <span class="ot">=</span> <span class="fu">getfilt</span>(<span class="st">&#39;r_VST&#39;</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>Ks_filt <span class="ot">=</span> <span class="fu">getfilt</span>(<span class="st">&#39;Ks_VISTA&#39;</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>    </span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a><span class="cf">for</span>(Z <span class="cf">in</span> BC03hr<span class="sc">$</span>Z){</span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>  mag_NUV_r_PHOENIX <span class="ot">=</span> {}</span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>  mag_r_Ks_PHOENIX <span class="ot">=</span> {}</span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a>  mag_NUV_r_C3K <span class="ot">=</span> {}</span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a>  mag_r_Ks_C3K <span class="ot">=</span> {}</span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a>  mag_NUV_r_MILES <span class="ot">=</span> {}</span>
+<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a>  mag_r_Ks_MILES <span class="ot">=</span> {}</span>
+<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a>  mag_NUV_r_BASEL <span class="ot">=</span> {}</span>
+<span id="cb11-13"><a href="#cb11-13" tabindex="-1"></a>  mag_r_Ks_BASEL <span class="ot">=</span> {}</span>
+<span id="cb11-14"><a href="#cb11-14" tabindex="-1"></a>  <span class="cf">for</span>(logAge <span class="cf">in</span> <span class="dv">6</span><span class="sc">:</span><span class="dv">10</span>){</span>
+<span id="cb11-15"><a href="#cb11-15" tabindex="-1"></a>    temp_PHOENIX <span class="ot">=</span> <span class="fu">specReBin</span>(PG_Ch_PHOENIX<span class="sc">$</span>Wave, PG_Ch_PHOENIX<span class="sc">$</span>Zspec[[<span class="fu">min</span>(<span class="fu">which</span>(PG_Ch_PHOENIX<span class="sc">$</span>Z <span class="sc">&gt;=</span> Z))]][<span class="fu">min</span>(<span class="fu">which</span>(PG_Ch_PHOENIX<span class="sc">$</span>Age <span class="sc">&gt;=</span> <span class="dv">10</span><span class="sc">^</span>logAge)),], BC03lr<span class="sc">$</span>Wave)</span>
+<span id="cb11-16"><a href="#cb11-16" tabindex="-1"></a>    temp_C3K <span class="ot">=</span> <span class="fu">specReBin</span>(PG_Ch_C3K<span class="sc">$</span>Wave, PG_Ch_C3K<span class="sc">$</span>Zspec[[<span class="fu">min</span>(<span class="fu">which</span>(PG_Ch_C3K<span class="sc">$</span>Z <span class="sc">&gt;=</span> Z))]][<span class="fu">min</span>(<span class="fu">which</span>(PG_Ch_C3K<span class="sc">$</span>Age <span class="sc">&gt;=</span> <span class="dv">10</span><span class="sc">^</span>logAge)),], BC03lr<span class="sc">$</span>Wave)</span>
+<span id="cb11-17"><a href="#cb11-17" tabindex="-1"></a>    temp_MILES <span class="ot">=</span> <span class="fu">specReBin</span>(PG_Ch_MILES<span class="sc">$</span>Wave, PG_Ch_MILES<span class="sc">$</span>Zspec[[<span class="fu">min</span>(<span class="fu">which</span>(PG_Ch_MILES<span class="sc">$</span>Z <span class="sc">&gt;=</span> Z))]][<span class="fu">min</span>(<span class="fu">which</span>(PG_Ch_MILES<span class="sc">$</span>Age <span class="sc">&gt;=</span> <span class="dv">10</span><span class="sc">^</span>logAge)),], BC03lr<span class="sc">$</span>Wave)</span>
+<span id="cb11-18"><a href="#cb11-18" tabindex="-1"></a>    temp_BASEL <span class="ot">=</span> <span class="fu">specReBin</span>(PG_Ch_BASEL<span class="sc">$</span>Wave, PG_Ch_BASEL<span class="sc">$</span>Zspec[[<span class="fu">min</span>(<span class="fu">which</span>(PG_Ch_BASEL<span class="sc">$</span>Z <span class="sc">&gt;=</span> Z))]][<span class="fu">min</span>(<span class="fu">which</span>(PG_Ch_BASEL<span class="sc">$</span>Age <span class="sc">&gt;=</span> <span class="dv">10</span><span class="sc">^</span>logAge)),], BC03lr<span class="sc">$</span>Wave)</span>
+<span id="cb11-19"><a href="#cb11-19" tabindex="-1"></a>    </span>
+<span id="cb11-20"><a href="#cb11-20" tabindex="-1"></a>    mag_NUV_r_PHOENIX <span class="ot">=</span> <span class="fu">c</span>(mag_NUV_r_PHOENIX, <span class="fu">magABcalc</span>(temp_PHOENIX, <span class="at">filter=</span>NUV_filt) <span class="sc">-</span> <span class="fu">magABcalc</span>(temp_PHOENIX, <span class="at">filter=</span>r_filt))</span>
+<span id="cb11-21"><a href="#cb11-21" tabindex="-1"></a>    mag_r_Ks_PHOENIX <span class="ot">=</span> <span class="fu">c</span>(mag_r_Ks_PHOENIX, <span class="fu">magABcalc</span>(temp_PHOENIX, <span class="at">filter=</span>r_filt) <span class="sc">-</span> <span class="fu">magABcalc</span>(temp_PHOENIX, <span class="at">filter=</span>Ks_filt))</span>
+<span id="cb11-22"><a href="#cb11-22" tabindex="-1"></a>    mag_NUV_r_C3K <span class="ot">=</span> <span class="fu">c</span>(mag_NUV_r_C3K, <span class="fu">magABcalc</span>(temp_C3K, <span class="at">filter=</span>NUV_filt) <span class="sc">-</span> <span class="fu">magABcalc</span>(temp_C3K, <span class="at">filter=</span>r_filt))</span>
+<span id="cb11-23"><a href="#cb11-23" tabindex="-1"></a>    mag_r_Ks_C3K <span class="ot">=</span> <span class="fu">c</span>(mag_r_Ks_C3K, <span class="fu">magABcalc</span>(temp_C3K, <span class="at">filter=</span>r_filt) <span class="sc">-</span> <span class="fu">magABcalc</span>(temp_C3K, <span class="at">filter=</span>Ks_filt))</span>
+<span id="cb11-24"><a href="#cb11-24" tabindex="-1"></a>    mag_NUV_r_MILES <span class="ot">=</span> <span class="fu">c</span>(mag_NUV_r_MILES, <span class="fu">magABcalc</span>(temp_MILES, <span class="at">filter=</span>NUV_filt) <span class="sc">-</span> <span class="fu">magABcalc</span>(temp_MILES, <span class="at">filter=</span>r_filt))</span>
+<span id="cb11-25"><a href="#cb11-25" tabindex="-1"></a>    mag_r_Ks_MILES <span class="ot">=</span> <span class="fu">c</span>(mag_r_Ks_MILES, <span class="fu">magABcalc</span>(temp_MILES, <span class="at">filter=</span>r_filt) <span class="sc">-</span> <span class="fu">magABcalc</span>(temp_MILES, <span class="at">filter=</span>Ks_filt))</span>
+<span id="cb11-26"><a href="#cb11-26" tabindex="-1"></a>    mag_NUV_r_BASEL <span class="ot">=</span> <span class="fu">c</span>(mag_NUV_r_BASEL, <span class="fu">magABcalc</span>(temp_BASEL, <span class="at">filter=</span>NUV_filt) <span class="sc">-</span> <span class="fu">magABcalc</span>(temp_BASEL, <span class="at">filter=</span>r_filt))</span>
+<span id="cb11-27"><a href="#cb11-27" tabindex="-1"></a>    mag_r_Ks_BASEL <span class="ot">=</span> <span class="fu">c</span>(mag_r_Ks_BASEL, <span class="fu">magABcalc</span>(temp_BASEL, <span class="at">filter=</span>r_filt) <span class="sc">-</span> <span class="fu">magABcalc</span>(temp_BASEL, <span class="at">filter=</span>Ks_filt))</span>
+<span id="cb11-28"><a href="#cb11-28" tabindex="-1"></a>  }</span>
+<span id="cb11-29"><a href="#cb11-29" tabindex="-1"></a>  </span>
+<span id="cb11-30"><a href="#cb11-30" tabindex="-1"></a>  <span class="fu">magplot</span>(mag_NUV_r_PHOENIX, mag_r_Ks_PHOENIX, <span class="at">type=</span><span class="st">&#39;l&#39;</span>, <span class="at">col=</span><span class="st">&#39;blue&#39;</span>, <span class="at">xlim=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">2</span>,<span class="dv">8</span>), <span class="at">ylim=</span><span class="fu">c</span>(<span class="sc">-</span><span class="fl">2.5</span>,<span class="dv">2</span>), <span class="at">xlab=</span><span class="st">&#39;NUV - r&#39;</span>, <span class="at">ylab=</span><span class="st">&#39;r - Ks&#39;</span>)</span>
+<span id="cb11-31"><a href="#cb11-31" tabindex="-1"></a>  <span class="fu">points</span>(mag_NUV_r_PHOENIX, mag_r_Ks_PHOENIX, <span class="at">cex=</span><span class="fu">seq</span>(<span class="fl">0.5</span>,<span class="dv">2</span>,<span class="at">len=</span><span class="dv">5</span>), <span class="at">col=</span><span class="st">&#39;blue&#39;</span>)</span>
+<span id="cb11-32"><a href="#cb11-32" tabindex="-1"></a>  <span class="fu">lines</span>(mag_NUV_r_C3K, mag_r_Ks_C3K, <span class="at">col=</span><span class="st">&#39;darkgreen&#39;</span>)</span>
+<span id="cb11-33"><a href="#cb11-33" tabindex="-1"></a>  <span class="fu">points</span>(mag_NUV_r_C3K, mag_r_Ks_C3K, <span class="at">cex=</span><span class="fu">seq</span>(<span class="fl">0.5</span>,<span class="dv">2</span>,<span class="at">len=</span><span class="dv">5</span>), <span class="at">col=</span><span class="st">&#39;darkgreen&#39;</span>)</span>
+<span id="cb11-34"><a href="#cb11-34" tabindex="-1"></a>  <span class="fu">lines</span>(mag_NUV_r_MILES, mag_r_Ks_MILES, <span class="at">col=</span><span class="st">&#39;red&#39;</span>)</span>
+<span id="cb11-35"><a href="#cb11-35" tabindex="-1"></a>  <span class="fu">points</span>(mag_NUV_r_MILES, mag_r_Ks_MILES, <span class="at">cex=</span><span class="fu">seq</span>(<span class="fl">0.5</span>,<span class="dv">2</span>,<span class="at">len=</span><span class="dv">5</span>), <span class="at">col=</span><span class="st">&#39;red&#39;</span>)</span>
+<span id="cb11-36"><a href="#cb11-36" tabindex="-1"></a>  <span class="fu">lines</span>(mag_NUV_r_BASEL, mag_r_Ks_BASEL, <span class="at">col=</span><span class="st">&#39;orange&#39;</span>)</span>
+<span id="cb11-37"><a href="#cb11-37" tabindex="-1"></a>  <span class="fu">points</span>(mag_NUV_r_BASEL, mag_r_Ks_BASEL, <span class="at">cex=</span><span class="fu">seq</span>(<span class="fl">0.5</span>,<span class="dv">2</span>,<span class="at">len=</span><span class="dv">5</span>), <span class="at">col=</span><span class="st">&#39;orange&#39;</span>)</span>
+<span id="cb11-38"><a href="#cb11-38" tabindex="-1"></a>  <span class="fu">legend</span>(<span class="st">&#39;bottomright&#39;</span>, <span class="at">legend=</span><span class="fu">c</span>(<span class="st">&#39;PG_Ch_PHOENIX&#39;</span>, <span class="st">&#39;PG_Ch_C3K&#39;</span>, <span class="st">&#39;PG_Ch_MILES&#39;</span>, <span class="st">&#39;PG_Ch_BASEL&#39;</span>, <span class="st">&#39;BC03&#39;</span>), <span class="at">col=</span><span class="fu">c</span>(<span class="st">&#39;blue&#39;</span>, <span class="st">&#39;darkgreen&#39;</span>, <span class="st">&#39;red&#39;</span>, <span class="st">&#39;orange&#39;</span>, <span class="st">&#39;black&#39;</span>), <span class="at">lty=</span><span class="dv">1</span>)</span>
+<span id="cb11-39"><a href="#cb11-39" tabindex="-1"></a>  <span class="fu">legend</span>(<span class="st">&#39;topright&#39;</span>, <span class="at">legend=</span><span class="fu">paste</span>(<span class="st">&#39;Z:&#39;</span>,Z))</span>
+<span id="cb11-40"><a href="#cb11-40" tabindex="-1"></a>  <span class="fu">legend</span>(<span class="st">&#39;bottom&#39;</span>, <span class="at">legend=</span><span class="fu">c</span>(<span class="fu">expression</span>(<span class="dv">10</span><span class="sc">^</span><span class="dv">6</span><span class="sc">*</span><span class="st">&#39; [Yr]&#39;</span>), <span class="fu">expression</span>(<span class="dv">10</span><span class="sc">^</span><span class="dv">7</span><span class="sc">*</span><span class="st">&#39; [Yr]&#39;</span>), <span class="fu">expression</span>(<span class="dv">10</span><span class="sc">^</span><span class="dv">8</span><span class="sc">*</span><span class="st">&#39; [Yr]&#39;</span>), <span class="fu">expression</span>(<span class="dv">10</span><span class="sc">^</span><span class="dv">9</span><span class="sc">*</span><span class="st">&#39; [Yr]&#39;</span>), <span class="fu">expression</span>(<span class="dv">10</span><span class="sc">^</span><span class="dv">10</span><span class="sc">*</span><span class="st">&#39; [Yr]&#39;</span>)), <span class="at">pt.cex=</span><span class="fu">seq</span>(<span class="fl">0.5</span>,<span class="dv">2</span>,<span class="at">len=</span><span class="dv">5</span>), <span class="at">pch=</span><span class="dv">1</span>)</span>
+<span id="cb11-41"><a href="#cb11-41" tabindex="-1"></a>}</span></code></pre></div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

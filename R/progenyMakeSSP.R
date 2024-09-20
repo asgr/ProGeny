@@ -1,4 +1,4 @@
-progenyMakeSSP = function(Iso, IMFfunc, ..., Spec_combine,
+progenyMakeSSP = function(Iso, IMFfunc, ..., rem_frac = 'get', Spec_combine,
                           Interp_combine, Zsol=0.02, cores=8, Labels = list(
                             Zlab = "Metallicity", Agelab = "Time since ZAM / Yrs", Wavelab = "Wavelength / Ang",
                             Lumlab = "Lsun / Ang (for 1 Msun SF)", LumAgelab = "Lsun / Ang (for 1 Msun/Yr SFR)")){
@@ -54,8 +54,12 @@ progenyMakeSSP = function(Iso, IMFfunc, ..., Spec_combine,
   message('Generating evo grids:')
 
   Zevo = foreach(logZ_step = logZ_steps)%dopar%{
-    temp_cut = Iso_temp[logZ == logZ_step & logAge >= 8,data.table(Mini,Mass/Mini)[which.max(Mini),],by=logAge]
-    temp_func = approxfun(temp_cut[,Mini], temp_cut[,V2], rule=2)
+    if(rem_frac == 'get'){
+      temp_cut = Iso_temp[logZ == logZ_step & logAge >= 8,data.table(Mini,Mass/Mini)[which.max(Mini),],by=logAge]
+      temp_func = approxfun(temp_cut[,Mini], temp_cut[,V2], rule=2)
+    }else{
+      temp_func = function(x){rem_frac}
+    }
 
     missing_func = function(lo_lim){
         integrate(function(x){IMFfunc(x, massmult=TRUE, ...)*temp_func(x)}, lower=lo_lim, upper=Inf)$value

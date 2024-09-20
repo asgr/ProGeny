@@ -8,10 +8,10 @@ High Level SSP Creator
 The main interface via which users will likely use ProGeny to create SSPs.
 }
 \usage{
-progenyMakeSSP(Iso, IMFfunc, ..., Spec_combine, Interp_combine, Zsol = 0.02,
-  cores = 8, Labels = list(Zlab = "Metallicity", Agelab = "Time since ZAM / Yrs",
-  Wavelab = "Wavelength / Ang", Lumlab = "Lsun / Ang (for 1 Msun SF)",
-  LumAgelab = "Lsun / Ang (for 1 Msun/Yr SFR)"))
+progenyMakeSSP(Iso, IMFfunc, ..., rem_frac = 'get', Spec_combine, Interp_combine,
+  Zsol = 0.02, cores = 8, Labels = list(Zlab = "Metallicity",
+  Agelab = "Time since ZAM / Yrs", Wavelab = "Wavelength / Ang",
+  Lumlab = "Lsun / Ang (for 1 Msun SF)", LumAgelab = "Lsun / Ang (for 1 Msun/Yr SFR)"))
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -23,6 +23,9 @@ Function; the IMF to be analysed. \code{ProSpect} comes with IMF_Chabrier and IM
 }
   \item{\dots}{
 Other arguments that can be accepted by the input \option{IMFfunc}.
+}
+  \item{rem_frac}{
+Character/numeric scalar; the fraction of stellar mass that remans locked up in remnants after a star leaves the main sequence. If 'get' then this is estimated direclty from the isochrones, but this only works if the isochrones at least partially follow the mass loss phases of the star (MIST and PARSEC). Other the value needs to be specified directly (usually somewhere between 0.5 - 0.6 in practice). This is necessary for BaSTI_New, which terminates at the point of mass loss (so this phase is not well tracked).
 }
   \item{Spec_combine}{
 List; the required spectral atmspheres. This should probably be loaded via \code{\link{progenyAtmosLoad}}, where the inputs for that come via \code{\link{progenyAtmosDownload}}.

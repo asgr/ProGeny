@@ -23,3 +23,9 @@
 
   return(list(lo = bin_lo, hi = bin_hi))
 }
+
+progenyIsoFormat = function(Iso){
+  setDT(Iso)
+  setkeyv(Iso, c('logZ', 'logAge', 'Mini'))
+  return(Iso)
+}

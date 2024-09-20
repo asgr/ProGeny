@@ -2,19 +2,6 @@
   ifelse(x < lim[1], lim[1], ifelse(x > lim[2], lim[2], x))
 }
 
-.Kroupa_shape=function(mass, alpha1 = 0.3, alpha2 = 1.3, alpha3 = 2.3, masslow = 0.01, mass1 = 0.08, mass2=0.5, massmax=150, massmult = FALSE){
-  k2 = (mass1^-alpha1)/(mass1^-alpha2)
-  k3 = k2*(mass2^-alpha2)/(mass2^-alpha3)
-  out = ifelse(mass<mass1, mass^-alpha1,
-               ifelse(mass<mass2, k2*mass^-alpha2,
-                      k3*mass^-alpha3
-               )
-  )
-  out[mass<masslow | mass>massmax]=0
-  if(massmult){out=out*mass}
-  return(out)
-}
-
 IMF_Kroupa_evo = function(mass, Age = 0, Age_lim = c(0,13.8),
                           alpha1_lim = c(0.3,0.3), alpha2_lim = c(1.3,1.3), alpha3_lim = c(2.3,2),
                           masslow_lim = c(0.01,0.01), mass1_lim = c(0.08,0.08), mass2_lim = c(0.5,0.5),

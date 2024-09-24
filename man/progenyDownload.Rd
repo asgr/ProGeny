@@ -2,6 +2,7 @@
 \alias{progenyIsoDownload}
 \alias{progenyAtmosDownload}
 \alias{progenyAtmosLoad}
+\alias{progenyIsoFormat}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Download and Internally Load Isochrones and Stellar Atmospheres.

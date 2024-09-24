@@ -10,6 +10,7 @@ import("NISTunits")
 import('celestial')
 import('magicaxis')
 import("ParmOff")
+import("knitr")
 
 importFrom("utils", "browseURL")
 importFrom("grDevices", "hcl.colors")

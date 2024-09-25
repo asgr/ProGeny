@@ -8,6 +8,7 @@ progenyMakeSSP = function(Iso, IMFfunc, ..., rem_frac = 'get', Spec_combine,
 
   setDT(Iso)
 
+  #To be safe to not alter the original Isochrones
   Iso_temp = copy(Iso)
   setkeyv(Iso_temp, c('logZ', 'logAge', 'Mini'))
 

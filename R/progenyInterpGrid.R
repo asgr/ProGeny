@@ -107,7 +107,10 @@ progenyInterpBest = function(Iso, Interp_combine, do_base=TRUE, do_extend=TRUE, 
                              do_AGB=TRUE, do_white=TRUE, b2e=1.5, label_AGB=NULL, label_white=NULL){
   setDT(Iso)
 
-  best_spec = rep(0L, dim(Iso)[1])
+  #To be safe to not alter the original Isochrones
+  Iso_temp = copy(Iso)
+
+  best_spec = rep(0L, dim(Iso_temp)[1])
 
   if(do_base){
     best_spec[best_spec == 0L & Interp_combine$base$nn.idx[,1] > 0 & (Interp_combine$base$nn.dists[,1] < Interp_combine$extend$nn.dists[,1]*b2e)] = 1L
@@ -122,17 +125,17 @@ progenyInterpBest = function(Iso, Interp_combine, do_base=TRUE, do_extend=TRUE, 
     if(is.null(label_AGB)){
       best_spec[best_spec == 0L & Interp_combine$AGB$nn.idx[,1] > 0] = 4L
     }else{
-      best_spec[best_spec == 0L & Interp_combine$AGB$nn.idx[,1] > 0 & Iso$label %in% label_AGB] = 4L
+      best_spec[best_spec == 0L & Interp_combine$AGB$nn.idx[,1] > 0 & Iso_temp$label %in% label_AGB] = 4L
     }
   }
   if(do_white & !is.null(Interp_combine$white)){
     if(is.null(label_white)){
       best_spec[best_spec == 0L & Interp_combine$white$nn.idx[,1] > 0] = 5L
     }else{
-      best_spec[best_spec == 0L & Interp_combine$white$nn.idx[,1] > 0 & Iso$label %in% label_white] = 5L
+      best_spec[best_spec == 0L & Interp_combine$white$nn.idx[,1] > 0 & Iso_temp$label %in% label_white] = 5L
     }
   }
 
   best = NULL
-  return(Iso[,best:=best_spec])
+  return(Iso_temp[,best:=best_spec])
 }

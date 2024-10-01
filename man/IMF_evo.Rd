@@ -109,7 +109,7 @@ Lacey et al, 2016, MNRAS, 462, 3854
 Aaron Robotham
 }
 \seealso{
-\code{\link{progenyUpdateIMF}}
+\code{\link{IMF}}, \code{\link{progenyUpdateIMF}}
 }
 \examples{
 library(magicaxis)

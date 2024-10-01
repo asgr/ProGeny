@@ -90,7 +90,9 @@ Kroupa, 2001, MNRAS, 322, 231
 \author{
 Aaron Robotham
 }
-
+\seealso{
+\code{\link{IMF_evo}}, \code{\link{progenyUpdateIMF}}
+}
 \examples{
 curve(IMF_Salpeter, 0.01, 150, log='xy', xlab='Star Mass / Msol', ylab='dN/dM (1 Msol)')
 curve(IMF_Kroupa, 0.01, 150, add=TRUE, col='red')

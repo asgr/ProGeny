@@ -2,6 +2,8 @@
 \alias{IMF_evo}
 \alias{IMF_Kroupa_evo}
 \alias{IMF_Lacey_evo}
+\alias{IMF_Kroupa_Zevo}
+\alias{IMF_Lacey_Zevo}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Evoloving Kroupa Initial Mass Functions (IMF)
@@ -21,6 +23,18 @@ IMF_Lacey_evo(mass, Age = 0, Age_lim = c(0, 10), alpha1_lim = c(0.4, 2),
   mass1_lim = c(0.1, 0.1), mass2_lim = c(1, 1), massmax_lim = c(100, 100),
   Lookback_Age = 0, massform = 1, massmult = FALSE, rel.tol = .Machine$double.eps^0.25,
   method = 'constant', ...)
+
+IMF_Kroupa_Zevo(mass, logZ = 0, logZ_lim = c(-4, 0), alpha1_lim = c(0.3, 0.3),
+  alpha2_lim = c(1.3, 1.3), alpha3_lim = c(2, 2.3), masslow_lim = c(0.01, 0.01),
+  mass1_lim = c(0.08, 0.08), mass2_lim = c(0.5, 0.5), massmax_lim = c(150, 150),
+  massform = 1, massmult = FALSE, rel.tol = .Machine$double.eps^0.25,
+  method = 'linear', ...)
+
+IMF_Lacey_Zevo(mass, logZ = 0, logZ_lim = c(-4, 0), alpha1_lim = c(2, 0.4),
+  alpha2_lim = c(2, 0.4), alpha3_lim = c(2, 2.3), masslow_lim = c(0.1, 0.1),
+  mass1_lim = c(0.1, 0.1), mass2_lim = c(1, 1), massmax_lim = c(100, 100),
+  massform = 1, massmult = FALSE, rel.tol = .Machine$double.eps^0.25,
+  method = 'constant', ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -30,8 +44,14 @@ Numeric vector or data.frame/list; the target stellar mass to be evaluated (Msol
   \item{Age}{
 Numeric scalar; the linear age of the population in Gyrs. This basically informs the interpolation relative the range defined by \option{Age_lim}. The \code{\link{approxfun}} function is used to calculate the interpolation between \option{Age} given the vector of \option{Age_lim}  (which is treat as \option{x}). and the parameter of interest (which is treat as \option{y}).
 }
+  \item{logZ}{
+Numeric scalar; the log10(Z/Zsol) of the population, where 0 is solar. This basically informs the interpolation relative the range defined by \option{logZ_lim}. The \code{\link{approxfun}} function is used to calculate the interpolation between \option{logZ} given the vector of \option{logZ_lim}  (which is treat as \option{x}). and the parameter of interest (which is treat as \option{y}).
+}
   \item{Age_lim}{
 Numeric vector; the lower and upper ages to interpolate between. \option{Age} values outside of this range are bounded to the \option{Age_lim} limits specified.
+}
+  \item{logZ_lim}{
+Numeric vector; the lower and upper ages to interpolate between. \option{logZ} values outside of this range are bounded to the \option{logZ_lim} limits specified.
 }
   \item{alpha1_lim}{
 Numeric vector; the low mass slope (masslow < mass < mass1) of the Kroupa IMF at \option{Age_lim}. We interpolate over this domain using the specified \option{Age}.
@@ -93,6 +113,9 @@ Aaron Robotham
 }
 \examples{
 library(magicaxis)
+
+#First age based evolution:
+
 magcurve(IMF_Kroupa_evo(x, Age=0), 0.01, 150, log='xy', lty=1, lwd=2,
   xlab='Star Mass / Msol', ylab='dN/dM (1 Msol)')
 curve(IMF_Kroupa_evo(x, Age=6.9), 0.01, 150, log='xy', lty=2, add=TRUE, lwd=2)
@@ -104,6 +127,20 @@ curve(IMF_Lacey_evo(x, Age=13.8), 0.01, 150, log='xy', lty=3, add=TRUE, col='red
 
 legend('topright', legend=c('Kroupa Evo', 'Lacey Evo'), pch=16, col=c('black', 'red'))
 legend('bottomleft', legend=c('0 Gyrs', '6.9 Gyrs', '13.8 Gyrs'), lty=1:3, lwd=2)
+
+#Second metallicity based evolution:
+
+magcurve(IMF_Kroupa_Zevo(x, logZ=0), 0.01, 150, log='xy', lty=1, lwd=2,
+  xlab='Star Mass / Msol', ylab='dN/dM (1 Msol)')
+curve(IMF_Kroupa_Zevo(x, logZ=-2), 0.01, 150, log='xy', lty=2, add=TRUE, lwd=2)
+curve(IMF_Kroupa_Zevo(x, logZ=-4), 0.01, 150, log='xy', lty=3, add=TRUE, lwd=2)
+
+curve(IMF_Lacey_Zevo(x, logZ=0), 0.01, 150, log='xy', lty=1, add=TRUE, col='red', lwd=2)
+curve(IMF_Lacey_Zevo(x, logZ=-2), 0.01, 150, log='xy', lty=2, add=TRUE, col='red', lwd=2)
+curve(IMF_Lacey_Zevo(x, logZ=-4), 0.01, 150, log='xy', lty=3, add=TRUE, col='red', lwd=2)
+
+legend('topright', legend=c('Kroupa Evo', 'Lacey Evo'), pch=16, col=c('black', 'red'))
+legend('bottomleft', legend=c('logZ: -4', 'logZ: -2', 'logZ: 0'), lty=3:1, lwd=2)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory (show via RShowDoc("KEYWORDS")):

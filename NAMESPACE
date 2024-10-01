@@ -11,6 +11,7 @@ import('celestial')
 import('magicaxis')
 import("ParmOff")
 import("knitr")
+import("checkmate")
 
 importFrom("utils", "browseURL")
 importFrom("grDevices", "hcl.colors")

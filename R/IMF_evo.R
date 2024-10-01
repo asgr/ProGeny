@@ -8,6 +8,17 @@ IMF_Kroupa_evo = function(mass, Age = 0, Age_lim = c(0,13.8),
                           massmax_lim = c(150,150), Lookback_Age = 0, massform = 1,
                           massmult = FALSE, rel.tol = .Machine$double.eps^0.25, method = 'linear', ...){
 
+  assertNumeric(Age_lim)
+  ageLen = length(Age_lim)
+
+  assertNumeric(alpha1_lim, len=ageLen)
+  assertNumeric(alpha2_lim, len=ageLen)
+  assertNumeric(alpha3_lim, len=ageLen)
+  assertNumeric(masslow_lim, len=ageLen)
+  assertNumeric(mass1_lim, len=ageLen)
+  assertNumeric(mass2_lim, len=ageLen)
+  assertNumeric(massmax_lim, len=ageLen)
+
   Age = .interval(Age + Lookback_Age, Age_lim)
 
   alpha1 = approxfun(Age_lim, alpha1_lim, method=method, ...)(Age)

@@ -58,8 +58,8 @@ progenyInterpGrid = function(loc, info, rescale, radius=2, weight_pow=2, k=8){
   temp$weights = 1/(temp$nn.dists^weight_pow)
   temp$weights = temp$weights / rowSums(temp$weights)
   temp$weights[is.na(temp$weights)] = 1
-  temp$nn.dists[temp$nn.idx == 0L] = NA
-  temp$weights[temp$nn.idx == 0L] = NA
+  temp$nn.dists[temp$nn.idx == 0L] = Inf
+  temp$weights[temp$nn.idx == 0L] = 0
   return(temp)
 }
 

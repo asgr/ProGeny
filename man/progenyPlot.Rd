@@ -13,11 +13,11 @@ Create useful diagnostic plots of ProGeny related objects.
 progenyAtmosPlot(Spec_combine, add = FALSE, do_base = TRUE, do_extend = TRUE,
   do_hot = TRUE, do_AGB = TRUE, do_white = TRUE,
   col = c("black", "grey", "blue", "red", "darkgreen"), pch = 16, cex = 1,
-  xlim = c(2000, 4e+05), ylim = c(-1, 9), log = "x", ...)
+  xlim = c(2000, 4e+05), ylim = c(-1.5, 9.5), log = "x", ...)
 
 progenyIsoPlot(Iso, add = FALSE, sampleN = 1e4, seed = 666, zsel = 'Lum', zunit = 'Lsol',
-  zstretch = 'log', col = hcl.colors(101, "geyser"), pch = 16, cex = 0.5,
-  xlim = c(2e3,4e5), ylim = c(-1,9), log = 'x', ...)
+  zstretch = 'log', zlegend = NULL, col = hcl.colors(101, "geyser"), pch = 16, cex = 0.5,
+  xlim = c(2e3,4e5), ylim = c(-1.5, 9.5), log = 'x', ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -44,6 +44,9 @@ Character scalar; the units for \option{zsel} (used for plot labelling).
 }
   \item{zstretch}{
 Character scalar; the stretch to apply to \option{zsel}, either 'lin' (for linear) or 'log' (for log).
+}
+  \item{zlegend}{
+Character vector; a vector of names can be used instead if the labelling of the z-axis is categorical rather than continuous (e.g. the numeric reference to the best matching atmosphere library).
 }
   \item{do_base}{
 Logical; should the 'base' spectral atmospheres be plotted?

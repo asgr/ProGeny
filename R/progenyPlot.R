@@ -1,7 +1,7 @@
 progenyAtmosPlot = function(Spec_combine, add=FALSE,
                             do_base=TRUE, do_extend=TRUE, do_hot=TRUE, do_AGB=TRUE, do_white=TRUE,
                             col = c('black', 'grey', 'blue', 'red', 'darkgreen'),
-                            pch=16, cex=1, xlim=c(2e3,4e5), ylim=c(-1,9), log='x', ...){
+                            pch=16, cex=1, xlim=c(2e3,4e5), ylim=c(-1.5,9.5), log='x', ...){
 
   legvec = {}
   colvec = col[c(do_base, do_extend, do_AGB, do_hot, do_white)]
@@ -38,9 +38,10 @@ progenyAtmosPlot = function(Spec_combine, add=FALSE,
   legend('topleft', legend=rev(legvec), col=colvec, pch=1)
 }
 
-progenyIsoPlot = function(Iso, add=FALSE, sampleN=1e4, seed=666, zsel='Lum', zunit='Lsol', zstretch = 'log',
+progenyIsoPlot = function(Iso, add=FALSE, sampleN=1e4, seed=666, zsel='Lum', zunit='Lsol',
+                          zstretch = 'log', zlegend = NULL,
                           col = hcl.colors(101, 'geyser'), pch=16, cex=0.5,
-                          xlim=c(2e3,4e5), ylim=c(-1,9), log='x', ...){
+                          xlim=c(2e3,4e5), ylim=c(-1.5,9.5), log='x', ...){
 
   if(add == FALSE){
     magplot(NA, NA, xlim=xlim, ylim=ylim, log=log, xlab='Teff / K', ylab=expression(log(g / cm.s^{-2})))
@@ -54,13 +55,20 @@ progenyIsoPlot = function(Iso, add=FALSE, sampleN=1e4, seed=666, zsel='Lum', zun
     Iso_use = copy(Iso[sample(dim(Iso)[1], sampleN),])
   }
 
-  zext = max(ceiling(abs(log10(range(unlist(Iso_use[,..zsel]))))))
-  zlim = c(10^(-zext), 10^zext)
+  if(zstretch=='log'){
+    zext = max(ceiling(abs(log10(range(unlist(Iso_use[,..zsel]))))))
+    zlim = c(10^(-zext), 10^zext)
+  }else{
+    zlim = range(Iso_use[,..zsel])
+  }
 
   ParmOff(plot.xy, .args = list(xy=Iso_use[,list(Teff, logG)], type='p',
-                                col=col[magmap(unlist(Iso_use[,..zsel]), range=c(1,101), stretch=zstretch)$map],
+                                col=col[magmap(unlist(Iso_use[,..zsel]), range=c(1,length(col)), stretch=zstretch)$map],
                                 pch=pch, cex=cex), .pass_dots=FALSE, ...)
 
-  ParmOff(magbar, .args = list(position='bottomright', range=zlim, col=col, log=(zstretch=='log'), title = paste(zsel,zunit,sep=' / ')), .pass_dots=FALSE, ...)
-  #magbar('bottomright', range=zlim, col=col, log=(zstretch=='log'), title = paste(zsel,zunit,sep=' / '))
+  if(is.null(zlegend)){
+    ParmOff(magbar, .args = list(position='bottomright', range=zlim, col=col, log=(zstretch=='log'), title = paste(zsel,zunit,sep=' / ')), .pass_dots=FALSE, ...)
+  }else{
+    legend('bottomright', legend=zlegend, col=col, pch=16, ...)
+  }
 }

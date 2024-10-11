@@ -15,9 +15,9 @@ progenyIsoDownload(URL = "https://tinyurl.com/progeny-isochrone/", ...)
 
 progenyAtmosDownload(URL = "https://tinyurl.com/progeny-atmos/", ...)
 
-progenyAtmosLoad(destpath= '', base = 'combine_PHOENIX_husser',
+progenyAtmosLoad(destpath= '', base = 'combine_C3K_conroy',
   extend = 'combine_PHOENIX_allard', hot = 'combine_TMAP_werner',
-  AGB = 'combine_AGB_lancon', white = NULL)
+  AGB = 'combine_AGB_lancon', white = NULL, wavegrid = NULL, ...)
 
 progenyIsoFormat(Iso)
 }
@@ -29,9 +29,6 @@ Character scalar; location of the ProGeny isochrones / atmospheres libraries. Th
 }
   \item{Iso}{
 Data.frame / data.table; the input table of Isochrones.
-}
-  \item{\dots}{
-Other arguments to pass to \code{\link{browseURL}}.
 }
   \item{destpath}{
 Character scalar; folder path where the target atomospheres will be laoded from. They all need to be in the same folder.
@@ -50,6 +47,12 @@ Character scalar/logical; for \code{progenyAtmosLoad}  name of the 'AGB' stellar
 }
   \item{white}{
 Character scalar/logical; for \code{progenyAtmosLoad}  name of the 'white' dwarf stellar atmosphere library to use (without the '.fits' extension). The 'white' dwarf library will be the preferred option for the white dwarf spectra \option{Teff}, \option{logG} and \option{logZ} solution when interpolating the atmopsheres onto the isochrone grids. See \code{\link{progenyInterpGrid}}. This can be flagged in the isochrones with the \option{label} column, see \code{\link{progenyInterpBest}}.
+}
+  \item{wavegrid}{
+Numeric vector; the target spectral wavelength grid in Angstroms. If NULL then all inputs must have the same native wavelength grid or bad things will happen. Basic checks our made though (that they are at least the same length). If not NULL then all stellar atmosphere spectra are rebinned using the \code{ProSpect} \code{specReBin} function, so \code{ProSpect} must also be isntalled in this case.
+}
+  \item{\dots}{
+For download functions, additional arguments to pass to \code{\link{browseURL}}. For \code{progenyAtmosLoad}, additional arguments to pass to \code{ProSpect} \code{specReBin}. Only relevant if \option{wavegrid} is not NULL.
 }
 }
 \details{

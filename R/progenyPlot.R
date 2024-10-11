@@ -41,7 +41,7 @@ progenyAtmosPlot = function(Spec_combine, add=FALSE,
 progenyIsoPlot = function(Iso, add=FALSE, sampleN=1e4, seed=666, zsel='Lum', zunit='Lsol',
                           zstretch = 'log', zlegend = NULL,
                           col = hcl.colors(101, 'geyser'), pch=16, cex=0.5,
-                          xlim=c(2e3,4e5), ylim=c(-1.5,9.5), log='x', ...){
+                          xlim=c(2e3,4e5), ylim=c(-1.5,9.5), zlim=NULL, log='x', draw_regions=FALSE, ...){
 
   if(add == FALSE){
     magplot(NA, NA, xlim=xlim, ylim=ylim, log=log, xlab='Teff / K', ylab=expression(log(g / cm.s^{-2})))
@@ -55,20 +55,33 @@ progenyIsoPlot = function(Iso, add=FALSE, sampleN=1e4, seed=666, zsel='Lum', zun
     Iso_use = copy(Iso[sample(dim(Iso)[1], sampleN),])
   }
 
-  if(zstretch=='log'){
-    zext = max(ceiling(abs(log10(range(unlist(Iso_use[,..zsel]))))))
-    zlim = c(10^(-zext), 10^zext)
-  }else{
-    zlim = range(Iso_use[,..zsel])
+  if(is.null(zlim)){
+    zlim = range(unlist(Iso_use[,..zsel]))
   }
 
+  locut = zlim[1]
+  hicut = zlim[2]
+
   ParmOff(plot.xy, .args = list(xy=Iso_use[,list(Teff, logG)], type='p',
-                                col=col[magmap(unlist(Iso_use[,..zsel]), range=c(1,length(col)), stretch=zstretch)$map],
+                                col=col[magmap(unlist(Iso_use[,..zsel]), range=c(1,length(col)),
+                                               stretch=zstretch, type='num', locut=locut, hicut=hicut)$map],
                                 pch=pch, cex=cex), .pass_dots=FALSE, ...)
 
   if(is.null(zlegend)){
-    ParmOff(magbar, .args = list(position='bottomright', range=zlim, col=col, log=(zstretch=='log'), title = paste(zsel,zunit,sep=' / ')), .pass_dots=FALSE, ...)
+    ParmOff(magbar, .args = list(position='bottomright', range=zlim, col=col, log=(zstretch=='log'),
+                                 title = paste(zsel, zunit, sep=' / ')), .pass_dots=FALSE, ...)
   }else{
     legend('bottomright', legend=zlegend, col=col, pch=16, ...)
+  }
+
+  if(draw_regions){
+    polygon(c(2e3,9e3,5e4,2e3), c(2,2,5.5,5.5))
+    text(2.5e3, 4.3, 'MS')
+    lines(c(2e3,2.3e4), c(4,4), lty=3)
+    text(2.8e3, c(3,2.3), c('RGB', 'CHeB'))
+    polygon(c(4e3, 2e3, 3e3, 7e3), c(2, -1.55, -1.55, 2))
+    text(2.5e3, -1.8, 'AGB')
+    polygon(c(4.9e3, 1e5, 1.3e4, 1.3e4, 4e5, 4e5, 3e3), c(0.5, 6.5, 7, 10, 8.5, 6, -1.55))
+    text(3e4, 6.5, 'Post-AGB')
   }
 }

@@ -82,14 +82,23 @@ In PARSEC the isochrones labels are provided as: 0 = PreMS, 1 = MS, 2 = SubGB, 3
 In BaSTI the isochrones labels are provided as: -1 = PreMS, 0 = MS, 1 = RGB, 2 = CHeB, 3 = eAGB, 4-5 = AGB, 6 = PostAGB
 
 In general:
+
 PMS: pre main sequence
+
 MS: main sequence
+
 WR: Wolf-Rayet (generally only a few million years old)
+
 SubGB: subgiant branch, or Hertzsprung gap for more intermediate+massive stars
+
 RGB: red giant branch, or the quick stage of red giant for intermediate+massive stars
-CHEB: core He-burning for low mass stars, or the very initial stage of CHeB for intermediate+massive stars
+
+CHeB: core He-burning for low mass stars, or the very initial stage of CHeB for intermediate+massive stars
+
 eAGB: the early asymptotic giant branch, or a quick stage of red giant for massive stars
+
 TP-AGB: the thermally pulsing asymptotic giant branch
+
 Post-AGB: post asymptotic giant branch
 }
 \value{

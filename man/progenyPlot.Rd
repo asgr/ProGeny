@@ -17,7 +17,8 @@ progenyAtmosPlot(Spec_combine, add = FALSE, do_base = TRUE, do_extend = TRUE,
 
 progenyIsoPlot(Iso, add = FALSE, sampleN = 1e4, seed = 666, zsel = 'Lum', zunit = 'Lsol',
   zstretch = 'log', zlegend = NULL, col = hcl.colors(101, "geyser"), pch = 16, cex = 0.5,
-  xlim = c(2e3,4e5), ylim = c(-1.5, 9.5), log = 'x', ...)
+  xlim = c(2e3,4e5), ylim = c(-1.5, 9.5), zlim = NULL, log = 'x', draw_regions = FALSE,
+  ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -78,8 +79,14 @@ Vector; range of x data to display.
   \item{ylim}{
 Vector; range of y data to display.
 }
+  \item{zlim}{
+Vector; range of z data to display. Note if \option{zstretch} = 'log' then these values should be the logged quantity (so c(-4,4) for a range 1e-4 to 1e4). If left as NULL the \option{zlim} is the maximum extent of the \option{zsel} data provided in the isochrone.
+}
   \item{log}{
 Character scalar; log axis arguments to be passed to plot. E.g. use 'x', 'y', 'xy' or 'yx' as appropriate. '' assumes no logging of any axes.
+}
+  \item{draw_regions}{
+Logical; should indicative stellar phase regions be added to the plot? This is useful to broadly guide the eye when assessing isochrones, but they should not be treated strictly.
 }
   \item{\dots}{
 Additional arguments to pass to the \code{\link{points}} plotting function.

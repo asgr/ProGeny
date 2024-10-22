@@ -54,13 +54,13 @@ Spec_BASEL = progenyAtmosLoad(path_to_atmos, base='combine_BASEL_wlbc')
 Now we compute our weighted interpolation onto each isochrone grid for all atmospheres (so 3 x 4 = 12 combinations):
 
 ```{r}
-Interp_Mist_PHOENIX = progenyInterpGrid_All(Iso = MistIso, Spec_combine = Spec_PHOENIX)
-Interp_Par_PHOENIX = progenyInterpGrid_All(Iso = ParIso, Spec_combine = Spec_PHOENIX)
-Interp_Bas_PHOENIX = progenyInterpGrid_All(Iso = BasIso, Spec_combine = Spec_PHOENIX)
-
 Interp_Mist_C3K = progenyInterpGrid_All(Iso = MistIso, Spec_combine = Spec_C3K)
 Interp_Par_C3K = progenyInterpGrid_All(Iso = ParIso, Spec_combine = Spec_C3K)
 Interp_Bas_C3K = progenyInterpGrid_All(Iso = BasIso, Spec_combine = Spec_C3K)
+
+Interp_Mist_PHOENIX = progenyInterpGrid_All(Iso = MistIso, Spec_combine = Spec_PHOENIX)
+Interp_Par_PHOENIX = progenyInterpGrid_All(Iso = ParIso, Spec_combine = Spec_PHOENIX)
+Interp_Bas_PHOENIX = progenyInterpGrid_All(Iso = BasIso, Spec_combine = Spec_PHOENIX)
 
 Interp_Mist_MILES = progenyInterpGrid_All(Iso = MistIso, Spec_combine = Spec_MILES)
 Interp_Par_MILES = progenyInterpGrid_All(Iso = ParIso, Spec_combine = Spec_MILES)
@@ -155,19 +155,19 @@ BasIso_BASEL = progenyInterpBest(Iso = BasIso,
 ### Chabrier
 
 ```{r}
-PG_Ch_Mi_PHOENIX = progenyMakeSSP(Iso = MistIso_PHOENIX,
-                               IMFfunc = IMF_Chabrier,
-                               masslow = 0.1,
-                               massmax = 100,
-                               Spec_combine = Spec_PHOENIX,
-                               Interp_combine = Interp_Mist_PHOENIX
-)
 PG_Ch_Mi_C3K = progenyMakeSSP(Iso = MistIso_C3K,
                                   IMFfunc = IMF_Chabrier,
                                   masslow = 0.1,
                                   massmax = 100,
                                   Spec_combine = Spec_C3K,
                                   Interp_combine = Interp_Mist_C3K
+)
+PG_Ch_Mi_PHOENIX = progenyMakeSSP(Iso = MistIso_PHOENIX,
+                               IMFfunc = IMF_Chabrier,
+                               masslow = 0.1,
+                               massmax = 100,
+                               Spec_combine = Spec_PHOENIX,
+                               Interp_combine = Interp_Mist_PHOENIX
 )
 PG_Ch_Mi_MILES = progenyMakeSSP(Iso = MistIso_MILES,
                               IMFfunc = IMF_Chabrier,
@@ -188,8 +188,8 @@ PG_Ch_Mi_BASEL = progenyMakeSSP(Iso = MistIso_BASEL,
 Save them in the correct format (this can be loaded dirctly into **ProSpect** with *speclib_FITSload*).
 
 ```{r}
-Rfits_write(PG_Ch_Mi_PHOENIX, file.path(path_to_SSP,'PG_Ch_Mi_PHOENIX.fits'), flatten = T)
 Rfits_write(PG_Ch_Mi_C3K, file.path(path_to_SSP,'SSP_paper/PG_Ch_Mi_C3K.fits'), flatten = T)
+Rfits_write(PG_Ch_Mi_PHOENIX, file.path(path_to_SSP,'PG_Ch_Mi_PHOENIX.fits'), flatten = T)
 Rfits_write(PG_Ch_Mi_MILES, file.path(path_to_SSP,'SSP_paper/PG_Ch_Mi_MILES.fits'), flatten = T)
 Rfits_write(PG_Ch_Mi_BASEL, file.path(path_to_SSP,'SSP_paper/PG_Ch_Mi_BASEL.fits'), flatten = T)
 ```
@@ -197,19 +197,19 @@ Rfits_write(PG_Ch_Mi_BASEL, file.path(path_to_SSP,'SSP_paper/PG_Ch_Mi_BASEL.fits
 ### Kroupa
 
 ```{r}
-PG_Kr_Mi_PHOENIX = progenyMakeSSP(Iso = MistIso_PHOENIX,
-                                  IMFfunc = IMF_Kroupa,
-                                  masslow = 0.1,
-                                  massmax = 100,
-                                  Spec_combine = Spec_PHOENIX,
-                                  Interp_combine = Interp_Mist_PHOENIX
-)
 PG_Kr_Mi_C3K = progenyMakeSSP(Iso = MistIso_C3K,
                               IMFfunc = IMF_Kroupa,
                               masslow = 0.1,
                               massmax = 100,
                               Spec_combine = Spec_C3K,
                               Interp_combine = Interp_Mist_C3K
+)
+PG_Kr_Mi_PHOENIX = progenyMakeSSP(Iso = MistIso_PHOENIX,
+                                  IMFfunc = IMF_Kroupa,
+                                  masslow = 0.1,
+                                  massmax = 100,
+                                  Spec_combine = Spec_PHOENIX,
+                                  Interp_combine = Interp_Mist_PHOENIX
 )
 PG_Kr_Mi_MILES = progenyMakeSSP(Iso = MistIso_MILES,
                                 IMFfunc = IMF_Kroupa,
@@ -226,8 +226,8 @@ PG_Kr_Mi_BASEL = progenyMakeSSP(Iso = MistIso_BASEL,
                                 Interp_combine = Interp_Mist_BASEL
 )
 
-Rfits_write(PG_Kr_Mi_PHOENIX, file.path(path_to_SSP,'PG_Kr_Mi_PHOENIX.fits'), flatten = T)
 Rfits_write(PG_Kr_Mi_C3K, file.path(path_to_SSP,'PG_Kr_Mi_C3K.fits'), flatten = T)
+Rfits_write(PG_Kr_Mi_PHOENIX, file.path(path_to_SSP,'PG_Kr_Mi_PHOENIX.fits'), flatten = T)
 Rfits_write(PG_Kr_Mi_MILES, file.path(path_to_SSP,'PG_Kr_Mi_MILES.fits'), flatten = T)
 Rfits_write(PG_Kr_Mi_BASEL, file.path(path_to_SSP,'PG_Kr_Mi_BASEL.fits'), flatten = T)
 ```
@@ -235,19 +235,19 @@ Rfits_write(PG_Kr_Mi_BASEL, file.path(path_to_SSP,'PG_Kr_Mi_BASEL.fits'), flatte
 ### Salpeter
 
 ```{r}
-PG_Sp_Mi_PHOENIX = progenyMakeSSP(Iso = MistIso_PHOENIX,
-                                  IMFfunc = IMF_Salpeter,
-                                  masslow = 0.1,
-                                  massmax = 100,
-                                  Spec_combine = Spec_PHOENIX,
-                                  Interp_combine = Interp_Mist_PHOENIX
-)
 PG_Sp_Mi_C3K = progenyMakeSSP(Iso = MistIso_C3K,
                               IMFfunc = IMF_Salpeter,
                               masslow = 0.1,
                               massmax = 100,
                               Spec_combine = Spec_C3K,
                               Interp_combine = Interp_Mist_C3K
+)
+PG_Sp_Mi_PHOENIX = progenyMakeSSP(Iso = MistIso_PHOENIX,
+                                  IMFfunc = IMF_Salpeter,
+                                  masslow = 0.1,
+                                  massmax = 100,
+                                  Spec_combine = Spec_PHOENIX,
+                                  Interp_combine = Interp_Mist_PHOENIX
 )
 PG_Sp_Mi_MILES = progenyMakeSSP(Iso = MistIso_MILES,
                                 IMFfunc = IMF_Salpeter,
@@ -264,8 +264,8 @@ PG_Sp_Mi_BASEL = progenyMakeSSP(Iso = MistIso_BASEL,
                                 Interp_combine = Interp_Mist_BASEL
 )
 
-Rfits_write(PG_Sp_Mi_PHOENIX, file.path(path_to_SSP,'PG_Sp_Mi_PHOENIX.fits'), flatten = T)
 Rfits_write(PG_Sp_Mi_C3K, file.path(path_to_SSP,'PG_Sp_Mi_C3K.fits'), flatten = T)
+Rfits_write(PG_Sp_Mi_PHOENIX, file.path(path_to_SSP,'PG_Sp_Mi_PHOENIX.fits'), flatten = T)
 Rfits_write(PG_Sp_Mi_MILES, file.path(path_to_SSP,'PG_Sp_Mi_MILES.fits'), flatten = T)
 Rfits_write(PG_Sp_Mi_BASEL, file.path(path_to_SSP,'PG_Sp_Mi_BASEL.fits'), flatten = T)
 ```
@@ -275,19 +275,19 @@ Rfits_write(PG_Sp_Mi_BASEL, file.path(path_to_SSP,'PG_Sp_Mi_BASEL.fits'), flatte
 ### Chabrier
 
 ```{r}
-PG_Ch_PC_PHOENIX = progenyMakeSSP(Iso = ParIso_PHOENIX,
-                                  IMFfunc = IMF_Chabrier,
-                                  masslow = 0.1,
-                                  massmax = 100,
-                                  Spec_combine = Spec_PHOENIX,
-                                  Interp_combine = Interp_Par_PHOENIX
-)
 PG_Ch_PC_C3K = progenyMakeSSP(Iso = ParIso_C3K,
                               IMFfunc = IMF_Chabrier,
                               masslow = 0.1,
                               massmax = 100,
                               Spec_combine = Spec_C3K,
                               Interp_combine = Interp_Par_C3K
+)
+PG_Ch_PC_PHOENIX = progenyMakeSSP(Iso = ParIso_PHOENIX,
+                                  IMFfunc = IMF_Chabrier,
+                                  masslow = 0.1,
+                                  massmax = 100,
+                                  Spec_combine = Spec_PHOENIX,
+                                  Interp_combine = Interp_Par_PHOENIX
 )
 PG_Ch_PC_MILES = progenyMakeSSP(Iso = ParIso_MILES,
                                 IMFfunc = IMF_Chabrier,
@@ -304,8 +304,8 @@ PG_Ch_PC_BASEL = progenyMakeSSP(Iso = ParIso_BASEL,
                                 Interp_combine = Interp_Par_BASEL
 )
 
-Rfits_write(PG_Ch_PC_PHOENIX, file.path(path_to_SSP,'PG_Ch_PC_PHOENIX.fits'), flatten = T)
 Rfits_write(PG_Ch_PC_C3K, file.path(path_to_SSP,'PG_Ch_PC_C3K.fits'), flatten = T)
+Rfits_write(PG_Ch_PC_PHOENIX, file.path(path_to_SSP,'PG_Ch_PC_PHOENIX.fits'), flatten = T)
 Rfits_write(PG_Ch_PC_MILES, file.path(path_to_SSP,'PG_Ch_PC_MILES.fits'), flatten = T)
 Rfits_write(PG_Ch_PC_BASEL, file.path(path_to_SSP,'PG_Ch_PC_BASEL.fits'), flatten = T)
 ```
@@ -313,19 +313,19 @@ Rfits_write(PG_Ch_PC_BASEL, file.path(path_to_SSP,'PG_Ch_PC_BASEL.fits'), flatte
 ### Kroupa
 
 ```{r}
-PG_Kr_PC_PHOENIX = progenyMakeSSP(Iso = ParIso_PHOENIX,
-                                  IMFfunc = IMF_Kroupa,
-                                  masslow = 0.1,
-                                  massmax = 100,
-                                  Spec_combine = Spec_PHOENIX,
-                                  Interp_combine = Interp_Par_PHOENIX
-)
 PG_Kr_PC_C3K = progenyMakeSSP(Iso = ParIso_C3K,
                               IMFfunc = IMF_Kroupa,
                               masslow = 0.1,
                               massmax = 100,
                               Spec_combine = Spec_C3K,
                               Interp_combine = Interp_Par_C3K
+)
+PG_Kr_PC_PHOENIX = progenyMakeSSP(Iso = ParIso_PHOENIX,
+                                  IMFfunc = IMF_Kroupa,
+                                  masslow = 0.1,
+                                  massmax = 100,
+                                  Spec_combine = Spec_PHOENIX,
+                                  Interp_combine = Interp_Par_PHOENIX
 )
 PG_Kr_PC_MILES = progenyMakeSSP(Iso = ParIso_MILES,
                                 IMFfunc = IMF_Kroupa,
@@ -342,8 +342,8 @@ PG_Kr_PC_BASEL = progenyMakeSSP(Iso = ParIso_BASEL,
                                 Interp_combine = Interp_Par_BASEL
 )
 
-Rfits_write(PG_Kr_PC_PHOENIX, file.path(path_to_SSP,'PG_Kr_PC_PHOENIX.fits'), flatten = T)
 Rfits_write(PG_Kr_PC_C3K, file.path(path_to_SSP,'PG_Kr_PC_C3K.fits'), flatten = T)
+Rfits_write(PG_Kr_PC_PHOENIX, file.path(path_to_SSP,'PG_Kr_PC_PHOENIX.fits'), flatten = T)
 Rfits_write(PG_Kr_PC_MILES, file.path(path_to_SSP,'PG_Kr_PC_MILES.fits'), flatten = T)
 Rfits_write(PG_Kr_PC_BASEL, file.path(path_to_SSP,'PG_Kr_PC_BASEL.fits'), flatten = T)
 ```
@@ -351,19 +351,19 @@ Rfits_write(PG_Kr_PC_BASEL, file.path(path_to_SSP,'PG_Kr_PC_BASEL.fits'), flatte
 ### Salpeter
 
 ```{r}
-PG_Sp_PC_PHOENIX = progenyMakeSSP(Iso = ParIso_PHOENIX,
-                                  IMFfunc = IMF_Salpeter,
-                                  masslow = 0.1,
-                                  massmax = 100,
-                                  Spec_combine = Spec_PHOENIX,
-                                  Interp_combine = Interp_Par_PHOENIX
-)
 PG_Sp_PC_C3K = progenyMakeSSP(Iso = ParIso_C3K,
                               IMFfunc = IMF_Salpeter,
                               masslow = 0.1,
                               massmax = 100,
                               Spec_combine = Spec_C3K,
                               Interp_combine = Interp_Par_C3K
+)
+PG_Sp_PC_PHOENIX = progenyMakeSSP(Iso = ParIso_PHOENIX,
+                                  IMFfunc = IMF_Salpeter,
+                                  masslow = 0.1,
+                                  massmax = 100,
+                                  Spec_combine = Spec_PHOENIX,
+                                  Interp_combine = Interp_Par_PHOENIX
 )
 PG_Sp_PC_MILES = progenyMakeSSP(Iso = ParIso_MILES,
                                 IMFfunc = IMF_Salpeter,
@@ -380,8 +380,8 @@ PG_Sp_PC_BASEL = progenyMakeSSP(Iso = ParIso_BASEL,
                                 Interp_combine = Interp_Par_BASEL
 )
 
-Rfits_write(PG_Sp_PC_PHOENIX, file.path(path_to_SSP,'PG_Sp_PC_PHOENIX.fits'), flatten = T)
 Rfits_write(PG_Sp_PC_C3K, file.path(path_to_SSP,'PG_Sp_PC_C3K.fits'), flatten = T)
+Rfits_write(PG_Sp_PC_PHOENIX, file.path(path_to_SSP,'PG_Sp_PC_PHOENIX.fits'), flatten = T)
 Rfits_write(PG_Sp_PC_MILES, file.path(path_to_SSP,'PG_Sp_PC_MILES.fits'), flatten = T)
 Rfits_write(PG_Sp_PC_BASEL, file.path(path_to_SSP,'PG_Sp_PC_BASEL.fits'), flatten = T)
 ```
@@ -391,19 +391,19 @@ Rfits_write(PG_Sp_PC_BASEL, file.path(path_to_SSP,'PG_Sp_PC_BASEL.fits'), flatte
 ### Chabrier
 
 ```{r}
-PG_Ch_Ba_PHOENIX = progenyMakeSSP(Iso = BasIso_PHOENIX,
-                                  IMFfunc = IMF_Chabrier,
-                                  masslow = 0.1,
-                                  massmax = 100,
-                                  Spec_combine = Spec_PHOENIX,
-                                  Interp_combine = Interp_Bas_PHOENIX
-)
 PG_Ch_Ba_C3K = progenyMakeSSP(Iso = BasIso_C3K,
                               IMFfunc = IMF_Chabrier,
                               masslow = 0.1,
                               massmax = 100,
                               Spec_combine = Spec_C3K,
                               Interp_combine = Interp_Bas_C3K
+)
+PG_Ch_Ba_PHOENIX = progenyMakeSSP(Iso = BasIso_PHOENIX,
+                                  IMFfunc = IMF_Chabrier,
+                                  masslow = 0.1,
+                                  massmax = 100,
+                                  Spec_combine = Spec_PHOENIX,
+                                  Interp_combine = Interp_Bas_PHOENIX
 )
 PG_Ch_Ba_MILES = progenyMakeSSP(Iso = BasIso_MILES,
                                 IMFfunc = IMF_Chabrier,
@@ -420,8 +420,8 @@ PG_Ch_Ba_BASEL = progenyMakeSSP(Iso = BasIso_BASEL,
                                 Interp_combine = Interp_Bas_BASEL
 )
 
-Rfits_write(PG_Ch_Ba_PHOENIX, file.path(path_to_SSP,'PG_Ch_Ba_PHOENIX.fits'), flatten = T)
 Rfits_write(PG_Ch_Ba_C3K, file.path(path_to_SSP,'PG_Ch_Ba_C3K.fits'), flatten = T)
+Rfits_write(PG_Ch_Ba_PHOENIX, file.path(path_to_SSP,'PG_Ch_Ba_PHOENIX.fits'), flatten = T)
 Rfits_write(PG_Ch_Ba_MILES, file.path(path_to_SSP,'PG_Ch_Ba_MILES.fits'), flatten = T)
 Rfits_write(PG_Ch_Ba_BASEL, file.path(path_to_SSP,'PG_Ch_Ba_BASEL.fits'), flatten = T)
 ```
@@ -429,19 +429,19 @@ Rfits_write(PG_Ch_Ba_BASEL, file.path(path_to_SSP,'PG_Ch_Ba_BASEL.fits'), flatte
 ### Kroupa
 
 ```{r}
-PG_Kr_Ba_PHOENIX = progenyMakeSSP(Iso = BasIso_PHOENIX,
-                                  IMFfunc = IMF_Kroupa,
-                                  masslow = 0.1,
-                                  massmax = 100,
-                                  Spec_combine = Spec_PHOENIX,
-                                  Interp_combine = Interp_Bas_PHOENIX
-)
 PG_Kr_Ba_C3K = progenyMakeSSP(Iso = BasIso_C3K,
                               IMFfunc = IMF_Kroupa,
                               masslow = 0.1,
                               massmax = 100,
                               Spec_combine = Spec_C3K,
                               Interp_combine = Interp_Bas_C3K
+)
+PG_Kr_Ba_PHOENIX = progenyMakeSSP(Iso = BasIso_PHOENIX,
+                                  IMFfunc = IMF_Kroupa,
+                                  masslow = 0.1,
+                                  massmax = 100,
+                                  Spec_combine = Spec_PHOENIX,
+                                  Interp_combine = Interp_Bas_PHOENIX
 )
 PG_Kr_Ba_MILES = progenyMakeSSP(Iso = BasIso_MILES,
                                 IMFfunc = IMF_Kroupa,
@@ -458,8 +458,8 @@ PG_Kr_Ba_BASEL = progenyMakeSSP(Iso = BasIso_BASEL,
                                 Interp_combine = Interp_Bas_BASEL
 )
 
-Rfits_write(PG_Kr_Ba_PHOENIX, file.path(path_to_SSP,'PG_Kr_Ba_PHOENIX.fits'), flatten = T)
 Rfits_write(PG_Kr_Ba_C3K, file.path(path_to_SSP,'PG_Kr_Ba_C3K.fits'), flatten = T)
+Rfits_write(PG_Kr_Ba_PHOENIX, file.path(path_to_SSP,'PG_Kr_Ba_PHOENIX.fits'), flatten = T)
 Rfits_write(PG_Kr_Ba_MILES, file.path(path_to_SSP,'PG_Kr_Ba_MILES.fits'), flatten = T)
 Rfits_write(PG_Kr_Ba_BASEL, file.path(path_to_SSP,'PG_Kr_Ba_BASEL.fits'), flatten = T)
 ```
@@ -467,19 +467,19 @@ Rfits_write(PG_Kr_Ba_BASEL, file.path(path_to_SSP,'PG_Kr_Ba_BASEL.fits'), flatte
 ### Salpeter
 
 ```{r}
-PG_Sp_Ba_PHOENIX = progenyMakeSSP(Iso = BasIso_PHOENIX,
-                                  IMFfunc = IMF_Salpeter,
-                                  masslow = 0.1,
-                                  massmax = 100,
-                                  Spec_combine = Spec_PHOENIX,
-                                  Interp_combine = Interp_Bas_PHOENIX
-)
 PG_Sp_Ba_C3K = progenyMakeSSP(Iso = BasIso_C3K,
                               IMFfunc = IMF_Salpeter,
                               masslow = 0.1,
                               massmax = 100,
                               Spec_combine = Spec_C3K,
                               Interp_combine = Interp_Bas_C3K
+)
+PG_Sp_Ba_PHOENIX = progenyMakeSSP(Iso = BasIso_PHOENIX,
+                                  IMFfunc = IMF_Salpeter,
+                                  masslow = 0.1,
+                                  massmax = 100,
+                                  Spec_combine = Spec_PHOENIX,
+                                  Interp_combine = Interp_Bas_PHOENIX
 )
 PG_Sp_Ba_MILES = progenyMakeSSP(Iso = BasIso_MILES,
                                 IMFfunc = IMF_Salpeter,
@@ -496,8 +496,8 @@ PG_Sp_Ba_BASEL = progenyMakeSSP(Iso = BasIso_BASEL,
                                 Interp_combine = Interp_Bas_BASEL
 )
 
-Rfits_write(PG_Sp_Ba_PHOENIX, file.path(path_to_SSP,'PG_Sp_Ba_PHOENIX.fits'), flatten = T)
 Rfits_write(PG_Sp_Ba_C3K, file.path(path_to_SSP,'PG_Sp_Ba_C3K.fits'), flatten = T)
+Rfits_write(PG_Sp_Ba_PHOENIX, file.path(path_to_SSP,'PG_Sp_Ba_PHOENIX.fits'), flatten = T)
 Rfits_write(PG_Sp_Ba_MILES, file.path(path_to_SSP,'PG_Sp_Ba_MILES.fits'), flatten = T)
 Rfits_write(PG_Sp_Ba_BASEL, file.path(path_to_SSP,'PG_Sp_Ba_BASEL.fits'), flatten = T)
 ```
@@ -507,19 +507,19 @@ Rfits_write(PG_Sp_Ba_BASEL, file.path(path_to_SSP,'PG_Sp_Ba_BASEL.fits'), flatte
 ### Kroupa Age Evo
 
 ```{r}
-PG_KrE_Mi_PHOENIX = progenyMakeSSP(Iso = MistIso_PHOENIX,
-                                  IMFfunc = IMF_Kroupa_evo,
-                                  masslow = rep(0.1, 2),
-                                  massmax = rep(100, 2),
-                                  Spec_combine = Spec_PHOENIX,
-                                  Interp_combine = Interp_Mist_PHOENIX
-)
 PG_KrE_Mi_C3K = progenyMakeSSP(Iso = MistIso_C3K,
                               IMFfunc = IMF_Kroupa_evo,
                               masslow = rep(0.1, 2),
                               massmax = rep(100, 2),
                               Spec_combine = Spec_C3K,
                               Interp_combine = Interp_Mist_C3K
+)
+PG_KrE_Mi_PHOENIX = progenyMakeSSP(Iso = MistIso_PHOENIX,
+                                  IMFfunc = IMF_Kroupa_evo,
+                                  masslow = rep(0.1, 2),
+                                  massmax = rep(100, 2),
+                                  Spec_combine = Spec_PHOENIX,
+                                  Interp_combine = Interp_Mist_PHOENIX
 )
 PG_KrE_Mi_MILES = progenyMakeSSP(Iso = MistIso_MILES,
                                 IMFfunc = IMF_Kroupa_evo,
@@ -536,8 +536,8 @@ PG_KrE_Mi_BASEL = progenyMakeSSP(Iso = MistIso_BASEL,
                                 Interp_combine = Interp_Mist_BASEL
 )
 
-Rfits_write(PG_KrE_Mi_PHOENIX, file.path(path_to_SSP,'PG_KrE_Mi_PHOENIX.fits'), flatten = T)
 Rfits_write(PG_KrE_Mi_C3K, file.path(path_to_SSP,'PG_KrE_Mi_C3K.fits'), flatten = T)
+Rfits_write(PG_KrE_Mi_PHOENIX, file.path(path_to_SSP,'PG_KrE_Mi_PHOENIX.fits'), flatten = T)
 Rfits_write(PG_KrE_Mi_MILES, file.path(path_to_SSP,'PG_KrE_Mi_MILES.fits'), flatten = T)
 Rfits_write(PG_KrE_Mi_BASEL, file.path(path_to_SSP,'PG_KrE_Mi_BASEL.fits'), flatten = T)
 ```
@@ -545,19 +545,19 @@ Rfits_write(PG_KrE_Mi_BASEL, file.path(path_to_SSP,'PG_KrE_Mi_BASEL.fits'), flat
 ### Kroupa Z Evo
 
 ```{r}
-PG_KrZE_Mi_PHOENIX = progenyMakeSSP(Iso = MistIso_PHOENIX,
-                                   IMFfunc = IMF_Kroupa_Zevo,
-                                   masslow = rep(0.1, 2),
-                                   massmax = rep(100, 2),
-                                   Spec_combine = Spec_PHOENIX,
-                                   Interp_combine = Interp_Mist_PHOENIX
-)
 PG_KrZE_Mi_C3K = progenyMakeSSP(Iso = MistIso_C3K,
                                IMFfunc = IMF_Kroupa_Zevo,
                                masslow = rep(0.1, 2),
                                massmax = rep(100, 2),
                                Spec_combine = Spec_C3K,
                                Interp_combine = Interp_Mist_C3K
+)
+PG_KrZE_Mi_PHOENIX = progenyMakeSSP(Iso = MistIso_PHOENIX,
+                                   IMFfunc = IMF_Kroupa_Zevo,
+                                   masslow = rep(0.1, 2),
+                                   massmax = rep(100, 2),
+                                   Spec_combine = Spec_PHOENIX,
+                                   Interp_combine = Interp_Mist_PHOENIX
 )
 PG_KrZE_Mi_MILES = progenyMakeSSP(Iso = MistIso_MILES,
                                  IMFfunc = IMF_Kroupa_Zevo,
@@ -574,8 +574,8 @@ PG_KrZE_Mi_BASEL = progenyMakeSSP(Iso = MistIso_BASEL,
                                  Interp_combine = Interp_Mist_BASEL
 )
 
-Rfits_write(PG_KrZE_Mi_PHOENIX, file.path(path_to_SSP,'PG_KrZE_Mi_PHOENIX.fits'), flatten = T)
 Rfits_write(PG_KrZE_Mi_C3K, file.path(path_to_SSP,'PG_KrZE_Mi_C3K.fits'), flatten = T)
+Rfits_write(PG_KrZE_Mi_PHOENIX, file.path(path_to_SSP,'PG_KrZE_Mi_PHOENIX.fits'), flatten = T)
 Rfits_write(PG_KrZE_Mi_MILES, file.path(path_to_SSP,'PG_KrZE_Mi_MILES.fits'), flatten = T)
 Rfits_write(PG_KrZE_Mi_BASEL, file.path(path_to_SSP,'PG_KrZE_Mi_BASEL.fits'), flatten = T)
 ```

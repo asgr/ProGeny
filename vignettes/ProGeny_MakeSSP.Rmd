@@ -10,7 +10,7 @@ vignette: >
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(eval = FALSE)
+knitr::opts_chunk$set(eval = TRUE)
 ```
 
 Load what we will need:
@@ -22,10 +22,6 @@ library(data.table)
 library(Rfits)
 library(fst)
 library(magicaxis)
-```
-
-```{r}
-data(BC03lr) #we shall use this later!
 ```
 
 The main thing **ProGeny** does (and the reason it was designed at all) is to create Simple Stellar Population (SSP) models that can directly load into **ProSpect**. This is useful because it gives us full control over what isochrones and stellar atmospheres we use, and how we map them together. We can also control our initial mass function (IMF).
@@ -40,7 +36,7 @@ MistIso  = read.fst('~/Dropbox (Personal)/ProGeny_isochrone/MistIso.fst', as.dat
 
 If you do not have one already, you can get them using the *progenyIsoDownload* function. Currently we provide MIST (preferred, for reasons we shall get to), PARSEC and BaSTI as base isochrones.
 
-Here we load four different base spectra options: C3K, PHOENIX (Husser) MILES and BASEL. To get these locally you will need to run *progenyAtmosDownload*. The below might take about a minute to run (depending on the speed of your HDD or SSD).
+Here we load four different base spectra options: C3K, PHOENIX (Husser) MILES and BaSeL (msotly styled as BASEL below). To get these locally you will need to run *progenyAtmosDownload*. The below might take about a minute to run (depending on the speed of your HDD or SSD).
 
 ```{r}
 Spec_C3K = progenyAtmosLoad('~/Dropbox (Personal)/ProGeny_atmos/', base='combine_C3K_conroy')
@@ -125,7 +121,7 @@ PG_Ch_BASEL = progenyMakeSSP(Iso = Iso_BASEL,
 We can check this with our **ProSpect** *speclib_check* function:
 
 ```{r}
-speclib_check(PG_Ch_PHOENIX)
+speclib_check(PG_Ch_C3K) #just checking this one since it our fiducial SSP
 ```
 
 Hopefully it all passes! I won't do this for all of the SSPs here though (too much clutter).
@@ -133,6 +129,8 @@ Hopefully it all passes! I won't do this for all of the SSPs here though (too mu
 Now for some plots. Below we can compare a specific target metallicity (Z) and age (in log(Age/Years) units). Here we loop around the metallicities available in BC03, and ages 10^5^ -- 10^10^ Years in 1 dex spacing:
 
 ```{r, fig.width=8, fig.height=6}
+data(BC03lr)
+
 for(Z in BC03lr$Z){
   for(logAge in 7:10){
     temp_PHOENIX = specReBin(PG_Ch_PHOENIX$Wave, PG_Ch_PHOENIX$Zspec[[min(which(PG_Ch_PHOENIX$Z >= Z))]][min(which(PG_Ch_PHOENIX$Age >= 10^logAge)),], BC03lr$Wave)
@@ -188,6 +186,7 @@ for(Z in BC03lr$Z){
     temp_PHOENIX = specReBin(PG_Ch_PHOENIX$Wave, PG_Ch_PHOENIX$Zspec[[min(which(PG_Ch_PHOENIX$Z >= Z))]][min(which(PG_Ch_PHOENIX$Age >= 10^logAge)),], BC03lr$Wave)
     temp_MILES = specReBin(PG_Ch_MILES$Wave, PG_Ch_MILES$Zspec[[min(which(PG_Ch_MILES$Z >= Z))]][min(which(PG_Ch_MILES$Age >= 10^logAge)),], BC03lr$Wave)
     temp_BASEL = specReBin(PG_Ch_BASEL$Wave, PG_Ch_BASEL$Zspec[[min(which(PG_Ch_BASEL$Z >= Z))]][min(which(PG_Ch_BASEL$Age >= 10^logAge)),], BC03lr$Wave)
+    temp_BC03 = cbind(BC03lr$Wave, BC03lr$Zspec[[min(which(BC03lr$Z >= Z))]][min(which(BC03lr$Age >= 10^logAge)),])
     
     mag_NUV_r_C3K = c(mag_NUV_r_C3K, magABcalc(temp_C3K, filter=NUV_filt) - magABcalc(temp_C3K, filter=r_filt))
     mag_r_Ks_C3K = c(mag_r_Ks_C3K, magABcalc(temp_C3K, filter=r_filt) - magABcalc(temp_C3K, filter=Ks_filt))

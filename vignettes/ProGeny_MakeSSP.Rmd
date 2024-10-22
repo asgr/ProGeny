@@ -28,7 +28,7 @@ library(magicaxis)
 data(BC03lr) #we shall use this later!
 ```
 
-The main thing **ProGeny** does (and the reason it was designed at all) is create Simple Stellar Poopulation (SSP) models that can directly few into **ProSpect**. This is useful because it gives us full control over what isochrones and stellar atmospheres we use, and how we map them together. We can also control our initial mass function (IMF).
+The main thing **ProGeny** does (and the reason it was designed at all) is to create Simple Stellar Population (SSP) models that can directly load into **ProSpect**. This is useful because it gives us full control over what isochrones and stellar atmospheres we use, and how we map them together. We can also control our initial mass function (IMF).
 
 The basic path to doing this is to firstly load our desired isochrones (MIST, in this case). On my machine this is at:
 

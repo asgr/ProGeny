@@ -1,4 +1,5 @@
 \name{progenyDownload}
+\alias{progenyDownload}
 \alias{progenyIsoDownload}
 \alias{progenyAtmosDownload}
 \alias{progenyAtmosLoad}

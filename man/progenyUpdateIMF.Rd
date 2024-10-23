@@ -42,10 +42,10 @@ Aaron Robotham
 }
 \examples{
 \dontrun{
-#load iso
+#Load isochrone:
 Iso  = read.fst('path/to/Iso.fst', as.data.table=TRUE)
 
-#Integrate the IMF
+#Integrate the IMF:
 IMFint = progenyUpdateIMF(Iso, IMF_Chabrier)
 }
 }

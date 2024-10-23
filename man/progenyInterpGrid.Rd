@@ -116,16 +116,16 @@ Aaron Robotham
 }
 \examples{
 \dontrun{
-#load iso
+#Load isochrone:
 Iso  = read.fst('path/to/Iso.fst', as.data.table=TRUE)
 
-#load atmos
+#Load stellar atmosheres:
 Spec_combine = progenyAtmosLoad('path/to/atmos/')
 
-#Interp atmos onto isochrone grid
+#Interpolate stellar atmosheres onto isochrone grid:
 Interp_combine = progenyInterpGrid_All(Iso=Iso, Spec_combine=Spec_combine)
 
-#Select best atmos library
+#Select best stellar atmoshere library:
 Iso = progenyInterpBest(Iso=Iso, Interp_combine=Interp_combine)
 }
 }

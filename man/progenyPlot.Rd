@@ -109,19 +109,19 @@ Aaron Robotham
 }
 \examples{
 \dontrun{
-#load iso
+#Load isochrone:
 Iso  = read.fst('path/to/Iso.fst', as.data.table=TRUE)
 
-#load atmos
+#Load stellar atmosheres:
 Spec_combine = progenyAtmosLoad('path/to/atmos/')
 
-#plot the whole isochrone
+#Plot the whole isochrone:
 progenyIsoPlot(Iso)
 
-#plot all atmos
+#Plot all stellar atmosheres:
 progenyAtmosPlot(Spec_combine)
 
-#plot a particular part of the isochrone on the current stellar atmosphere plot
+#Plot a particular part of the isochrone on the current stellar atmosphere plot:
 progenyIsoPlot(Iso[logAge==9 & logZ==0,], add=TRUE)
 }
 }

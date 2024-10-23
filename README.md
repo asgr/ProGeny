@@ -4,6 +4,13 @@
 
 Details will be added over time, but the base package can be installed from this repo. Below we show a very simple (and fully default) example of how you can construct an SSP.
 
+### First download the desired isochrones and stellar atmospheres
+
+```r
+progenyIsoDownload()
+progenyAtmosDownload()
+```
+
 ### Load isochrone
 
 ```r

@@ -32,7 +32,7 @@ List; information that allows us to map Teff, logG, logZ information from the ta
 }
 }
 \details{
-TBD
+This is a lower level function that can create a single realisation spectra for a target age and metallicity. The SSP generating function \code{\link{progenyMakeSSP}} basically loops over this function for the grid of all possible ages and metallicities available in the given isochrone.
 }
 \value{
 Numeric vector; the stacked spectrum. Units will be Lsol/Ang.
@@ -47,5 +47,28 @@ Aaron Robotham
 \code{\link{progenyMakeSSP}}
 }
 \examples{
-## Nothing yet
+\dontrun{
+#load iso
+Iso  = read.fst('path/to/Iso.fst', as.data.table=TRUE)
+
+#load atmos
+Spec_combine = progenyAtmosLoad('path/to/atmos/')
+
+#Interp atmos onto isochrone grid
+Interp_combine = progenyInterpGrid_All(Iso=Iso, Spec_combine=Spec_combine)
+
+#Select best atmos library
+Iso = progenyInterpBest(Iso=Iso, Interp_combine=Interp_combine)
+
+#Integrate the IMF
+IMFint = progenyUpdateIMF(Iso, IMF_Chabrier)
+
+#Generate a single spectrum at Age = 1 Gyr and Z = Zsol
+Spec = progenyIso2Spec(logAge=9, logZ=0, Iso=Iso, IMFint=IMFint$IMFint,
+  Spec_combine=Spec_combine, Interp_combine=Interp_combine)
+
+#Plot it
+magplot(Spec_combine$base$wave, Spec, log='xy', type='l', xlim=c(1e3,1e5),
+  xlab="Wavelength / Ang", ylab="Lsun / Ang (for 1 Msun SF)")
+}
 }

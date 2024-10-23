@@ -15,6 +15,6 @@ import("checkmate")
 
 importFrom("utils", "browseURL")
 importFrom("grDevices", "hcl.colors")
-importFrom("graphics", "legend", "points", "plot.xy")
+importFrom("graphics", "legend", "points", "plot.xy", "lines", "polygon", "text")
 importFrom("parallel", "detectCores")
 importFrom("stats", "approxfun", "integrate")

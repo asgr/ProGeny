@@ -100,7 +100,7 @@ progenyInterpGrid_All = function(Iso, Spec_combine, radius=2, weight_pow=2, k=8)
     white = Interp_white
   )
 
-  return(Interp_combine)
+  return(invisible(Interp_combine))
 }
 
 progenyInterpBest = function(Iso, Interp_combine, do_base=TRUE, do_extend=TRUE, do_hot=TRUE,
@@ -137,5 +137,5 @@ progenyInterpBest = function(Iso, Interp_combine, do_base=TRUE, do_extend=TRUE, 
   }
 
   best = NULL
-  return(Iso_temp[,best:=best_spec])
+  return(invisible(Iso_temp[,best:=best_spec]))
 }

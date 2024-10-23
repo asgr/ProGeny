@@ -10,23 +10,23 @@ Progeny Plotting
 Create useful diagnostic plots of ProGeny related objects.
 }
 \usage{
-progenyAtmosPlot(Spec_combine, add = FALSE, do_base = TRUE, do_extend = TRUE,
-  do_hot = TRUE, do_AGB = TRUE, do_white = TRUE,
-  col = c("black", "grey", "blue", "red", "darkgreen"), pch = 16, cex = 1,
-  xlim = c(2000, 4e+05), ylim = c(-1.5, 9.5), log = "x", ...)
-
 progenyIsoPlot(Iso, add = FALSE, sampleN = 1e4, seed = 666, zsel = 'Lum', zunit = 'Lsol',
   zstretch = 'log', zlegend = NULL, col = hcl.colors(101, "geyser"), pch = 16, cex = 0.5,
   xlim = c(2e3,4e5), ylim = c(-1.5, 9.5), zlim = NULL, log = 'x', draw_regions = FALSE,
   ...)
+
+progenyAtmosPlot(Spec_combine, add = FALSE, do_base = TRUE, do_extend = TRUE,
+  do_hot = TRUE, do_AGB = TRUE, do_white = TRUE,
+  col = c("black", "grey", "blue", "red", "darkgreen"), pch = 16, cex = 1,
+  xlim = c(2000, 4e+05), ylim = c(-1.5, 9.5), log = "x", ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{Spec_combine}{
-List; the required spectral atmspheres. This must be loaded via \code{\link{progenyAtmosLoad}}, where the inputs for that come via \code{\link{progenyAtmosDownload}}.
-}
   \item{Iso}{
 Data.frame / data.table; the input table of Isochrones. This must have a particular format (see ParsecIso in \code{\link{progenyIsoDownload}}).
+}
+  \item{Spec_combine}{
+List; the required spectral atmspheres. This must be loaded via \code{\link{progenyAtmosLoad}}, where the inputs for that come via \code{\link{progenyAtmosDownload}}.
 }
   \item{add}{
 Logical; should information be added to the current plot device (TRUE) or should a fresh plot be made (FALSE).
@@ -108,5 +108,20 @@ Aaron Robotham
 \code{\link{progenyMakeSSP}}
 }
 \examples{
-## Nothing yet
+\dontrun{
+#load iso
+Iso  = read.fst('path/to/Iso.fst', as.data.table=TRUE)
+
+#load atmos
+Spec_combine = progenyAtmosLoad('path/to/atmos/')
+
+#plot the whole isochrone
+progenyIsoPlot(Iso)
+
+#plot all atmos
+progenyAtmosPlot(Spec_combine)
+
+#plot a particular part of the isochrone on the current stellar atmosphere plot
+progenyIsoPlot(Iso[logAge==9 & logZ==0,], add=TRUE)
+}
 }

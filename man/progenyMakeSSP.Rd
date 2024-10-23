@@ -8,8 +8,8 @@ High Level SSP Creator
 The main interface via which users will likely use ProGeny to create SSPs.
 }
 \usage{
-progenyMakeSSP(Iso, IMFfunc, ..., rem_frac = 'get', Spec_combine, Interp_combine,
-  Zsol = 0.02, cores = 8, Labels = list(Zlab = "Metallicity",
+progenyMakeSSP(Iso, IMFfunc = IMF_Chabrier, ..., rem_frac = 'get', Spec_combine,
+  Interp_combine, Zsol = 0.02, cores = 8, Labels = list(Zlab = "Metallicity",
   Agelab = "Time since ZAM / Yrs", Wavelab = "Wavelength / Ang",
   Lumlab = "Lsun / Ang (for 1 Msun SF)", LumAgelab = "Lsun / Ang (for 1 Msun/Yr SFR)"))
 }
@@ -68,5 +68,28 @@ Aaron Robotham
 \code{\link{progenyMakeSSP}}
 }
 \examples{
-## Nothing yet
+\dontrun{
+#load iso
+Iso  = read.fst('path/to/Iso.fst', as.data.table=TRUE)
+
+#load atmos
+Spec_combine = progenyAtmosLoad('path/to/atmos/')
+
+#Interp atmos onto isochrone grid
+Interp_combine = progenyInterpGrid_All(Iso=Iso, Spec_combine=Spec_combine)
+
+#Select best atmos library
+Iso = progenyInterpBest(Iso=Iso, Interp_combine=Interp_combine)
+
+#Note above you might want to set label_AGB and label_white to restrict how AGB
+#And white dwarf atmospheres are added
+
+SSP = progenyMakeSSP(Iso=Iso, IMFfunc=IMF_Chabrier, Spec_combine=Spec_combine,
+  Interp_combine=Interp_combine)
+
+#We can check this with the ProSpect function
+
+library(ProSpect)
+speclib_check(SSP)
+}
 }

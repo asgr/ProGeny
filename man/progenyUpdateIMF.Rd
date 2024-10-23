@@ -23,7 +23,7 @@ Other arguments that can be accepted by the input \option{IMFfunc}.
 }
 }
 \details{
-TBD
+This is a low level function that generally only need to be run if manually generating a single spectrum with \code{\link{progenyIso2Spec}}. In comparison (for simpler use) \code{\link{progenyMakeSSP}} runs this internally each time it is executed. This adds a small amount of overhead when making a lot of SSPs, but reduces user errors.
 }
 \value{
 
@@ -41,5 +41,11 @@ Aaron Robotham
 \code{\link{progenyMakeSSP}}, \code{\link{IMF_evo}}
 }
 \examples{
-## Nothing yet
+\dontrun{
+#load iso
+Iso  = read.fst('path/to/Iso.fst', as.data.table=TRUE)
+
+#Integrate the IMF
+IMFint = progenyUpdateIMF(Iso, IMF_Chabrier)
+}
 }

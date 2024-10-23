@@ -78,5 +78,12 @@ Aaron Robotham
 \code{\link{progenyMakeSSP}}
 }
 \examples{
-## Nothing yet
+\dontrun{
+progenyIsoDownload()
+Iso = read.fst('path/to/Iso.fst')
+Iso = progenyIsoFormat(Iso)
+
+progenyAtmosDownload()
+SpecCombine = progenyAtmosLoad('path/to/atmos/')
+}
 }

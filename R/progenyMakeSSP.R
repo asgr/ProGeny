@@ -1,4 +1,4 @@
-progenyMakeSSP = function(Iso, IMFfunc, ..., rem_frac = 'get', Spec_combine,
+progenyMakeSSP = function(Iso, IMFfunc = IMF_Chabrier, ..., rem_frac = 'get', Spec_combine,
                           Interp_combine, Zsol=0.02, cores=8, Labels = list(
                             Zlab = "Metallicity", Agelab = "Time since ZAM / Yrs", Wavelab = "Wavelength / Ang",
                             Lumlab = "Lsun / Ang (for 1 Msun SF)", LumAgelab = "Lsun / Ang (for 1 Msun/Yr SFR)")){
@@ -100,5 +100,5 @@ progenyMakeSSP = function(Iso, IMFfunc, ..., rem_frac = 'get', Spec_combine,
     Zevo = Zevo
   )
 
-  return(SSP)
+  return(invisible(SSP))
 }

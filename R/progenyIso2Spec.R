@@ -39,5 +39,5 @@ progenyIso2Spec = function(logAge=8.4, logZ=0, Iso, IMFint, Spec_combine, Interp
     }
   }
 
-  return(spec_stack)
+  return(invisible(spec_stack))
 }

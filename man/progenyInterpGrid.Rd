@@ -72,9 +72,6 @@ Integer vector; the \option{Iso} column \option{label} value that corresponds sp
 }
 }
 \details{
-TBD
-}
-\note{
 In MIST the isochrones labels are provided as: -1 = PreMS, 0 = MS, 2 = RGB, 3 = CHeB, 4 = eAGB, 5 = TP-AGB, 6-8 = PostAGB, 9 = WR.
 
 In PARSEC the isochrones labels are provided as: 0 = PreMS, 1 = MS, 2 = SubGB, 3 = RGB, 4-6 = CHeB, 7 = eAGB, 8 = TP-AGB, 9 = PostAGB.
@@ -118,6 +115,18 @@ Aaron Robotham
 \code{\link{progenyMakeSSP}}
 }
 \examples{
-## Nothing yet
+\dontrun{
+#load iso
+Iso  = read.fst('path/to/Iso.fst', as.data.table=TRUE)
+
+#load atmos
+Spec_combine = progenyAtmosLoad('path/to/atmos/')
+
+#Interp atmos onto isochrone grid
+Interp_combine = progenyInterpGrid_All(Iso=Iso, Spec_combine=Spec_combine)
+
+#Select best atmos library
+Iso = progenyInterpBest(Iso=Iso, Interp_combine=Interp_combine)
+}
 }
 

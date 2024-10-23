@@ -67,5 +67,5 @@ progenyUpdateIMF = function(Iso, IMFfunc, ...){
     output = output[reorder,]
   }
 
-  return(output)
+  return(invisible(output))
 }

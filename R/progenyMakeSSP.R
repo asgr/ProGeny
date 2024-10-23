@@ -19,17 +19,6 @@ progenyMakeSSP = function(Iso, IMFfunc = IMF_Chabrier, ..., rem_frac = 'get', Sp
   #The below should work more generically (regardless of isochrone)
   Iso_temp[Lum > 1e-6,IMFint := progenyUpdateIMF(Iso_temp[Lum > 1e-6,], IMFfunc, ...)$IMFint]
 
-  # if(any(Iso$label == -1)){ #are we using MIST?
-  #   #If so continue as normal
-  #   Iso_temp[,IMFint := progenyUpdateIMF(Iso_temp, IMFfunc, ...)$IMFint]
-  # }else{
-  #   #Else we are using PARSEC and need to correct for remnants.
-  #   #The below is to avoid the issue where we have a massive gap to the remnant
-  #   #Which means the integral bin limit for the AGB before this gains way too much IMF integral.
-  #   Iso_temp[label < 9,IMFint := progenyUpdateIMF(Iso_temp[label < 9,], IMFfunc, ...)$IMFint]
-  # }
-  #Iso_temp[,ID:= 1:dim(Iso_temp)[1]]
-
   cores = min(cores, length(logZ_steps), detectCores())
   registerDoParallel(cores=cores)
   #
@@ -46,14 +35,6 @@ progenyMakeSSP = function(Iso, IMFfunc = IMF_Chabrier, ..., rem_frac = 'get', Sp
     }
     return(do.call(rbind, output))
   }
-
-  # Iso_stack = Iso_temp[,list(ID=list(ID)), by=list(logAge,logZ)]
-  #
-  # Zspec = foreach(i = 1:dim(Iso_stack))%dopar%{
-  #   #for(i in 1:dim(Iso_stack)[1]){
-  #   .progenyIso2SpecSub(subset=unlist(Iso_stack[i,ID]), Iso=Iso_temp, Iso_temp$IMFint, Spec_combine, Interp_combine)
-  # }
-  #need to check this a bit more carefully!
 
   message('Generating evo grids:')
 

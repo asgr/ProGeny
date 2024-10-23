@@ -10,7 +10,7 @@ vignette: >
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(eval = FALSE)
+knitr::opts_chunk$set(eval = TRUE)
 ```
 
 Below we will make all SSPs used in the ProGeny papers (Robotham & Bellstedt, and the companion paper and Bellstedt & Robotham). This covers the full grid of three isochrones (MIST, PARSEC, BaSTI); four stellar atmospheres (C3K, PHOENIX, MILES, BaSeL); three IMFs (Chabrier, Kroupa, Salpeter), i.e. 3 x 3 x 4 = 36 SSPs. Additionally there are Kroupa age and Z evolving IMFs for all four stellar atmosphere (MIST only), i.e. 2 x 4 = 8. And finally there is a Lacey age evolving IMF (MIST and C3K only). This makes 45 variants in total. Running all of the below on a modern machine with 8 cores will take about half an hour.
@@ -19,6 +19,7 @@ First we load the libraries. **ProGeny** and **Rfits** or available at [GitHub/a
 
 ```{r}
 library(ProGeny)
+library(ProSpect)
 library(Rfits)
 library(fst)
 library(data.table)
@@ -185,13 +186,21 @@ PG_Ch_Mi_BASEL = progenyMakeSSP(Iso = MistIso_BASEL,
 )
 ```
 
-Save them in the correct format (this can be loaded dirctly into **ProSpect** with *speclib_FITSload*).
+You might also want to check each SSP with the **ProSpect** function *speclib_check* before writing it out.
 
 ```{r}
-Rfits_write(PG_Ch_Mi_C3K, file.path(path_to_SSP,'SSP_paper/PG_Ch_Mi_C3K.fits'), flatten = T)
+speclib_check(PG_Ch_Mi_C3K)
+```
+
+As well as printing a bunch of diagnostic messages, this will return a logical output specifying whether all checks are passed (TRUE) or not (FALSE).
+
+Assuming our checks are passed (the above should work!) then we can write them out. Below we save them in the correct FITS format (this can be loaded directly into **ProSpect** with *speclib_FITSload*).
+
+```{r}
+Rfits_write(PG_Ch_Mi_C3K, file.path(path_to_SSP,'PG_Ch_Mi_C3K.fits'), flatten = T)
 Rfits_write(PG_Ch_Mi_PHOENIX, file.path(path_to_SSP,'PG_Ch_Mi_PHOENIX.fits'), flatten = T)
-Rfits_write(PG_Ch_Mi_MILES, file.path(path_to_SSP,'SSP_paper/PG_Ch_Mi_MILES.fits'), flatten = T)
-Rfits_write(PG_Ch_Mi_BASEL, file.path(path_to_SSP,'SSP_paper/PG_Ch_Mi_BASEL.fits'), flatten = T)
+Rfits_write(PG_Ch_Mi_MILES, file.path(path_to_SSP,'PG_Ch_Mi_MILES.fits'), flatten = T)
+Rfits_write(PG_Ch_Mi_BASEL, file.path(path_to_SSP,'PG_Ch_Mi_BASEL.fits'), flatten = T)
 ```
 
 ### Kroupa

@@ -24,25 +24,28 @@ progenyIsoDownload()
 progenyAtmosDownload()
 ```
 
-### Load isochrone
+Where below we assume the isochrone being used has been saved at path/to/Iso.fst, and the stellar atmospheres are in path/to/atmos/.
+
+Load isochrone:
 
 ```r
-Iso  = read.fst('path/to/Iso.fst', as.data.table=TRUE)
+install.packages("fst") # if you don't already have fst
+Iso  = fst::read.fst('path/to/Iso.fst', as.data.table=TRUE)
 ```
 
-### Load stellar atmospheres
+Load stellar atmospheres:
 
 ```r
 Spec_combine = progenyAtmosLoad('path/to/atmos/')
 ```
 
-### Interpolate stellar atmosheres onto isochrone grid
+Interpolate stellar atmosheres onto isochrone grid:
 
 ```r
 Interp_combine = progenyInterpGrid_All(Iso=Iso, Spec_combine=Spec_combine)
 ```
 
-### Select best stellar atmosphere library
+Select best stellar atmosphere library:
 
 ```r
 Iso = progenyInterpBest(Iso=Iso, Interp_combine=Interp_combine)
@@ -50,14 +53,14 @@ Iso = progenyInterpBest(Iso=Iso, Interp_combine=Interp_combine)
 
 Note above you might want to set label_AGB and label_white to restrict how AGB and white dwarf atmospheres are added.
 
-### Generate a full ProSpect ready SSP
+Generate a full ProSpect ready SSP:
 
 ```r
 SSP = progenyMakeSSP(Iso=Iso, IMFfunc=IMF_Chabrier, Spec_combine=Spec_combine,
   Interp_combine=Interp_combine)
 ```
 
-### Check this with the ProSpect function
+Check this with the ProSpect function:
 
 ```r
 library(ProSpect)

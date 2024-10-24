@@ -4,6 +4,19 @@
 
 Details will be added over time, but the base package can be installed from this repo. Below we show a very simple (and fully default) example of how you can construct an SSP.
 
+## Installation
+
+You will need some other CRAN packages to install **ProGeny**, but these should install automatically. To install ProGeny itseld you should run:
+
+```r
+install.packages("remotes") # if you don't already have remotes
+remotes::install_github("asgr/ProGeny")
+```
+
+That should be pretty painless since it doesn't require any compilation.
+
+## Using ProGeny
+
 ### First download the desired isochrones and stellar atmospheres
 
 ```r

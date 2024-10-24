@@ -10,7 +10,7 @@ vignette: >
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(eval = TRUE)
+knitr::opts_chunk$set(eval = FALSE)
 ```
 
 Below we will make all SSPs used in the ProGeny papers (Robotham & Bellstedt, and the companion paper and Bellstedt & Robotham). This covers the full grid of three isochrones (MIST, PARSEC, BaSTI); four stellar atmospheres (C3K, PHOENIX, MILES, BaSeL); three IMFs (Chabrier, Kroupa, Salpeter), i.e. 3 x 3 x 4 = 36 SSPs. Additionally there are Kroupa age and Z evolving IMFs for all four stellar atmosphere (MIST only), i.e. 2 x 4 = 8. And finally there is a Lacey age evolving IMF (MIST and C3K only). This makes 45 variants in total. Running all of the below on a modern machine with 8 cores will take about half an hour.

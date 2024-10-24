@@ -1,6 +1,5 @@
 exportPattern("^[[:alpha:]]+")
 
-import("fst")
 import("foreach")
 import("doParallel")
 import('data.table')

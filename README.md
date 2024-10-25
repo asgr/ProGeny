@@ -1,8 +1,8 @@
-# ProGeny
+# ProGeny: Stellar Population Library
 
 **ProGeny** is a stellar population library (SPL) that generates highly flexible simple/single stellar populations (SSPs) that can be directly loaded into the spectral energy distribution (SED) generating and fitting code **ProSpect**.
 
-Details will be added over time, but the base package can be installed from this repo. Below we show a very simple (and fully default) example of how you can construct an SSP.
+Details will be added over time, but the base package can be installed from this repo. Below we show a very simple (and fully default) example of how you can construct an SSP. For more complex vignettes see (rpubs.com/asgr/)[https://rpubs.com/asgr/].
 
 ## Installation
 
@@ -66,3 +66,36 @@ Check this with the ProSpect function:
 library(ProSpect)
 speclib_check(SSP)
 ```
+
+We can save it to use later:
+
+```r
+Rfits_write(SSP, 'path/to/SSP.fits', flatten = T)
+```
+
+We can load this into **ProSpect** easily:
+
+```r
+SSP2 = speclib_FITSload('path/to/SSP.fits')
+```
+
+Run it through **ProSpect** with the default SFH (constant):
+
+```r
+SSP2_pro = ProSpectSED(speclib=SSP2)
+```
+
+Plot it!
+
+```r
+plot(SSP2_pro, ylim=c(1e3,1e7))
+```
+
+We can compare that to the classic BC03 (high res) SSP (one line for convenience):
+
+```r
+data(BC03hr)
+plot(ProSpectSED(speclib=BC03hr), ylim=c(1e3,1e7))
+```
+
+That is just the start, see (rpubs.com/asgr/)[https://rpubs.com/asgr/] for longer vignettes!

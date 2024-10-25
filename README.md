@@ -2,7 +2,7 @@
 
 **ProGeny** is a stellar population library (SPL) that generates highly flexible simple/single stellar populations (SSPs) that can be directly loaded into the spectral energy distribution (SED) generating and fitting code **ProSpect**.
 
-Details will be added over time, but the base package can be installed from this repo. Below we show a very simple (and fully default) example of how you can construct an SSP. For more complex vignettes see (rpubs.com/asgr/)[https://rpubs.com/asgr/].
+Details will be added over time, but the base package can be installed from this repo. Below we show a very simple (and fully default) example of how you can construct an SSP. For more complex vignettes see [rpubs.com/asgr](https://rpubs.com/asgr).
 
 ## Installation
 
@@ -60,9 +60,10 @@ SSP = progenyMakeSSP(Iso=Iso, IMFfunc=IMF_Chabrier, Spec_combine=Spec_combine,
   Interp_combine=Interp_combine)
 ```
 
-Check this with the ProSpect function:
+Check this with the **ProSpect** function:
 
 ```r
+remotes::install_github("asgr/ProSpect") #Install ProSpect if needed
 library(ProSpect)
 speclib_check(SSP)
 ```
@@ -70,19 +71,21 @@ speclib_check(SSP)
 We can save it to use later:
 
 ```r
+remotes::install_github("asgr/Rfits") #Install Rfits if needed
+library(Rfits)
 Rfits_write(SSP, 'path/to/SSP.fits', flatten = T)
 ```
 
-We can load this into **ProSpect** easily:
+We can load this back into the **ProSpect** format:
 
 ```r
 SSP2 = speclib_FITSload('path/to/SSP.fits')
 ```
 
-Run it through **ProSpect** with the default SFH (constant):
+Now we run it through **ProSpect** with the default SFH (constant) to make our first SED:
 
 ```r
-SSP2_pro = ProSpectSED(speclib=SSP2)
+SSP_pro = ProSpectSED(speclib=SSP2) # Obviously ProSpectSED(speclib=SSP) also works
 ```
 
 Plot it!
@@ -98,4 +101,4 @@ data(BC03hr)
 plot(ProSpectSED(speclib=BC03hr), ylim=c(1e3,1e7))
 ```
 
-That is just the start, see (rpubs.com/asgr/)[https://rpubs.com/asgr/] for longer vignettes!
+That is just the start, see [rpubs.com/asgr](https://rpubs.com/asgr) for longer vignettes!

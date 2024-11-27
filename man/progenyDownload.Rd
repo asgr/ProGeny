@@ -85,5 +85,21 @@ Iso = progenyIsoFormat(Iso)
 
 progenyAtmosDownload()
 SpecCombine = progenyAtmosLoad('path/to/atmos/')
+
+#We can plot some atmospheres coloured by temperature:
+
+Temp_vec = seq(2000,50000,by=1000)
+col_vec = hcl.colors(length(Temp_vec), 'Zissou 1', rev=TRUE)
+
+magplot(NA, NA, type='n', log='xy', xlim=c(3e2,1e5), ylim=c(1e-10,1),
+  xlab='Wavelength / Ang', ylab = expression(L[lambda]))
+for(i in seq_along(Temp_vec)){
+  loc = SpecCombine$base$info[Teff==Temp_vec[i] & logG == 4 & logZ == 0,which=T]
+  if(length(loc) > 0){
+    lines(SpecCombine$base$wave, SpecCombine$base$spec[loc,], col=col_vec[i])
+  }
+}
+
+magbar('topright', range=c(2000,50000), col=col_vec, title='Temp / K', titleshift=0.5)
 }
 }

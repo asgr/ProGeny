@@ -49,14 +49,18 @@ progenyAtmosLoad = function(destpath = '',
     base$spec[base$spec < 0] = 0
 
     if(!is.null(wavegrid)){
-      spec_new = matrix(0, dim(base$spec)[1], length(wavegrid))
+      if(wavegrid[1] == 'get'){
+        wavegrid = base$wave
+      }else{
+        spec_new = matrix(0, dim(base$spec)[1], length(wavegrid))
 
-      for(i in 1:dim(spec_new)[1]){
-        spec_new[i,] = ProSpect::specReBin(wave=base$wave, flux=base$spec[i,], wavegrid=wavegrid, ...)$flux
+        for(i in 1:dim(spec_new)[1]){
+          spec_new[i,] = ProSpect::specReBin(wave=base$wave, flux=base$spec[i,], wavegrid=wavegrid, ...)$flux
+        }
+
+        base$spec = spec_new
+        base$wave = wavegrid
       }
-
-      base$spec = spec_new
-      base$wave = wavegrid
     }
 
   }else{

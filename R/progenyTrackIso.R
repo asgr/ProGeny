@@ -164,9 +164,17 @@ progenyTrackInterp = function(tracklist, mass_target, logAge_vec=NULL,
   }
 
   if(length(combine_out) == 1){
-    return(combine_out[[1]])
+    combine_out = combine_out[[1]]
   }else{
-    return(rbindlist(combine_out))
+    combine_out = rbindlist(combine_out)
+  }
+
+  setkey(combine_out, logAge, Mini)
+
+  use_age = unique(combine_out$logAge)
+
+  foreach(age = use_age)%do%{
+
   }
 }
 

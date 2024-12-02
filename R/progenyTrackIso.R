@@ -4,12 +4,10 @@ progenyTrackInterp = function(tracklist, mass_target, logAge_vec=NULL,
   track_masses = unique(tracklist$Mini)
 
   if(is.data.frame(mass_target)){
-    logAge_lo = mass_target$logAge_lo
-    logAge_hi = mass_target$logAge_hi
-    mass_target = mass_target$Mini
+    mass_target_orig = mass_target
+    mass_target = unique(mass_target$Mini)
   }else{
-    logAge_lo = NULL
-    logAge_hi = NULL
+    mass_target_orig = NULL
   }
 
   track_bins = as.integer(cut(mass_target, breaks=track_masses, right=FALSE))
@@ -151,7 +149,7 @@ progenyTrackInterp = function(tracklist, mass_target, logAge_vec=NULL,
       }
 
       temp_out = data.table(logAge = temp_vec_logAge,
-                       Mini = mass_target[i],
+                       Mini = 10^mass_target_loc[i],
                        Mass = 10^temp_vec_logMass,
                        Lum = 10^temp_vec_logLum,
                        Teff = 10^temp_vec_logTeff,
@@ -171,11 +169,19 @@ progenyTrackInterp = function(tracklist, mass_target, logAge_vec=NULL,
 
   setkey(combine_out, logAge, Mini)
 
-  use_age = unique(combine_out$logAge)
+  if(!is.null(mass_target_orig)){
+    use_age = unique(mass_target_orig[,list(logAge_lo, logAge_hi)])
 
-  foreach(age = use_age)%do%{
+    combine_out = foreach(i = 1:dim(use_age)[1])%do%{
+      logAge_lo_temp = use_age[i,logAge_lo]
+      logAge_hi_temp = use_age[i,logAge_hi]
+      combine_out[(Mini %in% mass_target_orig[logAge_lo == logAge_lo_temp & logAge_hi == logAge_hi_temp,Mini]) & (logAge >= logAge_lo_temp) & (logAge <= logAge_hi_temp),]
+    }
 
+    combine_out = rbindlist(combine_out)
   }
+
+  return(combine_out)
 }
 
 #This will extract the locations of important features

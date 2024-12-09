@@ -1,4 +1,4 @@
-progenyIsoDownload = function(URL = 'https://tinyurl.com/progeny-isochrone/', ...) {
+progenyIsoDownload = function(URL = 'https://drive.google.com/drive/folders/1SnUUDgXGOiRZgcUZUKnWpG0WN0Lzg1Zs?usp=sharing', ...) {
   # if (Iso == 'avail') {
   #   url.show(paste0(URL, 'avail.txt?raw=1'))
   # } else{
@@ -11,7 +11,7 @@ progenyIsoDownload = function(URL = 'https://tinyurl.com/progeny-isochrone/', ..
   browseURL(URL, ...)
 }
 
-progenyAtmosDownload = function(URL = 'https://tinyurl.com/progeny-atmos/', ...) {
+progenyAtmosDownload = function(URL = 'https://drive.google.com/drive/folders/1oYS1JBQzP56cvTXuvDaw8b1ckwIZSnzw?usp=sharing', ...) {
   # if (atmos == 'avail') {
   #   url.show(paste0(URL, 'avail.txt?raw=1'))
   # } else{

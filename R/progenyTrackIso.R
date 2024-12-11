@@ -243,22 +243,24 @@ progenyTagFeatures = function(tracklist, deriv=1, n=1e4, expand=-1:1){
     for(i in seq_along(track_vals)){
       suppressWarnings({
         sel = tracklist_temp[Mini == track_vals[i] & logZ == logZ_use, which=TRUE]
+        interval = c(0, 10^max(tracklist_temp[Mini == track_vals[i],logAge]))
+        
+        temp_func = splinefun(tracklist_temp[sel, list(10^logAge, Mass)])
+        Mass_root = rootSolve::uniroot.all(function(x){temp_func(x,deriv)}, interval, n=n)
 
-        temp_func = splinefun(tracklist_temp[sel, list(logAge, Mass)])
-        Mass_root = rootSolve::uniroot.all(function(x){temp_func(x,deriv)}, c(1,max(tracklist_temp[Mini == track_vals[i],logAge])), n=n)
+        temp_func = splinefun(tracklist_temp[sel, list(10^logAge, Lum)])
+        Lum_root = rootSolve::uniroot.all(function(x){temp_func(x,deriv)}, interval, n=n)
 
-        temp_func = splinefun(tracklist_temp[sel, list(logAge, Lum)])
-        Lum_root = rootSolve::uniroot.all(function(x){temp_func(x,deriv)}, c(1,max(tracklist_temp[Mini == track_vals[i],logAge])), n=n)
+        temp_func = splinefun(tracklist_temp[sel, list(10^logAge, Teff)])
+        Teff_root = rootSolve::uniroot.all(function(x){temp_func(x,deriv)}, interval, n=n)
 
-        temp_func = splinefun(tracklist_temp[sel, list(logAge, Teff)])
-        Teff_root = rootSolve::uniroot.all(function(x){temp_func(x,deriv)}, c(1,max(tracklist_temp[Mini == track_vals[i],logAge])), n=n)
+        temp_func = splinefun(tracklist_temp[sel, list(10^logAge, logG)])
+        logG_root = rootSolve::uniroot.all(function(x){temp_func(x,deriv)}, interval, n=n)
 
-        temp_func = splinefun(tracklist_temp[sel, list(logAge, logG)])
-        logG_root = rootSolve::uniroot.all(function(x){temp_func(x,deriv)}, c(1,max(tracklist_temp[Mini == track_vals[i],logAge])), n=n)
-
-        all_root = sort(unique(c(Mass_root, Lum_root, Teff_root, logG_root)))
+        all_root = log10(sort(unique(c(Mass_root, Lum_root, Teff_root, logG_root))))
 
         tag_temp = findInterval(all_root, tracklist_temp[sel, logAge], all.inside = T)
+        tag_temp = c(1, tag_temp, length(sel))
         tag_temp = unique(as.integer(outer(tag_temp, expand, FUN='+')))
         tracklist_temp[sel, tag:= (1:length(sel) %in% tag_temp)]
       })
@@ -267,29 +269,53 @@ progenyTagFeatures = function(tracklist, deriv=1, n=1e4, expand=-1:1){
   return(tracklist_temp)
 }
 
-progenyMassMap = function(tracklist, logAge_vec){
+progenyMassMap = function(tracklist, logAge_vec, logZ_vec=NULL){
   tracklist_temp = copy(tracklist[tag == TRUE])
-  age_bin = findInterval(tracklist_temp$logAge, logAge_vec)
+  
+  age_bin = findInterval(tracklist_temp$logAge, logAge_vec, all.inside=TRUE)
   tracklist_temp = tracklist_temp[which(age_bin > 0),]
   age_bin = age_bin[age_bin > 0]
   age_bin_unique = sort(unique(age_bin))
+  
+  if(!is.null(logZ_vec)){
+    Z_bin = findInterval(tracklist_temp$logZ, logZ_vec, all.inside=TRUE)
+    tracklist_temp = tracklist_temp[which(Z_bin > 0),]
+    Z_bin = Z_bin[Z_bin > 0]
+    Z_bin_unique = sort(unique(Z_bin))
+  }
+  
   Mini_vec = sort(unique(tracklist$Mini))
-
   Mini_match = match(tracklist_temp$Mini, Mini_vec)
   Mini_match_lo = Mini_match
-  Mini_match_lo[Mini_match_lo == 1L] = NA
+  Mini_match_lo[Mini_match_lo == 1L] = 2L
   Mini_match_hi = Mini_match
-  Mini_match_hi[Mini_match_hi == length(Mini_vec)] = NA
+  Mini_match_hi[Mini_match_hi == length(Mini_vec)] = length(Mini_vec) - 1L
 
   tracklist_temp[,Mini_prev:=Mini_vec[Mini_match_lo - 1L]]
   tracklist_temp[,Mini_next:=Mini_vec[Mini_match_hi + 1L]]
 
+  output = {}
+  
   for(i in age_bin_unique){
-    temp = tracklist_temp[which(age_bin == i),list(Mini, logAge)]
-    temp_Mini_hi = 10^unlist(temp[,log10(Mini) + (log10(Mini_next) - log10(Mini))*(logAge - logAge_vec[i]) / (logAge_vec[i + 1L] - logAge_vec[i])])
-    #Not worked on below yet
-    temp_Mini_lo = temp[,Mini + (Mini - Mini_prev)*(logAge - logAge_vec[i]) / (logAge_vec[i + 1L] - logAge_vec[i])]
+    if(is.null(logZ_vec)){
+      #interpolating over just logAge
+      weight = (logAge - logAge_vec[i]) / (logAge_vec[i + 1L] - logAge_vec[i])
+      temp = tracklist_temp[which(age_bin == i),list(Mini, logAge, Mini_prev, Mini_next)]
+      temp_Mini = 10^unlist(temp[,log10(Mini) + (log10(Mini_next) - log10(Mini))*weight])
+      output = rbind(output, data.table(Mini = temp_Mini, logAge_lo = logAge_vec[i], logAge_hi = logAge_vec[i + 1L]))
+    }else{
+      for(j in Z_bin_unique){
+        #if we need to also interpolate over logZ
+        #need to check this weight a bit more carefully...
+        weight = (logAge - logAge_vec[i]) / (logAge_vec[i + 1L] - logAge_vec[i]) * (logZ - logZ_vec[j]) / (logZ_vec[j + 1L] - logZ_vec[j])
+        temp = tracklist_temp[which(age_bin == i & Z_bin == j),list(Mini, logAge, Mini_prev, Mini_next)]
+        temp_Mini = 10^unlist(temp[,log10(Mini) + (log10(Mini_next) - log10(Mini))*weight])
+        output = rbind(output, data.table(Mini = temp_Mini, logAge_lo = logAge_vec[i], logAge_hi = logAge_vec[i + 1L], logZ_lo = logZ_vec[j], logZ_hi = logZ_vec[j + 1L]))
+      }
+    }
   }
+  
+  return(output)
 }
 
 progenyGradFeatures = function(tracklist, logAge_vec,

@@ -269,7 +269,7 @@ progenyTagFeatures = function(tracklist, deriv=1, n=1e4, expand=-1:1){
   return(tracklist_temp)
 }
 
-progenyMassMap = function(tracklist, logAge_vec, logZ_vec=NULL){
+progenyTagWeights = function(tracklist, logAge_vec, logZ_vec=NULL){
   tracklist_temp = copy(tracklist[tag == TRUE])
   
   age_bin = findInterval(tracklist_temp$logAge, logAge_vec, all.inside=TRUE)
@@ -299,18 +299,44 @@ progenyMassMap = function(tracklist, logAge_vec, logZ_vec=NULL){
   for(i in age_bin_unique){
     if(is.null(logZ_vec)){
       #interpolating over just logAge
-      weight = (logAge - logAge_vec[i]) / (logAge_vec[i + 1L] - logAge_vec[i])
       temp = tracklist_temp[which(age_bin == i),list(Mini, logAge, Mini_prev, Mini_next)]
-      temp_Mini = 10^unlist(temp[,log10(Mini) + (log10(Mini_next) - log10(Mini))*weight])
-      output = rbind(output, data.table(Mini = temp_Mini, logAge_lo = logAge_vec[i], logAge_hi = logAge_vec[i + 1L]))
+      logAge_weight = (temp$logAge - logAge_vec[i]) / (logAge_vec[i + 1L] - logAge_vec[i])
+      logAge_weight[logAge_weight < 0] = 0
+      logAge_weight[logAge_weight > 1] = 1
+      temp_Mini = 10^unlist(temp[,log10(Mini) + (log10(Mini_next) - log10(Mini))*logAge_weight])
+      output = rbind(output, data.table(Mini = temp_Mini,
+                                        Mini_lo = temp$Mini,
+                                        Mini_hi = temp$Mini_next,
+                                        logAge = temp$logAge,
+                                        logAge_weight = logAge_weight,
+                                        logAge_lo = logAge_vec[i],
+                                        logAge_hi = logAge_vec[i + 1L])
+                     )
     }else{
       for(j in Z_bin_unique){
         #if we need to also interpolate over logZ
         #need to check this weight a bit more carefully...
-        weight = (logAge - logAge_vec[i]) / (logAge_vec[i + 1L] - logAge_vec[i]) * (logZ - logZ_vec[j]) / (logZ_vec[j + 1L] - logZ_vec[j])
         temp = tracklist_temp[which(age_bin == i & Z_bin == j),list(Mini, logAge, Mini_prev, Mini_next)]
-        temp_Mini = 10^unlist(temp[,log10(Mini) + (log10(Mini_next) - log10(Mini))*weight])
-        output = rbind(output, data.table(Mini = temp_Mini, logAge_lo = logAge_vec[i], logAge_hi = logAge_vec[i + 1L], logZ_lo = logZ_vec[j], logZ_hi = logZ_vec[j + 1L]))
+        logAge_weight = (temp$logAge - logAge_vec[i]) / (logAge_vec[i + 1L] - logAge_vec[i])
+        logAge_weight[logAge_weight < 0] = 0
+        logAge_weight[logAge_weight > 1] = 1
+        logZ_weight = (temp$logZ - logZ_vec[j]) / (logZ_vec[j + 1L] - logZ_vec[j])
+        logZ_weight[logZ_weight < 0] = 0
+        logZ_weight[logZ_weight > 1] = 1
+        temp_Mini = 10^unlist(temp[,log10(Mini) + (log10(Mini_next) - log10(Mini))*logAge_weight])
+        output = rbind(output, data.table(Mini = temp_Mini,
+                                          Mini_lo = temp$Mini,
+                                          Mini_hi = temp$Mini_next,
+                                          logAge = temp$logAge,
+                                          logAge_weight = logAge_weight,
+                                          logAge_lo = logAge_vec[i],
+                                          logAge_hi = logAge_vec[i + 1L],
+                                          logZ = temp$logZ,
+                                          logZ_weight = logZ_weight,
+                                          logZ_lo = logZ_vec[j],
+                                          logZ_hi = logZ_vec[j + 1L]
+                                          )
+        )
       }
     }
   }

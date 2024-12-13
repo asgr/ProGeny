@@ -223,7 +223,49 @@ progenyTrackInterp = function(tracklist, target,
     combine_out = rbindlist(combine_out)
   }
 
+  combine_out = combine_out[is.finite(Mini) &
+                    is.finite(Mass) &
+                    is.finite(Lum) &
+                    is.finite(Teff) &
+                    is.finite(logG)
+                  , ]
+  
   return(combine_out)
+}
+
+progenyFindMass = function(tracklist, logAge_lim = c(5,7.3), logAge_bin=0.05,
+                           logZ_use=0, eep_range = 1:808){
+  
+  logAge_vec = seq(logAge_lim[1], logAge_lim[2], by=logAge_bin)
+  
+  temp = foreach(i = eep_range, .combine=rbind)%do%{
+    tracklist[logZ==logZ_use, list(i,logAge=logAge[i]), by=Mini]
+  }
+  
+  temp = temp[!is.na(logAge)]
+  
+  #to compute the interplated bicubic fit onto a regular isochrone grid
+  
+  akima.si = akima::interp(temp$logAge, temp$i, log10(temp$Mini),
+                           xo=logAge_vec, yo=min(temp$i):max(temp$i),
+                           linear = FALSE, extrap = FALSE, duplicate = 'median')
+  
+  clean = propaneBin2D(temp$logAge, temp$i, image=matrix(0,length(akima.si$x), length(akima.si$y)),
+                       xlim=range(akima.si$x), ylim=range(akima.si$y))
+  akima.si$z[clean$z == 0] = NA
+  akima.si$z[akima.si$z < min(log10(temp$Mini)) | akima.si$z > max(log10(temp$Mini))] = NA
+  
+  
+  output = foreach(i = seq_along(akima.si$x))%do%{
+    Mini_use = 10^akima.si$z[i,]
+    Mini_use = Mini_use[is.finite(Mini_use)]
+    data.table(Mini=Mini_use,
+               logAge_lo = akima.si$x[i] - logAge_bin/2,
+               logAge_hi = akima.si$x[i] + logAge_bin/2
+    )
+  }
+  
+  return(rbindlist(output))
 }
 
 progenyTagFeatures = function(tracklist, deriv=1, n=1e4, expand=-1:1){
@@ -345,7 +387,6 @@ progenyTagWeights = function(tracklist, logAge_vec, logZ_vec=NULL){
       }
     }
   }
-  
   return(output)
 }
 

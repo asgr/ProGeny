@@ -1,7 +1,11 @@
-progenyTrackInterp = function(tracklist, target, logAge_vec=NULL, target_type='Mini',
-                              iso_type='approx', cores=8, logZ=0, ...){
+progenyTrackInterp = function(tracklist, target, 
+                              make_iso = TRUE, logAge_lim = c(5,7.3), logAge_bin=0.05,
+                              iso_type='approx', cores=8, logZ_use=0, ...){
+  tracklist = copy(tracklist[logZ == logZ_use,])
+  target_type = 'Mini' #no longer thinking of Z interp, at least not for now.
   track_vals = unique(tracklist[[target_type]])
-
+  logAge_vec = seq(logAge_lim[1], logAge_lim[2], by=logAge_bin)
+  
   if(target_type == 'Mini'){
     target_log = TRUE
   }else if(target_type == 'logZ'){
@@ -148,7 +152,7 @@ progenyTrackInterp = function(tracklist, target, logAge_vec=NULL, target_type='M
                              end_func_label(remap_end[tag_vec_out])*weight)
       temp_vec_label = rowSums(temp_mat_label, na.rm = FALSE)
 
-      if(!is.null(logAge_vec)){
+      if(make_iso){
         if(iso_type == 'approx'){
           temp_vec_logMini = approxfun(temp_vec_logAge, temp_vec_logMini, ties = "ordered", ...)(logAge_vec)
           temp_vec_logMass = approxfun(temp_vec_logAge, temp_vec_logMass, ties = "ordered", ...)(logAge_vec)
@@ -157,12 +161,14 @@ progenyTrackInterp = function(tracklist, target, logAge_vec=NULL, target_type='M
           temp_vec_logG = approxfun(temp_vec_logAge, temp_vec_logG, ties = "ordered", ...)(logAge_vec)
           temp_vec_label = approxfun(temp_vec_logAge, temp_vec_label, ties = "ordered", ...)(logAge_vec)
         }else if(iso_type == 'integral' | iso_type == 'integrate'){
-          temp_vec_logMass = ProSpect::specReBin(temp_vec_logAge, temp_vec_logMass, logAge_vec, ...)$flux
-          temp_vec_logMini = ProSpect::specReBin(temp_vec_logAge, temp_vec_logMini, logAge_vec, ...)$flux
-          temp_vec_logLum = ProSpect::specReBin(temp_vec_logAge, temp_vec_logLum, logAge_vec, ...)$flux
-          temp_vec_logTeff = ProSpect::specReBin(temp_vec_logAge, temp_vec_logTeff, logAge_vec, ...)$flux
-          temp_vec_logG = ProSpect::specReBin(temp_vec_logAge, temp_vec_logG, logAge_vec, ...)$flux
-          temp_vec_label = ProSpect::specReBin(temp_vec_logAge, temp_vec_label, logAge_vec, ...)$flux
+          temp_vec_Age = 10^temp_vec_logAge
+          Age_vec = 10^logAge_vec
+          temp_vec_logMass = log10(ProSpect::specReBin(temp_vec_Age, 10^temp_vec_logMass, Age_vec, ...)$flux)
+          temp_vec_logMini = log10(ProSpect::specReBin(temp_vec_Age, 10^temp_vec_logMini, Age_vec, ...)$flux)
+          temp_vec_logLum = log10(ProSpect::specReBin(temp_vec_Age, 10^temp_vec_logLum, Age_vec, ...)$flux)
+          temp_vec_logTeff = log10(ProSpect::specReBin(temp_vec_Age, 10^temp_vec_logTeff, Age_vec, ...)$flux)
+          temp_vec_logG = log10(ProSpect::specReBin(temp_vec_Age, 10^temp_vec_logG, Age_vec, ...)$flux)
+          temp_vec_label = ProSpect::specReBin(temp_vec_Age, temp_vec_label, Age_vec, ...)$flux
         }
 
         temp_vec_logAge = logAge_vec
@@ -209,9 +215,8 @@ progenyTrackInterp = function(tracklist, target, logAge_vec=NULL, target_type='M
     use_age = unique(target_orig[,list(logAge_lo, logAge_hi)])
 
     combine_out = foreach(i = 1:dim(use_age)[1])%do%{
-      logAge_lo_temp = use_age[i,logAge_lo]
-      logAge_hi_temp = use_age[i,logAge_hi]
-      combine_temp = combine_out[(get(target_type) %in% target_orig[logAge_lo == logAge_lo_temp & logAge_hi == logAge_hi_temp,get(target_type)]) & (logAge >= logAge_lo_temp) & (logAge < logAge_hi_temp),]
+      logAge_temp = (use_age[i,logAge_lo] + use_age[i,logAge_hi])/2
+      combine_temp = combine_out[(get(target_type) %in% target_orig[logAge_lo == logAge_temp - logAge_bin/2, get(target_type)]) & (logAge == logAge_temp),]
       return(combine_temp)
     }
 

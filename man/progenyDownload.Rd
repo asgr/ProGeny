@@ -12,9 +12,9 @@ Download and Internally Load Isochrones and Stellar Atmospheres.
 Functions to discover, download and load the various isochrone and stellar atmosphere libraries needed to generate SSPs.
 }
 \usage{
-progenyIsoDownload(URL = "https://tinyurl.com/progeny-isochrone/", ...)
+progenyIsoDownload(URL = "https://drive.google.com/drive/folders/1SnUUDgXGOiRZgcUZUKnWpG0WN0Lzg1Zs?usp=sharing", ...)
 
-progenyAtmosDownload(URL = "https://tinyurl.com/progeny-atmos/", ...)
+progenyAtmosDownload(URL = "https://drive.google.com/drive/folders/1oYS1JBQzP56cvTXuvDaw8b1ckwIZSnzw?usp=sharing", ...)
 
 progenyAtmosLoad(destpath= '', base = 'combine_C3K_conroy',
   extend = 'combine_PHOENIX_allard', hot = 'combine_TMAP_werner',

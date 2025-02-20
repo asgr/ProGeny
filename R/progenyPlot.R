@@ -85,3 +85,27 @@ progenyIsoPlot = function(Iso, add=FALSE, sampleN=1e4, seed=666, zsel='Lum', zun
     text(3e4, 6.5, 'Post-AGB')
   }
 }
+
+progenySampPlot = function(wave, z=0, v=NULL, h=NULL, add=FALSE, xlim='auto',
+                           ylim='auto', xlab='Wavelength / Ang', ylab='Sampling Resolution', ...){
+  wave_grid = (1+z)*(wave[-1] + wave[-length(wave)])/2
+  samp_res = wave[-1]/diff(wave)
+  if(add){
+    lines(wave_grid, samp_res, ...)
+  }else{
+    if(ylim[1] == 'auto'){
+      ylim = c(0, max(samp_res, na.rm=TRUE))
+    }
+
+    if(xlim[1] == 'auto'){
+      #don't really need an xlim argument, but makes things seem more consistent
+      xlim = range(wave, na.rm=TRUE)
+    }
+
+    magplot(wave_grid, samp_res,
+            log='x', type='l', xlim=xlim, ylim=ylim, xlab=xlab, ylab=ylab, ...)
+  }
+  abline(v=v, lty=3, col='red')
+  abline(h=h, lty=3, col='blue')
+  return(invisible(data.frame(wave=wave_grid, res=samp_res)))
+}

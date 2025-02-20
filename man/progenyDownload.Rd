@@ -50,7 +50,7 @@ Character scalar/logical; for \code{progenyAtmosLoad}  name of the 'AGB' stellar
 Character scalar/logical; for \code{progenyAtmosLoad}  name of the 'white' dwarf stellar atmosphere library to use (without the '.fits' extension). The 'white' dwarf library will be the preferred option for the white dwarf spectra \option{Teff}, \option{logG} and \option{logZ} solution when interpolating the atmopsheres onto the isochrone grids. See \code{\link{progenyInterpGrid}}. This can be flagged in the isochrones with the \option{label} column, see \code{\link{progenyInterpBest}}.
 }
   \item{wavegrid}{
-Numeric vector; the target spectral wavelength grid in Angstroms. If NULL then all inputs must have the same native wavelength grid or bad things will happen. Basic checks our made though (that they are at least the same length). If not NULL then all stellar atmosphere spectra are rebinned using the \code{ProSpect} \code{specReBin} function, so \code{ProSpect} must also be isntalled in this case.
+Numeric vector; the target spectral wavelength grid in Angstroms. If NULL then all inputs must have the same native wavelength grid or bad things will happen. Basic checks our made though (that they are at least the same length). If not NULL then all stellar atmosphere spectra are rebinned using the \code{ProSpect} \code{specReBin} function, so \code{ProSpect} must also be installed in this case.
 }
   \item{\dots}{
 For download functions, additional arguments to pass to \code{\link{browseURL}}. For \code{progenyAtmosLoad}, additional arguments to pass to \code{ProSpect} \code{specReBin}. Only relevant if \option{wavegrid} is not NULL.

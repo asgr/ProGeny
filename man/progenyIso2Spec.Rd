@@ -8,7 +8,8 @@ Convert a Specific Age and Z Isochrone and IMF to a Stacked Spectrum
 Given a full Isochrone table and IMF, this will subset by a target Age and Z and stacked all the best matching spectral atmospheres to make a single galaxy spectrum. Running this with all Age and Z combinations is basically how we construct a full SSP (with \code{\link{progenyMakeSSP}}).
 }
 \usage{
-progenyIso2Spec(logAge = 8.4, logZ = 0, Iso, IMFint, Spec_combine, Interp_combine)
+progenyIso2Spec(logAge = 8.4, logZ = 0, Iso, IMFint, Spec_combine, Interp_combine,
+  interp = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -29,6 +30,9 @@ List; the required spectral atmspheres. This must be loaded via \code{\link{prog
 }
   \item{Interp_combine}{
 List; information that allows us to map Teff, logG, logZ information from the target \option{Iso} with the provided \option{Spec_combine}. This is made via \code{\link{progenyInterpGrid_All}}.
+}
+  \item{interp}{
+Logical; should the spectrum be interpolated? This is relevant if you wish to create metallicity outputs that are not on the same grid as the input isochrone. TRUE means a weighted log-linear interpolation is carried out using the surrounding 4 values of logAge and logZ, FALSE means the nearest exact grid values are used regardless of what is requested.
 }
 }
 \details{

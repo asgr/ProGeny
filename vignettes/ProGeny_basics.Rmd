@@ -30,19 +30,19 @@ The basic path to doing this is to firstly load our desired isochrones (MIST, in
 
 ```{r}
 MistIso  = read.fst('~/Dropbox (Personal)/ProGeny_isochrone/MistIso.fst', as.data.table=TRUE)
-#ParsecIso  = read.fst('~/Dropbox (Personal)/ProGeny_isochrone/ParsecIso.fst')
-#BastiIso  = read.fst('~/Dropbox (Personal)/ProGeny_isochrone/BastiIso_New.fst')
+#ParsecIso  = read.fst('~/Dropbox (Personal)/ProGeny_isochrone/ParsecIso.fst') #example if using PARSEC
+#BastiIso  = read.fst('~/Dropbox (Personal)/ProGeny_isochrone/BastiIso_New.fst') #example if using BaSTI
 ```
 
 If you do not have one already, you can get them using the *progenyIsoDownload* function. Currently we provide MIST (preferred, for reasons we shall get to), PARSEC and BaSTI as base isochrones.
 
-Here we load four different base spectra options: C3K, PHOENIX (Husser) MILES and BaSeL (msotly styled as BASEL below). To get these locally you will need to run *progenyAtmosDownload*. The below might take about a minute to run (depending on the speed of your HDD or SSD).
+Here we load four different base spectra options: C3K, PHOENIX (Husser) MILES and BaSeL (mostly styled as BASEL below). To get these locally you will need to run *progenyAtmosDownload*. The below might take about a minute to run (depending on the speed of your HDD or SSD).
 
 ```{r}
-Spec_C3K = progenyAtmosLoad('~/Dropbox (Personal)/ProGeny_atmos/', base='combine_C3K_conroy')
-Spec_PHOENIX = progenyAtmosLoad('~/Dropbox (Personal)/ProGeny_atmos/', base='combine_PHOENIX_husser')
-Spec_MILES = progenyAtmosLoad('~/Dropbox (Personal)/ProGeny_atmos/', base='combine_MILES_vazdekis')
-Spec_BASEL = progenyAtmosLoad('~/Dropbox (Personal)/ProGeny_atmos/', base='combine_BASEL_wlbc')
+Spec_C3K = progenyAtmosLoad('~/Dropbox (Personal)/ProGeny_atmos/', base='combine_C3K_conroy', wavegrid=BC03lr$Wave)
+Spec_PHOENIX = progenyAtmosLoad('~/Dropbox (Personal)/ProGeny_atmos/', base='combine_PHOENIX_husser', wavegrid=BC03lr$Wave)
+Spec_MILES = progenyAtmosLoad('~/Dropbox (Personal)/ProGeny_atmos/', base='combine_MILES_vazdekis', wavegrid=BC03lr$Wave)
+Spec_BASEL = progenyAtmosLoad('~/Dropbox (Personal)/ProGeny_atmos/', base='combine_BASEL_wlbc', wavegrid=BC03lr$Wave)
 ```
 
 Below we interpolate our spectra onto the isochrone grid of Teff, logG and logZ. The below might take a minute or two to run (depending on your CPU speed). For this example we will use MIST, but keen users should try switching to alternative isochrones.
@@ -120,25 +120,27 @@ PG_Ch_BASEL = progenyMakeSSP(Iso = Iso_BASEL,
 
 We can check this with our **ProSpect** *speclib_check* function:
 
-```{r}
+```{r, eval=FALSE}
 speclib_check(PG_Ch_C3K) #just checking this one since it our fiducial SSP
 ```
 
 Hopefully it all passes! I won't do this for all of the SSPs here though (too much clutter).
 
-Now for some plots. Below we can compare a specific target metallicity (Z) and age (in log(Age/Years) units). Here we loop around the metallicities available in BC03, and ages 10^5^ -- 10^10^ Years in 1 dex spacing:
+## Spectral Outputs
+
+Now for some plots. Below we can compare a specific target metallicity (Z) and age (in log(Age/Years) units) for fixed isochrone (MIST) and IMF (Chabrier), so we only vary the stellar spectral libraries used (PHOENIX, C3K, MILES and BaSeL). Here we loop around the metallicities available in BC03, and ages 10^5^ -- 10^10^ Years in 1 dex spacing:
 
 ```{r, fig.width=8, fig.height=6}
 data(BC03lr)
 
 for(Z in BC03lr$Z){
   for(logAge in 7:10){
-    temp_PHOENIX = specReBin(PG_Ch_PHOENIX$Wave, PG_Ch_PHOENIX$Zspec[[min(which(PG_Ch_PHOENIX$Z >= Z))]][min(which(PG_Ch_PHOENIX$Age >= 10^logAge)),], BC03lr$Wave)
-    temp_C3K = specReBin(PG_Ch_C3K$Wave, PG_Ch_C3K$Zspec[[min(which(PG_Ch_C3K$Z >= Z))]][min(which(PG_Ch_C3K$Age >= 10^logAge)),], BC03lr$Wave)
-    temp_MILES = specReBin(PG_Ch_MILES$Wave, PG_Ch_MILES$Zspec[[min(which(PG_Ch_MILES$Z >= Z))]][min(which(PG_Ch_MILES$Age >= 10^logAge)),], BC03lr$Wave)
-    temp_BASEL = specReBin(PG_Ch_BASEL$Wave, PG_Ch_BASEL$Zspec[[min(which(PG_Ch_BASEL$Z >= Z))]][min(which(PG_Ch_BASEL$Age >= 10^logAge)),], BC03lr$Wave)
+    temp_PHOENIX = cbind(PG_Ch_PHOENIX$Wave, PG_Ch_PHOENIX$Zspec[[min(which(PG_Ch_PHOENIX$Z >= Z))]][min(which(PG_Ch_PHOENIX$Age >= 10^logAge)),])
+    temp_C3K = cbind(PG_Ch_C3K$Wave, PG_Ch_C3K$Zspec[[min(which(PG_Ch_C3K$Z >= Z))]][min(which(PG_Ch_C3K$Age >= 10^logAge)),])
+    temp_MILES = cbind(PG_Ch_MILES$Wave, PG_Ch_MILES$Zspec[[min(which(PG_Ch_MILES$Z >= Z))]][min(which(PG_Ch_MILES$Age >= 10^logAge)),])
+    temp_BASEL = cbind(PG_Ch_BASEL$Wave, PG_Ch_BASEL$Zspec[[min(which(PG_Ch_BASEL$Z >= Z))]][min(which(PG_Ch_BASEL$Age >= 10^logAge)),])
     
-    magplot(NA, NA, log='xy', xlim=c(1e2,1e5), ylim=c(1e-8,3))
+    magplot(NA, NA, log='xy', xlim=c(1e2,1e5), ylim=c(1e-8,3), xlab='Wavelength / Ang', ylab='Lsol / Ang (for 1 Msol)')
     lines(temp_PHOENIX, col='blue')
     lines(temp_C3K, col='darkgreen')
     lines(temp_MILES, col='red')
@@ -152,6 +154,10 @@ for(Z in BC03lr$Z){
 
 The four different 'base' stellar atmosphere sets included with ProGeny show remarkable consistency for the most part. The main differences are caused by their differing native resolution (where PHOENIX is the highest).
 
+Using modifications to the above general approach, in the ProGeny I paper we also look at the impact of switching isochrone (keeping the stellar spectra and IMF fixed), and of switching IMF (keeping the isochrones and stellar spectra fixed). In general we remark that switching isochrones has the most impact, followed by stellar spectra. IMFs can have a large impact in mass-to-light if switching from Chabrier or Kroupa to Salpeter, but the spectral shape is fairly consistent.
+
+## Evolution of Stellar Mass Remaining
+
 It is also interesting to compare the stellar evolutionary tracks, in particular the mass remaining in stars with time, which is relevant for calculating standard stellar masses (which needs mass in stars, not total mass formed). Here we use PG_Ch_PHOENIX, but all four will be the same since we are using the same MIST isochrones in all cases.
 
 ```{r, fig.width=8, fig.height=6}
@@ -163,6 +169,10 @@ for(Z in BC03lr$Z){
   legend('topright', legend=paste('Z:',Z))
 }
 ```
+
+## Colour Outputs
+
+In the ProGeny I paper we also look at the impact of colour differences. Below we look at the impact of switching stellar spectral libraries, where using broadband colours make it easier to see small differences because the spectra covers many dex in luminosity.
 
 ```{r, fig.width=8, fig.height=6}
 NUV_filt = getfilt('NUV')

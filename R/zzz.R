@@ -1,10 +1,10 @@
 .onLoad<-function(libname, pkgname){
   packageStartupMessage(
 'Isochrones: Download with progenyIsoDownload. Load with read.fst
-Atmospheres: Download with progenyAtmosDownload. Load with atmos_load
+Atmospheres: Download with progenyAtmosDownload. Load with progenyAtmosLoad
 Interpolate grids with progenyInterpGrid_All
 Update the best match between Isochrones and Atmospheres with progenyInterpBest
-Generate your SSP using the input above with progenyMakeSSP, minimally:\n
+Generate your SSP using the input above with progenyMakeSSP, e.g. minimally:\n
 Iso  = read.fst(\'path/to/Iso.fst\', as.data.table=TRUE)
 Spec_combine = progenyAtmosLoad(\'path/to/atmos/\')
 Interp_combine = progenyInterpGrid_All(Iso=Iso, Spec_combine=Spec_combine)

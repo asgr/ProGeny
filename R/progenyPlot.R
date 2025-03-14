@@ -56,7 +56,7 @@ progenyIsoPlot = function(Iso, add=FALSE, sampleN=1e4, seed=666, zsel='Lum', zun
   }
 
   if(is.null(zlim)){
-    zlim = range(unlist(Iso_use[,..zsel]))
+    zlim = range(unlist(Iso_use[,..zsel]), na.rm=TRUE)
   }
 
   locut = zlim[1]
@@ -99,7 +99,7 @@ progenySampPlot = function(wave, z=0, v=NULL, h=NULL, add=FALSE, xlim='auto',
 
     if(xlim[1] == 'auto'){
       #don't really need an xlim argument, but makes things seem more consistent
-      xlim = range(wave, na.rm=TRUE)
+      xlim = range(wave_grid, na.rm=TRUE)
     }
 
     magplot(wave_grid, samp_res,

@@ -18,7 +18,7 @@ progenyAtmosDownload(URL = "https://drive.google.com/drive/folders/1oYS1JBQzP56c
 
 progenyAtmosLoad(destpath= '', base = 'combine_C3K_conroy',
   extend = 'combine_PHOENIX_allard', hot = 'combine_TMAP_werner',
-  AGB = 'combine_AGB_lancon', white = NULL, wavegrid = NULL, ...)
+  AGB = 'combine_AGB_lancon', white = NULL, wavegrid = NULL, cores = 8, ...)
 
 progenyIsoFormat(Iso)
 }
@@ -51,6 +51,9 @@ Character scalar/logical; for \code{progenyAtmosLoad}  name of the 'white' dwarf
 }
   \item{wavegrid}{
 Numeric vector; the target spectral wavelength grid in Angstroms. If NULL then all inputs must have the same native wavelength grid or bad things will happen. Basic checks our made though (that they are at least the same length). If not NULL then all stellar atmosphere spectra are rebinned using the \code{ProSpect} \code{specReBin} function, so \code{ProSpect} must also be installed in this case.
+}
+  \item{cores}{
+Integer scalar; the number of cores to run on.
 }
   \item{\dots}{
 For download functions, additional arguments to pass to \code{\link{browseURL}}. For \code{progenyAtmosLoad}, additional arguments to pass to \code{ProSpect} \code{specReBin}. Only relevant if \option{wavegrid} is not NULL.

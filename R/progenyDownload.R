@@ -31,11 +31,15 @@ progenyAtmosLoad = function(destpath = '',
                       AGB = 'combine_AGB_lancon',
                       white = NULL,
                       wavegrid = NULL,
+                      cores = 8,
                       ...
                       ){
   if(!is.null(wavegrid)){
     if(!requireNamespace("ProSpect", quietly = TRUE)){
       stop('The ProSpect package is needed for spectral re-binning. Please install from GitHub asgr/ProSpect.', call. = FALSE)
+    }
+    if(cores > 1){
+      registerDoParallel(cores = cores)
     }
   }
 
@@ -52,10 +56,18 @@ progenyAtmosLoad = function(destpath = '',
       if(wavegrid[1] == 'get'){
         wavegrid = base$wave
       }else{
-        spec_new = matrix(0, dim(base$spec)[1], length(wavegrid))
-
-        for(i in 1:dim(spec_new)[1]){
-          spec_new[i,] = ProSpect::specReBin(wave=base$wave, flux=base$spec[i,], wavegrid=wavegrid, ...)$flux
+        Nrow = dim(base$spec)[1]
+        Nwave = length(wavegrid)
+        if(cores == 1){
+          spec_new = matrix(0, Nrow, Nwave)
+          for(i in 1:Nrow){
+            spec_new[i,] = ProSpect::specReBin(wave=base$wave, flux=base$spec[i,], wavegrid=wavegrid, ...)$flux
+          }
+        }else{
+          spec_new = foreach(i = 1:Nrow)%dopar%{
+            ProSpect::specReBin(wave=base$wave, flux=base$spec[i,], wavegrid=wavegrid, ...)$flux
+          }
+          spec_new = do.call(rbind, spec_new)
         }
 
         base$spec = spec_new
@@ -77,10 +89,17 @@ progenyAtmosLoad = function(destpath = '',
     extend$spec[extend$spec < 0] = 0
 
     if(!is.null(wavegrid)){
-      spec_new = matrix(0, dim(extend$spec)[1], length(wavegrid))
-
-      for(i in 1:dim(spec_new)[1]){
-        spec_new[i,] = ProSpect::specReBin(wave=extend$wave, flux=extend$spec[i,], wavegrid=wavegrid, ...)$flux
+      Nrow = dim(extend$spec)[1]
+      if(cores == 1){
+        spec_new = matrix(0, Nrow, Nwave)
+        for(i in 1:Nrow){
+          spec_new[i,] = ProSpect::specReBin(wave=extend$wave, flux=extend$spec[i,], wavegrid=wavegrid, ...)$flux
+        }
+      }else{
+        spec_new = foreach(i = 1:Nrow)%dopar%{
+          ProSpect::specReBin(wave=extend$wave, flux=extend$spec[i,], wavegrid=wavegrid, ...)$flux
+        }
+        spec_new = do.call(rbind, spec_new)
       }
 
       extend$spec = spec_new
@@ -101,10 +120,17 @@ progenyAtmosLoad = function(destpath = '',
     hot$spec[hot$spec < 0] = 0
 
     if(!is.null(wavegrid)){
-      spec_new = matrix(0, dim(hot$spec)[1], length(wavegrid))
-
-      for(i in 1:dim(spec_new)[1]){
-        spec_new[i,] = ProSpect::specReBin(wave=hot$wave, flux=hot$spec[i,], wavegrid=wavegrid, ...)$flux
+      Nrow = dim(hot$spec)[1]
+      if(cores == 1){
+        spec_new = matrix(0, Nrow, Nwave)
+        for(i in 1:Nrow){
+          spec_new[i,] = ProSpect::specReBin(wave=hot$wave, flux=hot$spec[i,], wavegrid=wavegrid, ...)$flux
+        }
+      }else{
+        spec_new = foreach(i = 1:Nrow)%dopar%{
+          ProSpect::specReBin(wave=hot$wave, flux=hot$spec[i,], wavegrid=wavegrid, ...)$flux
+        }
+        spec_new = do.call(rbind, spec_new)
       }
 
       hot$spec = spec_new
@@ -125,10 +151,17 @@ progenyAtmosLoad = function(destpath = '',
     AGB$spec[AGB$spec < 0] = 0
 
     if(!is.null(wavegrid)){
-      spec_new = matrix(0, dim(AGB$spec)[1], length(wavegrid))
-
-      for(i in 1:dim(spec_new)[1]){
-        spec_new[i,] = ProSpect::specReBin(wave=AGB$wave, flux=AGB$spec[i,], wavegrid=wavegrid, ...)$flux
+      Nrow = dim(AGB$spec)[1]
+      if(cores == 1){
+        spec_new = matrix(0, Nrow, Nwave)
+        for(i in 1:Nrow){
+          spec_new[i,] = ProSpect::specReBin(wave=AGB$wave, flux=AGB$spec[i,], wavegrid=wavegrid, ...)$flux
+        }
+      }else{
+        spec_new = foreach(i = 1:Nrow)%dopar%{
+          ProSpect::specReBin(wave=AGB$wave, flux=AGB$spec[i,], wavegrid=wavegrid, ...)$flux
+        }
+        spec_new = do.call(rbind, spec_new)
       }
 
       AGB$spec = spec_new
@@ -149,10 +182,17 @@ progenyAtmosLoad = function(destpath = '',
     white$spec[white$spec < 0] = 0
 
     if(!is.null(wavegrid)){
-      spec_new = matrix(0, dim(white$spec)[1], length(wavegrid))
-
-      for(i in 1:dim(spec_new)[1]){
-        spec_new[i,] = ProSpect::specReBin(wave=white$wave, flux=white$spec[i,], wavegrid=wavegrid, ...)$flux
+      Nrow = dim(white$spec)[1]
+      if(cores == 1){
+        spec_new = matrix(0, Nrow, Nwave)
+        for(i in 1:Nrow){
+          spec_new[i,] = ProSpect::specReBin(wave=white$wave, flux=white$spec[i,], wavegrid=wavegrid, ...)$flux
+        }
+      }else{
+        spec_new = foreach(i = 1:Nrow)%dopar%{
+          ProSpect::specReBin(wave=white$wave, flux=white$spec[i,], wavegrid=wavegrid, ...)$flux
+        }
+        spec_new = do.call(rbind, spec_new)
       }
 
       white$spec = spec_new

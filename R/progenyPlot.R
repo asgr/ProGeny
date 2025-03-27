@@ -38,7 +38,7 @@ progenyAtmosPlot = function(Spec_combine, add=FALSE,
   legend('topleft', legend=rev(legvec), col=colvec, pch=1)
 }
 
-progenyIsoPlot = function(Iso, add=FALSE, sampleN=1e4, seed=666, zsel='Lum', zunit='Lsol',
+progenyIsoPlot = function(Iso, add=FALSE, Nsamp=1e4, seed=666, zsel='Lum', zunit='Lsol',
                           zstretch = 'log', zlegend = NULL,
                           col = hcl.colors(101, 'geyser'), pch=16, cex=0.5,
                           xlim=c(2e3,4e5), ylim=c(-1.5,9.5), zlim=NULL, log='x', draw_regions=FALSE, ...){
@@ -47,12 +47,12 @@ progenyIsoPlot = function(Iso, add=FALSE, sampleN=1e4, seed=666, zsel='Lum', zun
     magplot(NA, NA, xlim=xlim, ylim=ylim, log=log, xlab='Teff / K', ylab=expression(log(g / cm.s^{-2})))
   }
 
-  if(sampleN == 'all'){
+  if(Nsamp == 'all'){
     Iso_use = copy(Iso)
   }else{
     set.seed(seed)
-    sampleN = min(sampleN, dim(Iso)[1])
-    Iso_use = copy(Iso[sample(dim(Iso)[1], sampleN),])
+    Nsamp = min(Nsamp, dim(Iso)[1])
+    Iso_use = copy(Iso[sample(dim(Iso)[1], Nsamp),])
   }
 
   if(is.null(zlim)){

@@ -10,7 +10,7 @@ Progeny Plotting
 Create useful diagnostic plots of ProGeny related objects.
 }
 \usage{
-progenyIsoPlot(Iso, add = FALSE, sampleN = 1e4, seed = 666, zsel = 'Lum', zunit = 'Lsol',
+progenyIsoPlot(Iso, add = FALSE, Nsamp = 1e4, seed = 666, zsel = 'Lum', zunit = 'Lsol',
   zstretch = 'log', zlegend = NULL, col = hcl.colors(101, "geyser"), pch = 16, cex = 0.5,
   xlim = c(2e3,4e5), ylim = c(-1.5, 9.5), zlim = NULL, log = 'x', draw_regions = FALSE,
   ...)
@@ -31,7 +31,7 @@ List; the required spectral atmspheres. This must be loaded via \code{\link{prog
   \item{add}{
 Logical; should information be added to the current plot device (TRUE) or should a fresh plot be made (FALSE).
 }
-  \item{sampleN}{
+  \item{Nsamp}{
 Numeric/character scalar; the sparse sampling of the \option{Iso} being plotted. Since these are large you generally do not want to plot all points. Setting to 'all' will plot all points.
 }
   \item{seed}{

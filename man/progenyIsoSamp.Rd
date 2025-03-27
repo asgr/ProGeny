@@ -2,114 +2,78 @@
 \alias{progenyIsoSamp}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-A Capitalized Title (ideally limited to 65 characters)
+Sample a Subset of Stellar Spectra
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+A helper function to create small libraries of representative stellar spectra given various observing constraints. This was originally made to generate templates for stellar fitting in WAVES.
 }
 \usage{
-progenyIsoSamp(Iso, IMFfunc, ..., Nsamp = 10000, Lum_weight_func = NULL, logAge_weight_func = NULL, logZ_weight_func = NULL, label_use = seq(-1, 9), seed = 666)
+progenyIsoSamp(Iso, IMFfunc, ..., Nsamp = 10000, mag_lim = NULL, rad_lim = NULL,
+  Lum_weight_func = NULL, logAge_weight_func = NULL, logZ_weight_func = NULL,
+  label_use = seq(-1, 9), mag_Lsol_1kpc = 14.65, seed = 666)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{Iso}{
-%%     ~~Describe \code{Iso} here~~
+Data.frame / data.table; the input table of Isochrones. This must have a particular format (see e.g. MistIso in \code{\link{progenyIsoDownload}}).
 }
   \item{IMFfunc}{
-%%     ~~Describe \code{IMFfunc} here~~
+Function; the IMF to be analysed. \code{ProSpect} comes with IMF_Chabrier and IMF_Kroupa, which are good starting points. Must accept a \option{masslow}/\option{massmax} arguments as input.
 }
   \item{\dots}{
-%%     ~~Describe \code{\dots} here~~
+Other arguments that can be accepted by the input \option{IMFfunc}.
 }
   \item{Nsamp}{
-%%     ~~Describe \code{Nsamp} here~~
+Integer scalar; the number of samples to make.
+}
+  \item{mag_lim}{
+Numeric scalar; approximate faint AB mag limit of selection (see \option{mag_Lsol_1kpc}).
+}
+  \item{rad_lim}{
+Numeric scalar; approximate radial limit of selection (kpc). This should be sensible for the Milky Way if provided probably, so a few kpc at most.
 }
   \item{Lum_weight_func}{
-%%     ~~Describe \code{Lum_weight_func} here~~
+Function; optional additional weighting to apply based on the isochrone luminosity (in linear Lsol units).
 }
   \item{logAge_weight_func}{
-%%     ~~Describe \code{logAge_weight_func} here~~
+Function; optional additional weighting to apply based on the isochrone age (in log10(Age/Yr) units).
 }
   \item{logZ_weight_func}{
-%%     ~~Describe \code{logZ_weight_func} here~~
+Function; optional additional weighting to apply based on the isochrone metallicity (in log10(Z/Zsol) units).
 }
   \item{label_use}{
-%%     ~~Describe \code{label_use} here~~
+Integer vector; subset of isochrone phase labels to use. E.g. if you only want main sequence stars specify as needed here (this would be 0 for MIST isochrones).
+}
+  \item{mag_Lsol_1kpc}{
+Numeric scalar; rought scaling for the nominal filter implied by \option{mag_lim}. The default is the magnitude of our own Sun at a distance of 1 kpc in the r-band, so if using an optical filter this can be left as is. For other conversions apply the difference between the absolute AB magnitude of the Sun in the r-band (~4.65) to the new band as found here \href{https://mips.as.arizona.edu/~cnaw/sun.html}{https://mips.as.arizona.edu/~cnaw/sun.html}.
 }
   \item{seed}{
-%%     ~~Describe \code{seed} here~~
+Integer scalar; random seed to use for sampling.
 }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+Mostly useful for making small libraries of stellar spectra to represent different populations of stars.
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-%% ~put references to the literature/web site here ~
+The correctly sampled isochrone, which probably then needs passing through \code{\link{progenyInterpGrid_All}} and \code{\link{progenyInterpBest}} to actually match the subset isochrone with the stellar spectral atmospheres.
 }
 \author{
-%%  ~~who you are~~
+Aaron Robotham
 }
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+\code{\link{progenyInterpGrid_All}}, \code{\link{progenyInterpBest}}
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or standard data sets, see data().
+\dontrun{
+#Load isochrone:
+Iso  = read.fst('path/to/Iso.fst', as.data.table=TRUE)
 
-## The function is currently defined as
-function (Iso, IMFfunc, ..., Nsamp = 10000, Lum_weight_func = NULL, 
-    logAge_weight_func = NULL, logZ_weight_func = NULL, label_use = seq(-1, 
-        9), seed = 666) 
-{
-    set.seed(seed)
-    setDT(Iso)
-    Iso_temp = copy(Iso)
-    setkeyv(Iso_temp, c("logZ", "logAge", "Mini"))
-    logZ = logAge = Mini = Mass = NULL
-    Iso_temp[, `:=`(IMFint, 0)]
-    message("Integrating the IMF")
-    Iso_temp[Lum > 1e-06, `:=`(IMFint, progenyUpdateIMF(Iso_temp[Lum > 
-        1e-06, ], IMFfunc, ...)$IMFint)]
-    message("Applying weights")
-    if (!is.null(Lum_weight_func)) {
-        Iso_temp[, `:=`(IMFint, IMFint * Lum_weight_func(Lum))]
-    }
-    if (!is.null(logAge_weight_func)) {
-        Iso_temp[, `:=`(IMFint, IMFint * logAge_weight_func(logAge))]
-    }
-    if (!is.null(logZ_weight_func)) {
-        Iso_temp[, `:=`(IMFint, IMFint * logZ_weight_func(logZ))]
-    }
-    message("Creating inversion function")
-    Iso_temp[IMFint == 0, `:=`(IMFint, 1e-300)]
-    Iso_temp = Iso_temp[label \%in\% label_use, ]
-    temp_cumsum = cumsum(Iso_temp$IMFint)
-    temp_cumsum = temp_cumsum/max(temp_cumsum)
-    sel_dup = which(duplicated(temp_cumsum)) - 1L
-    if (length(sel_dup) > 0) {
-        temp_cumsum = temp_cumsum[-sel_dup]
-        Iso_temp = Iso_temp[-sel_dup, ]
-    }
-    temp_map = approxfun(temp_cumsum, 1:length(temp_cumsum), 
-        yleft = 1, yright = length(temp_cumsum))
-    message("Sampling")
-    sel = ceiling(temp_map(runif(Nsamp)))
-    return(Iso_temp[sel, ])
-  }
+#Sample isochrone (roughly mimic the Milk Way):
+MistIso_sub = progenyIsoSamp(Iso, IMF_Chabrier, mag_lim=20, rad_lim=4,
+  logAge_weight_func = function(x){dnorm(x,mean=9.6, sd=0.3)},
+  logZ_weight_func = function(x){dnorm(x,mean=0,sd=0.3)},
+  Nsamp=1e3)
+}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory (show via RShowDoc("KEYWORDS")):

@@ -16,7 +16,7 @@ progenyMakeSSP(Iso, IMFfunc = IMF_Chabrier, ..., rem_frac = 'get', Spec_combine,
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{Iso}{
-Data.frame / data.table; the input table of Isochrones. This must have a particular format (see ParsecIso in \code{\link{progenyIsoDownload}}).
+Data.frame / data.table; the input table of Isochrones. This must have a particular format (see e.g. MistIso in \code{\link{progenyIsoDownload}}).
 }
   \item{IMFfunc}{
 Function; the IMF to be analysed. \code{ProSpect} comes with IMF_Chabrier and IMF_Kroupa, which are good starting points. Must accept a \option{masslow}/\option{massmax} arguments as input.

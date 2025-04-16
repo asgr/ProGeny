@@ -16,9 +16,10 @@ progenyIsoDownload(URL = "https://drive.google.com/drive/folders/1SnUUDgXGOiRZgc
 
 progenyAtmosDownload(URL = "https://drive.google.com/drive/folders/1oYS1JBQzP56cvTXuvDaw8b1ckwIZSnzw?usp=sharing", ...)
 
-progenyAtmosLoad(destpath= '', base = 'combine_C3K_conroy',
-  extend = 'combine_PHOENIX_allard', hot = 'combine_TMAP_werner',
-  AGB = 'combine_AGB_lancon', white = NULL, wavegrid = NULL, cores = 8, ...)
+progenyAtmosLoad(destpath = '', base = 'combine_C3K_conroy',
+  extend = 'combine_PHOENIX_allard', hot = 'combine_OB_PoWR',
+  AGB = 'combine_AGB_lancon', white = 'combine_TMAP_werner',
+  WR = "combine_WNE_PoWR", wavegrid = NULL, cores = 8, ...)
 
 progenyIsoFormat(Iso)
 }
@@ -35,19 +36,22 @@ Data.frame / data.table; the input table of Isochrones.
 Character scalar; folder path where the target atomospheres will be laoded from. They all need to be in the same folder.
 }
   \item{base}{
-Character scalar/logical; for \code{progenyAtmosLoad} name of the 'base' stellar atmosphere library to use (without the '.fits' extension). The 'base' library will be the primary (i.e. preferred) \option{Teff}, \option{logG} and \option{logZ} solution when interpolating the atmopsheres onto the isochrone grids. See \code{\link{progenyInterpGrid}}.
+Character scalar/logical; for \code{progenyAtmosLoad} name of the base stellar atmosphere library to use (without the '.fits' extension). The 'base' library will be the primary (i.e. preferred) \option{Teff}, \option{logG} and \option{logZ} solution when interpolating the atmopsheres onto the isochrone grids. See \code{\link{progenyInterpGrid}}.
 }
   \item{extend}{
-Character scalar/logical; for \code{progenyAtmosLoad}  name of the 'extend' stellar atmosphere library to use (without the '.fits' extension). The 'extend' library will be the secondary (i.e. used when \option{base} does not have a good match) \option{Teff}, \option{logG} and \option{logZ} solution when interpolating the atmopsheres onto the isochrone grids. See \code{\link{progenyInterpGrid}}.
+Character scalar/logical; for \code{progenyAtmosLoad} name of the extend stellar atmosphere library to use (without the '.fits' extension). The 'extend' library will be the secondary (i.e. used when \option{base} does not have a good match) \option{Teff}, \option{logG} and \option{logZ} solution when interpolating the atmopsheres onto the isochrone grids. See \code{\link{progenyInterpGrid}}.
 }
   \item{hot}{
-Character scalar/logical; for \code{progenyAtmosLoad}  name of the 'hot' stellar atmosphere library to use (without the '.fits' extension). The 'hot' library will be the preferred option for the hot star spectra \option{Teff}, \option{logG} and \option{logZ} solution when interpolating the atmopsheres onto the isochrone grids. See \code{\link{progenyInterpGrid}}.
+Character scalar/logical; for \code{progenyAtmosLoad} name of the hot stellar atmosphere library to use (without the '.fits' extension). The 'hot' library will be the preferred option for the hot star spectra \option{Teff}, \option{logG} and \option{logZ} solution when interpolating the atmopsheres onto the isochrone grids. See \code{\link{progenyInterpGrid}}.
 }
   \item{AGB}{
-Character scalar/logical; for \code{progenyAtmosLoad}  name of the 'AGB' stellar atmosphere library to use (without the '.fits' extension). The 'AGB' library will be the preferred option for the AGB spectra \option{Teff}, \option{logG} and \option{logZ} solution when interpolating the atmopsheres onto the isochrone grids. See \code{\link{progenyInterpGrid}}. This can be flagged in the isochrones with the \option{label} column, see \code{\link{progenyInterpBest}}.
+Character scalar/logical; for \code{progenyAtmosLoad} name of the AGB stellar atmosphere library to use (without the '.fits' extension). The 'AGB' library will be the preferred option for the AGB spectra \option{Teff}, \option{logG} and \option{logZ} solution when interpolating the atmopsheres onto the isochrone grids. See \code{\link{progenyInterpGrid}}. This can be flagged in the isochrones with the \option{label} column, see \code{\link{progenyInterpBest}}.
 }
   \item{white}{
-Character scalar/logical; for \code{progenyAtmosLoad}  name of the 'white' dwarf stellar atmosphere library to use (without the '.fits' extension). The 'white' dwarf library will be the preferred option for the white dwarf spectra \option{Teff}, \option{logG} and \option{logZ} solution when interpolating the atmopsheres onto the isochrone grids. See \code{\link{progenyInterpGrid}}. This can be flagged in the isochrones with the \option{label} column, see \code{\link{progenyInterpBest}}.
+Character scalar/logical; for \code{progenyAtmosLoad} name of the white dwarf stellar atmosphere library to use (without the '.fits' extension). The 'white' dwarf library will be the preferred option for the white dwarf spectra \option{Teff}, \option{logG} and \option{logZ} solution when interpolating the atmopsheres onto the isochrone grids. See \code{\link{progenyInterpGrid}}. This can be flagged in the isochrones with the \option{label} column, see \code{\link{progenyInterpBest}}.
+}
+  \item{WR}{
+Character scalar/logical; for \code{progenyAtmosLoad} name of the Wolf-Rayet stellar atmosphere library to use (without the '.fits' extension). The 'white' dwarf library will be the preferred option for the white dwarf spectra \option{Teff}, \option{logG} and \option{logZ} solution when interpolating the atmopsheres onto the isochrone grids. See \code{\link{progenyInterpGrid}}. This can be flagged in the isochrones with the \option{label} column, see \code{\link{progenyInterpBest}}.
 }
   \item{wavegrid}{
 Numeric vector; the target spectral wavelength grid in Angstroms. If NULL then all inputs must have the same native wavelength grid or bad things will happen. Basic checks our made though (that they are at least the same length). If not NULL then all stellar atmosphere spectra are rebinned using the \code{ProSpect} \code{specReBin} function, so \code{ProSpect} must also be installed in this case.

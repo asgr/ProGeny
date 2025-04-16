@@ -17,7 +17,7 @@ progenyInterpGrid_All(Iso, Spec_combine, radius = 2, weight_pow = 2, k = 8)
 progenyInterpBest(Iso, Interp_combine, do_base = TRUE, do_extend = TRUE,
     b2e = 1.5, do_hot = TRUE, do_AGB = TRUE, do_white = TRUE, do_WR = TRUE,
     prefer_hot = FALSE, prefer_AGB = FALSE, prefer_white = FALSE, prefer_WR = FALSE,
-    label_hot = NULL, label_AGB = NULL, label_white = NULL, label_WR = NULL)
+    label_AGB = NULL, label_white = NULL, label_WR = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

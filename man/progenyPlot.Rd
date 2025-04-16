@@ -16,7 +16,7 @@ progenyIsoPlot(Iso, add = FALSE, Nsamp = 1e4, seed = 666, zsel = 'Lum', zunit = 
   ...)
 
 progenyAtmosPlot(Spec_combine, add = FALSE, do_base = TRUE, do_extend = TRUE,
-  do_hot = TRUE, do_AGB = TRUE, do_white = TRUE,
+  do_hot = TRUE, do_AGB = TRUE, do_white = TRUE, do_WR = TRUE,
   col = c("black", "grey", "blue", "red", "darkgreen", "orange"), pch = 16, cex = 1,
   xlim = c(2000, 4e+05), ylim = c(-1.5, 9.5), log = "x", ...)
 }
@@ -71,10 +71,10 @@ Logical; should the Wolf Rayet spectral atmospheres be plotted?
 Various; either colours vectors (for atmospheres) or colour palette (for isochrones) to use.
 }
   \item{pch}{
-Integer scalar/vector; \the point 'pch'. For \code{progenyAtmosPlot} either length 1 (used for all) or 6 (different for each atmosphere type).
+Integer scalar/vector; the point 'pch'. For \code{progenyAtmosPlot} either length 1 (used for all) or 6 (different for each atmosphere type).
 }
   \item{cex}{
-The point 'cex'. For \code{progenyAtmosPlot} either length 1 (used for all) or 6 (different for each atmosphere type).
+Integer scalar/vector; the point 'cex'. For \code{progenyAtmosPlot} either length 1 (used for all) or 6 (different for each atmosphere type).
 }
   \item{xlim}{
 Vector; range of x data to display.
@@ -83,7 +83,7 @@ Vector; range of x data to display.
 Vector; range of y data to display.
 }
   \item{zlim}{
-Vector; range of z data to display. Note if \option{zstretch} = 'log' then these values should be the logged quantity (so c(-4,4) for a range 1e-4 to 1e4). If left as NULL the \option{zlim} is the maximum extent of the \option{zsel} data provided in the isochrone.
+Vector; range of z data to display. This should be the linear z whether or not \option{zstretch} is linear (lin) or logarithmic (log). If left as NULL the \option{zlim} is the maximum extent of the \option{zsel} data provided in the isochrone.
 }
   \item{log}{
 Character scalar; log axis arguments to be passed to plot. E.g. use 'x', 'y', 'xy' or 'yx' as appropriate. '' assumes no logging of any axes.

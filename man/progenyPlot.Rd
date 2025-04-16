@@ -17,7 +17,7 @@ progenyIsoPlot(Iso, add = FALSE, Nsamp = 1e4, seed = 666, zsel = 'Lum', zunit = 
 
 progenyAtmosPlot(Spec_combine, add = FALSE, do_base = TRUE, do_extend = TRUE,
   do_hot = TRUE, do_AGB = TRUE, do_white = TRUE,
-  col = c("black", "grey", "blue", "red", "darkgreen"), pch = 16, cex = 1,
+  col = c("black", "grey", "blue", "red", "darkgreen", "orange"), pch = 16, cex = 1,
   xlim = c(2000, 4e+05), ylim = c(-1.5, 9.5), log = "x", ...)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -50,28 +50,31 @@ Character scalar; the stretch to apply to \option{zsel}, either 'lin' (for linea
 Character vector; a vector of names can be used instead if the labelling of the z-axis is categorical rather than continuous (e.g. the numeric reference to the best matching atmosphere library).
 }
   \item{do_base}{
-Logical; should the 'base' spectral atmospheres be plotted?
+Logical; should the base spectral atmospheres be plotted?
 }
   \item{do_extend}{
-Logical; should the 'extend' spectral atmospheres be plotted?
+Logical; should the extend spectral atmospheres be plotted?
 }
   \item{do_hot}{
-Logical; should the 'hot' spectral atmospheres be plotted?
+Logical; should the hot spectral atmospheres be plotted?
 }
   \item{do_AGB}{
-Logical; should the 'AGB' spectral atmospheres be plotted?
+Logical; should the AGB spectral atmospheres be plotted?
 }
   \item{do_white}{
-Logical; should the 'white' spectral atmospheres be plotted?
+Logical; should the white dwarf spectral atmospheres be plotted?
+}
+  \item{do_WR}{
+Logical; should the Wolf Rayet spectral atmospheres be plotted?
 }
   \item{col}{
 Various; either colours vectors (for atmospheres) or colour palette (for isochrones) to use.
 }
   \item{pch}{
-The point 'pch'.
+Integer scalar/vector; \the point 'pch'. For \code{progenyAtmosPlot} either length 1 (used for all) or 6 (different for each atmosphere type).
 }
   \item{cex}{
-The point 'cex'.
+The point 'cex'. For \code{progenyAtmosPlot} either length 1 (used for all) or 6 (different for each atmosphere type).
 }
   \item{xlim}{
 Vector; range of x data to display.

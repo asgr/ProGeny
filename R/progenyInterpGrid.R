@@ -43,17 +43,6 @@ progenyInterpGrid = function(loc, info, rescale, radius=2, weight_pow=2, k=8){
     info_local[,logZ:=logZ/rescale$logZ]
   }
 
-  # if(length(rescale) == 3){
-  #   loc = loc[,list(Teff/rescale[1], logG/rescale[2], logZ/rescale[3])]
-  #   info = info[,list(Teff/rescale[1], logG/rescale[2], logZ/rescale[3])]
-  # }else if(length(rescale) == 2){
-  #   loc = loc[,list(Teff/rescale[1], logG/rescale[2])]
-  #   info = info[,list(Teff/rescale[1], logG/rescale[2])]
-  # }else if(length(rescale) == 1){
-  #   loc = loc[,list(Teff/rescale[1])]
-  #   info = info[,list(Teff/rescale[1])]
-  # }
-
   temp = nn2(info_local, loc_local, k=k, radius=radius, searchtype = 'radius')
   temp$weights = 1/(temp$nn.dists^weight_pow)
   temp$weights = temp$weights / rowSums(temp$weights)
@@ -92,19 +81,28 @@ progenyInterpGrid_All = function(Iso, Spec_combine, radius=2, weight_pow=2, k=8)
     Interp_white = NULL
   }
 
+  if(!is.null(Spec_combine$WR)){
+    Interp_WR = progenyInterpGrid(Iso, Spec_combine$WR$info, Spec_combine$WR$rescale, radius=radius, weight_pow=weight_pow, k=k)
+  }else{
+    Interp_WR = NULL
+  }
+
   Interp_combine = list(
     base = Interp_base,
     extend = Interp_extend,
     hot = Interp_hot,
     AGB = Interp_AGB,
-    white = Interp_white
+    white = Interp_white,
+    WR = Interp_WR
   )
 
   return(invisible(Interp_combine))
 }
 
-progenyInterpBest = function(Iso, Interp_combine, do_base=TRUE, do_extend=TRUE, do_hot=TRUE,
-                             do_AGB=TRUE, do_white=TRUE, b2e=1.5, label_AGB=NULL, label_white=NULL){
+progenyInterpBest = function(Iso, Interp_combine, do_base=TRUE, do_extend=TRUE, b2e=1.5,
+                             do_hot=TRUE, do_AGB=TRUE, do_white=TRUE, do_WR=TRUE,
+                             prefer_hot=FALSE, prefer_AGB=FALSE, prefer_white=FALSE, prefer_WR=FALSE,
+                             label_AGB=NULL, label_white=NULL, label_WR=NULL){
   setDT(Iso)
 
   #To be safe to not alter the original Isochrones
@@ -115,24 +113,64 @@ progenyInterpBest = function(Iso, Interp_combine, do_base=TRUE, do_extend=TRUE, 
   if(do_base){
     best_spec[best_spec == 0L & Interp_combine$base$nn.idx[,1] > 0 & (Interp_combine$base$nn.dists[,1] < Interp_combine$extend$nn.dists[,1]*b2e)] = 1L
   }
+
   if(do_extend & !is.null(Interp_combine$extend)){
     best_spec[best_spec == 0L & Interp_combine$extend$nn.idx[,1] > 0] = 2L
   }
+
   if(do_hot & !is.null(Interp_combine$hot)){
-    best_spec[best_spec == 0L & Interp_combine$hot$nn.idx[,1] > 0] = 3L
-  }
-  if(do_AGB & !is.null(Interp_combine$AGB)){
-    if(is.null(label_AGB)){
-      best_spec[best_spec == 0L & Interp_combine$AGB$nn.idx[,1] > 0] = 4L
+    if(prefer_hot){
+      best_spec[Interp_combine$hot$nn.idx[,1] > 0] = 3L
     }else{
-      best_spec[best_spec == 0L & Interp_combine$AGB$nn.idx[,1] > 0 & Iso_temp$label %in% label_AGB] = 4L
+      best_spec[best_spec == 0L & Interp_combine$hot$nn.idx[,1] > 0] = 3L
     }
   }
-  if(do_white & !is.null(Interp_combine$white)){
-    if(is.null(label_white)){
-      best_spec[best_spec == 0L & Interp_combine$white$nn.idx[,1] > 0] = 5L
+
+  if(do_AGB & !is.null(Interp_combine$AGB)){
+    if(prefer_AGB){
+      if(is.null(label_AGB)){
+        best_spec[Interp_combine$AGB$nn.idx[,1] > 0] = 4L
+      }else{
+        best_spec[Interp_combine$AGB$nn.idx[,1] > 0 & Iso_temp$label %in% label_AGB] = 4L
+      }
     }else{
-      best_spec[best_spec == 0L & Interp_combine$white$nn.idx[,1] > 0 & Iso_temp$label %in% label_white] = 5L
+      if(is.null(label_AGB)){
+        best_spec[best_spec == 0L & Interp_combine$AGB$nn.idx[,1] > 0] = 4L
+      }else{
+        best_spec[best_spec == 0L & Interp_combine$AGB$nn.idx[,1] > 0 & Iso_temp$label %in% label_AGB] = 4L
+      }
+    }
+  }
+
+  if(do_white & !is.null(Interp_combine$white)){
+    if(prefer_white){
+      if(is.null(label_white)){
+        best_spec[Interp_combine$white$nn.idx[,1] > 0] = 5L
+      }else{
+        best_spec[Interp_combine$white$nn.idx[,1] > 0 & Iso_temp$label %in% label_white] = 5L
+      }
+    }else{
+      if(is.null(label_white)){
+        best_spec[best_spec == 0L & Interp_combine$white$nn.idx[,1] > 0] = 5L
+      }else{
+        best_spec[best_spec == 0L & Interp_combine$white$nn.idx[,1] > 0 & Iso_temp$label %in% label_white] = 5L
+      }
+    }
+  }
+
+  if(do_WR & !is.null(Interp_combine$WR)){
+    if(prefer_WR){
+      if(is.null(label_WR)){
+        best_spec[Interp_combine$WR$nn.idx[,1] > 0] = 6L
+      }else{
+        best_spec[Interp_combine$WR$nn.idx[,1] > 0 & Iso_temp$label %in% label_WR] = 6L
+      }
+    }else{
+      if(is.null(label_WR)){
+        best_spec[best_spec == 0L & Interp_combine$WR$nn.idx[,1] > 0] = 6L
+      }else{
+        best_spec[best_spec == 0L & Interp_combine$WR$nn.idx[,1] > 0 & Iso_temp$label %in% label_WR] = 6L
+      }
     }
   }
 

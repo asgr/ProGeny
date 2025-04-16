@@ -1,13 +1,23 @@
 progenyAtmosPlot = function(Spec_combine, add=FALSE,
-                            do_base=TRUE, do_extend=TRUE, do_hot=TRUE, do_AGB=TRUE, do_white=TRUE,
-                            col = c('black', 'grey', 'blue', 'red', 'darkgreen'),
+                            do_base=TRUE, do_extend=TRUE, do_hot=TRUE, do_AGB=TRUE, do_white=TRUE, do_WR=TRUE,
+                            col = c('black', 'grey', 'blue', 'red', 'darkgreen', 'orange'),
                             pch=16, cex=1, xlim=c(2e3,4e5), ylim=c(-1.5,9.5), log='x', ...){
 
   legvec = {}
-  colvec = col[c(do_base, do_extend, do_AGB, do_hot, do_white)]
+  if(length(pch) == 1){pch = rep(pch, 6)}
+  if(length(cex) == 1){cex = rep(cex, 6)}
+
+  colvec = col[c(do_base, do_extend, do_hot, do_AGB, do_white, do_WR)]
+  pchvec = pch[c(do_base, do_extend, do_hot, do_AGB, do_white, do_WR)]
+  cexvec = cex[c(do_base, do_extend, do_hot, do_AGB, do_white, do_WR)]
 
   if(add == FALSE){
     magplot(NA, NA, xlim=xlim, ylim=ylim, log=log, xlab='Teff / K', ylab=expression(log(g / cm.s^{-2})))
+  }
+
+  if(do_WR & !is.null(Spec_combine$WR)){
+    points(Spec_combine$WR$info[,list(Teff, logG)], col=col[6], pch=pch[6], cex=cex[6], ...)
+    legvec = c(legvec, 'WR')
   }
 
   if(do_white & !is.null(Spec_combine$white)){
@@ -35,7 +45,7 @@ progenyAtmosPlot = function(Spec_combine, add=FALSE,
     legvec = c(legvec, 'base')
   }
 
-  legend('topleft', legend=rev(legvec), col=colvec, pch=1)
+  legend('topleft', legend=rev(legvec), col=colvec, pch=pchvec, cex=1)
 }
 
 progenyIsoPlot = function(Iso, add=FALSE, Nsamp=1e4, seed=666, zsel='Lum', zunit='Lsol',

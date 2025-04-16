@@ -27,9 +27,10 @@ progenyAtmosDownload = function(URL = 'https://drive.google.com/drive/folders/1o
 progenyAtmosLoad = function(destpath = '',
                       base = 'combine_C3K_conroy',
                       extend = 'combine_PHOENIX_allard',
-                      hot = 'combine_TMAP_werner',
+                      hot = 'combine_OB_PoWR',
                       AGB = 'combine_AGB_lancon',
-                      white = NULL,
+                      white = 'combine_TMAP_werner',
+                      WR = 'combine_WNE_PoWR',
                       wavegrid = NULL,
                       cores = 8,
                       ...
@@ -203,6 +204,37 @@ progenyAtmosLoad = function(destpath = '',
     white = NULL
   }
 
+  if(is.character(WR)){
+    WR = Rfits_read(paste0(destpath,'/',WR,'.fits'), pointer=F, header=F)
+
+    if(anyNA(WR$spec)){
+      WR$spec[is.na(WR$spec)] = 0
+    }
+
+    WR$spec[WR$spec < 0] = 0
+
+    if(!is.null(wavegrid)){
+      Nrow = dim(WR$spec)[1]
+      if(cores == 1){
+        spec_new = matrix(0, Nrow, Nwave)
+        for(i in 1:Nrow){
+          spec_new[i,] = ProSpect::specReBin(wave=WR$wave, flux=WR$spec[i,], wavegrid=wavegrid, ...)$flux
+        }
+      }else{
+        spec_new = foreach(i = 1:Nrow)%dopar%{
+          ProSpect::specReBin(wave=WR$wave, flux=WR$spec[i,], wavegrid=wavegrid, ...)$flux
+        }
+        spec_new = do.call(rbind, spec_new)
+      }
+
+      WR$spec = spec_new
+      WR$wave = wavegrid
+    }
+
+  }else{
+    WR = NULL
+  }
+
   wavegrid = base$wave
 
   if(length(wavegrid) != length(base$wave)){
@@ -258,7 +290,8 @@ progenyAtmosLoad = function(destpath = '',
     extend = extend,
     hot = hot,
     AGB = AGB,
-    white = white
+    white = white,
+    WR = WR
   )
   return(invisible(Spec_combine))
 }

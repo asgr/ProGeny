@@ -14,8 +14,10 @@ progenyInterpGrid(loc, info, rescale, radius = 2, weight_pow = 2, k = 8)
 
 progenyInterpGrid_All(Iso, Spec_combine, radius = 2, weight_pow = 2, k = 8)
 
-progenyInterpBest(Iso, Interp_combine, do_base = TRUE, do_extend = TRUE, do_hot = TRUE,
-  do_AGB = TRUE, do_white = TRUE, b2e = 1.5, label_AGB = NULL, label_white = NULL)
+progenyInterpBest(Iso, Interp_combine, do_base = TRUE, do_extend = TRUE,
+    b2e = 1.5, do_hot = TRUE, do_AGB = TRUE, do_white = TRUE, do_WR = TRUE,
+    prefer_hot = FALSE, prefer_AGB = FALSE, prefer_white = FALSE, prefer_WR = FALSE,
+    label_hot = NULL, label_AGB = NULL, label_white = NULL, label_WR = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -52,23 +54,41 @@ Logical; should the 'base' spectra be considered when trying to determine the be
   \item{do_extend}{
 Logical; should the 'extend' spectra be considered when trying to determine the best interpolated spectra solution?
 }
-  \item{do_hot}{
-Logical; should the 'hot' spectra be considered when trying to determine the best interpolated spectra solution?
-}
-  \item{do_AGB}{
-Logical; should the 'AGB' spectra be considered when trying to determine the best interpolated spectra solution?
-}
-  \item{do_white}{
-Logical; should the 'white' dwarf spectra be considered when trying to determine the best interpolated spectra solution?
-}
   \item{b2e}{
 Numeric scalar; how much closer in re-scaled grid space does the 'extend' spectral atmosphere need to be before it is used instead of the 'base'. Values larger than \option{b2e} = 1 mean we are biased to preferring the 'base' solution even if it is not as close.
+}
+  \item{do_hot}{
+Logical; should the hot spectra be considered when trying to determine the best interpolated spectra solution?
+}
+  \item{do_AGB}{
+Logical; should the AGB spectra be considered when trying to determine the best interpolated spectra solution?
+}
+  \item{do_white}{
+Logical; should the white dwarf spectra be considered when trying to determine the best interpolated spectra solution?
+}
+  \item{do_WR}{
+Logical; should the Wolf Rayet spectra be considered when trying to determine the best interpolated spectra solution?
+}
+  \item{prefer_hot}{
+Logical; where a match to the hot spectrum if available should it be preferred over the base and/or extend alternative? Depending on the physics used for the base and extend spectra (e.g. non-LTE and line blanketing for hot stars) this may or may not be preferred.
+}
+  \item{prefer_AGB}{
+Logical; where a match to the AGB spectrum if available should it be preferred over the base and/or extend alternative? Depending on the physics used for the base and extend spectra this may or may not be preferred.
+}
+  \item{prefer_white}{
+Logical; where a match to the white dwarf spectrum if available should it be preferred over the base and/or extend alternative? Depending on the physics used for the base and extend spectra (e.g. non-LTE and helium rich atmospheres for high logG) this may or may not be preferred.
+}
+  \item{prefer_WR}{
+Logical; where a match to the Wolf Rayet spectrum if available should it be preferred over the base and/or extend alternative? Depending on the physics used for the base and extend spectra (e.g. non-LTE, winds and line blanketing for Wolf Rayet stars) this may or may not be preferred.
 }
   \item{label_AGB}{
 Integer vector; the \option{Iso} column \option{label} value that corresponds specifically to AGB periods (where the AGB spectra is then preferred). For MIST the setting should probably be 4:5, for PARSEC it should probably be 7:8, and for BaSTI_FSPS it should probably be 3:5. If left as the default NULL then it will try to match the AGBs purely based of Teff and logG (ignoring any specific isochrone labels), this is appropriate for BaSTI_New (which has no labels).
 }
   \item{label_white}{
 Integer vector; the \option{Iso} column \option{label} value that corresponds specifically to white dwarf periods (where the white dwarf spectra is then preferred). For MIST the setting should probably be 6:8 (note 9 is WR [Wolf-Rayet], which is a very different and very early phase of star formation, so avoid this!), for PARSEC it should probably be 9, and for BaSTI_FSPS it should probably be 6. If left as the default NULL then it will try to match the AGBs purely based of Teff and logG (ignoring any specific isochrone labels), this is appropriate for BaSTI_New (which has no labels).
+}
+  \item{label_WR}{
+Integer vector; the \option{Iso} column \option{label} value that corresponds specifically to Wolf Rayet periods (where the Wolf Rayet spectra is then preferred). For MIST the setting should probably be 9. For PARSEC and BaSTI this is not explictly tracked, so either users need to create their own label, or do not use this option.
 }
 }
 \details{

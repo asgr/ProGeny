@@ -22,24 +22,31 @@ progenyIso2Spec = function(logAge=8.4, logZ=0, Iso, IMFint, Spec_combine, Interp
       stop('Requested logZ not in range of isochrone logZ values!')
     }
 
-    logAge_loc = c(max(which(IsoAge <= logAge)), min(which(IsoAge >= logAge)))
+    temp_Age = interp_quick(logAge, IsoAge)
+    logAge_loc = as.integer(temp_Age[1:2])
     if(logAge_loc[1] == logAge_loc[2]){
       logAge_steps = IsoAge[logAge_loc[1]]
       logAge_wt = 1
     }else{
+      #logAge_diff = IsoAge[logAge_loc[2]] - IsoAge[logAge_loc[1]]
+      #logAge nearer to IsoAge[logAge_loc[1]] will have more weight (first element larger) since distance to IsoAge[logAge_loc[2]] is larger
+      #logAge_wt = c((IsoAge[logAge_loc[2]] - logAge)/logAge_diff, (logAge - IsoAge[logAge_loc[1]])/logAge_diff)
       logAge_steps = IsoAge[logAge_loc]
-      logAge_diff = IsoAge[logAge_loc[2]] - IsoAge[logAge_loc[1]]
-      logAge_wt = c((IsoAge[logAge_loc[2]] - logAge)/logAge_diff, (logAge - IsoAge[logAge_loc[1]])/logAge_diff)
+      logAge_wt = temp_Age[3:4]
     }
 
-    logZ_loc = c(max(which(IsoZ <= logZ)), min(which(IsoZ >= logZ)))
+    temp_Z = interp_quick(logZ, IsoZ)
+    logZ_loc = as.integer(temp_Z[1:2])
+    #logZ_loc = c(max(which(IsoZ <= logZ)), min(which(IsoZ >= logZ)))
     if(logZ_loc[1] == logZ_loc[2]){
       logZ_steps = IsoZ[logZ_loc[1]]
       logZ_wt = 1
     }else{
+      #logZ_diff = IsoZ[logZ_loc[2]] - IsoZ[logZ_loc[1]]
+      #logAge nearer to IsoZ[logZ_loc[1]] will have more weight (first element larger) since distance to IsoZ[logZ_loc[2]] is larger
+      #logZ_wt = c((IsoZ[logZ_loc[2]] - logZ)/logZ_diff, (logZ - IsoZ[logZ_loc[1]])/logZ_diff)
       logZ_steps = IsoZ[logZ_loc]
-      logZ_diff = IsoZ[logZ_loc[2]] - IsoZ[logZ_loc[1]]
-      logZ_wt = c((IsoZ[logZ_loc[2]] - logZ)/logZ_diff, (logZ - IsoZ[logZ_loc[1]])/logZ_diff)
+      logZ_wt = temp_Z[3:4]
     }
   }else{
     logAge_steps = IsoAge[which.min(abs(IsoAge - logAge))]

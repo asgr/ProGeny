@@ -29,3 +29,22 @@ progenyIsoFormat = function(Iso){
   setkeyv(Iso, c('logZ', 'logAge', 'Mini'))
   return(Iso)
 }
+
+#Scalar interpolation
+interp_quick = function(x, params, log=FALSE){
+  if(length(x) > 1){stop('x must be scalar!')}
+  if(x < min(params)){
+    return(c(ID_lo=1, ID_hi=1, wt_lo=1, wt_hi=0))
+  }
+  if(x > max(params)){
+    return(c(ID_lo=length(params), ID_hi=length(params), wt_lo=0, wt_hi=1))
+  }
+  if(log){
+    params = log(params)
+    x = log(x)
+  }
+  interp = approx(params, 1:length(params), xout=x)$y
+  IDlo = floor(interp)
+  IDhi = ceiling(interp)
+  return(c(ID_lo=IDlo, ID_hi=IDhi, wt_lo=1-(interp-IDlo), wt_hi=interp-IDlo))
+}

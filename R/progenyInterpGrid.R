@@ -55,37 +55,76 @@ progenyInterpGrid = function(loc, info, rescale, radius=2, weight_pow=2, k=8){
 progenyInterpGrid_All = function(Iso, Spec_combine, radius=2, weight_pow=2, k=8){
   setDT(Iso)
 
+  dobase = TRUE #always need base
+  doextend = !is.null(Spec_combine$extend)
+  dohot = !is.null(Spec_combine$hot)
+  doAGB = !is.null(Spec_combine$AGB)
+  dowhite = !is.null(Spec_combine$white)
+  doWR = !is.null(Spec_combine$WR)
+
+  #cores = max(dobase + doextend + dohot + doAGB + dowhite + doWR, cores)
+
+  #with(plan(multisession), local=TRUE)
+
+  message('Interpolating base spectra')
   Interp_base = progenyInterpGrid(Iso, Spec_combine$base$info, Spec_combine$base$rescale, radius=radius, weight_pow=weight_pow)
 
-  if(!is.null(Spec_combine$extend)){
+  if(doextend){
+    message('Interpolating extend spectra')
     Interp_extend = progenyInterpGrid(Iso, Spec_combine$extend$info, Spec_combine$extend$rescale, radius=radius, weight_pow=weight_pow, k=k)
   }else{
     Interp_extend = NULL
   }
 
-  if(!is.null(Spec_combine$hot)){
+  if(dohot){
+    message('Interpolating hot spectra')
     Interp_hot = progenyInterpGrid(Iso, Spec_combine$hot$info, Spec_combine$hot$rescale, radius=radius, weight_pow=weight_pow, k=k)
   }else{
     Interp_hot = NULL
   }
 
-  if(!is.null(Spec_combine$AGB)){
+  if(doAGB){
+    message('Interpolating AGB spectra')
     Interp_AGB = progenyInterpGrid(Iso, Spec_combine$AGB$info, Spec_combine$AGB$rescale, radius=radius, weight_pow=weight_pow, k=k)
   }else{
     Interp_AGB = NULL
   }
 
-  if(!is.null(Spec_combine$white)){
+  if(dowhite){
+    message('Interpolating white spectra')
     Interp_white = progenyInterpGrid(Iso, Spec_combine$white$info, Spec_combine$white$rescale, radius=radius, weight_pow=weight_pow, k=k)
   }else{
     Interp_white = NULL
   }
 
-  if(!is.null(Spec_combine$WR)){
+  if(doWR){
+    message('Interpolating WR spectra')
     Interp_WR = progenyInterpGrid(Iso, Spec_combine$WR$info, Spec_combine$WR$rescale, radius=radius, weight_pow=weight_pow, k=k)
   }else{
     Interp_WR = NULL
   }
+
+  # Interp_base = value(Interp_base)
+  #
+  # if(doextend){
+  #   Interp_extend = value(Interp_extend)
+  # }
+  #
+  # if(dohot){
+  #   Interp_hot = value(Interp_hot)
+  # }
+  #
+  # if(doAGB){
+  #   Interp_AGB = value(Interp_AGB)
+  # }
+  #
+  # if(dowhite){
+  #   Interp_white = value(Interp_white)
+  # }
+  #
+  # if(doWR){
+  #   Interp_WR = value(Interp_WR)
+  # }
 
   Interp_combine = list(
     base = Interp_base,

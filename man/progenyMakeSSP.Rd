@@ -5,13 +5,14 @@
 High Level SSP Creator
 }
 \description{
-The main interface via which users will likely use ProGeny to create SSPs.
+The main interface via which users will likely use ProGeny to create SSPs. This can either create SSPs on the exact logAge and logZ grid that exists within the provided isochrone, or be interplated onto an arbitrary logAge and logZ grid.
 }
 \usage{
 progenyMakeSSP(Iso, IMFfunc = IMF_Chabrier, ..., rem_frac = 'get', Spec_combine,
-  Interp_combine, Zsol = 0.02, cores = 8, Labels = list(Zlab = "Metallicity",
-  Agelab = "Time since ZAM / Yrs", Wavelab = "Wavelength / Ang",
-  Lumlab = "Lsun / Ang (for 1 Msun SF)", LumAgelab = "Lsun / Ang (for 1 Msun/Yr SFR)"))
+  Interp_combine, logAge_steps = NULL, logZ_steps = NULL, Zsol = 0.02, cores = 8,
+  Labels = list(Zlab = "Metallicity", Agelab = "Time since ZAM / Yrs",
+  Wavelab = "Wavelength / Ang", Lumlab = "Lsun / Ang (for 1 Msun SF)",
+  LumAgelab = "Lsun / Ang (for 1 Msun/Yr SFR)"))
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -33,6 +34,12 @@ List; the required spectral atmspheres. This should probably be loaded via \code
   \item{Interp_combine}{
 List; information that allows us to map Teff, logG, logZ information from the target \option{Iso} with the provided \option{Spec_combine}. This is made via \code{\link{progenyInterpGrid_All}}.
 }
+  \item{logAge_steps}{
+Numeric vector; if provided it is the log10(Age/yr) values that you want the output SSP to be interpolated at. If this argument is NULL we use the sorted unique logAge values from the \option{Iso} provided (the default). This means you can generate SSPs with fairly arbitrary age grids, with the caveat the \option{logAge_steps} must be fully inside the logAge extremes in the provided \option{Iso} (we can only interpolate, not extrapolate).
+}
+  \item{logZ_steps}{
+Numeric vector; if provided it is the log10(Z/Zsol) values that you want the output SSP to be interpolated at. If this argument is NULL we use the sorted unique logZ values from the \option{Iso} provided (the default). This means you can generate SSPs with fairly arbitrary metallicity grids, with the caveat the \option{logZ_steps} must be fully inside the logZ extremes in the provided \option{Iso} (we can only interpolate, not extrapolate).
+}
   \item{Zsol}{
 Numeric scalar; value of the Sun's solar metallicity (to convert logZ to Z).
 }
@@ -44,7 +51,7 @@ Character vector; labels for the \code{ProSpect} format speclib (SSP). Probably 
 }
 }
 \details{
-TBD
+For best accuracy the \option{logAge_steps} and \option{logZ_steps} arguments should not be used, since spectral interpolation is never perfect. Internally the interpolation is done in log-linear age and metallicity bilinear weighting, since this does the best job of approximating a target value of logAge and logZ during testing.
 }
 \value{
 A \code{ProSpect} compatible speclib (SSP) format looks like a list containing:

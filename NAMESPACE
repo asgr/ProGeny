@@ -11,6 +11,7 @@ import('magicaxis')
 import("ParmOff")
 import("knitr")
 import("checkmate")
+#import("future")
 
 importFrom("utils", "browseURL")
 importFrom("grDevices", "hcl.colors")

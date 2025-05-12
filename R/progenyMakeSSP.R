@@ -15,10 +15,10 @@ progenyMakeSSP = function(Iso, IMFfunc = IMF_Chabrier, ..., rem_frac = 'get', Sp
     message('Interpolating onto logAge grid different to isochrone!')
     Iso_logAge_steps = sort(unique(Iso$logAge))
     if(min(logAge_steps) < min(Iso_logAge_steps)){
-      stop('logAge_steps minimum is less than minimum logAge present in the provided Iso!')
+      stop('logAge_steps minimum is less than minimum logAge present in the provided isochrone!')
     }
     if(max(logAge_steps) > max(Iso_logAge_steps)){
-      stop('logAge_steps maximum is more than maximum logAge present in the provided Iso!')
+      stop('logAge_steps maximum is more than maximum logAge present in the provided isochrone!')
     }
     interp = TRUE
   }
@@ -31,10 +31,10 @@ progenyMakeSSP = function(Iso, IMFfunc = IMF_Chabrier, ..., rem_frac = 'get', Sp
     message('Interpolating onto logZ grid different to isochrone!')
     Iso_logZ_steps = sort(unique(Iso$logZ))
     if(min(logZ_steps) < min(Iso_logZ_steps)){
-      stop('logZ_steps minimum is less than minimum logZ present in the provided Iso!')
+      stop('logZ_steps minimum is less than minimum logZ present in the provided isochrone!')
     }
     if(max(logZ_steps) > max(Iso_logZ_steps)){
-      stop('logZ_steps maximum is more than maximum logZ present in the provided Iso!')
+      stop('logZ_steps maximum is more than maximum logZ present in the provided isochrone!')
     }
     interp = TRUE
   }

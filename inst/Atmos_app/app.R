@@ -1,6 +1,5 @@
 ui = fluidPage(
   titlePanel("ProGeny SSP Generator"),
-
   sidebarLayout(
     sidebarPanel(
       conditionalPanel(
@@ -20,7 +19,7 @@ ui = fluidPage(
         selectInput("AGB", "AGB", choices = "combine_AGB_lancon"),
         selectInput("white", "White Dwarfs", choices = c("TMAP" = "combine_TMAP_werner", "white" = "combvine_white")),
         selectInput("WR", "Wolf-Rayet", choices = c("PoWR" = "combine_WNE_PoWR")),
-        numericInput("cores", "Number of Cores", value = 8, min = 1),
+        numericInput("atmos_cores", "Number of Cores", value = 8, min = 1, step=1),
         actionButton("load_atmos", "Load Atmospheres"),
         br(), br(),
         actionButton("atmos_done", "Return Atmospheres")
@@ -35,9 +34,9 @@ ui = fluidPage(
         checkboxInput('do_AGB', 'Use AGB', value = TRUE),
         checkboxInput('do_white', 'Use White Dwarf', value = TRUE),
         checkboxInput('do_WR', 'Use Wolf-Rayet', value = TRUE),
-        selectInput('label_AGB', 'AGB Phase', choices=0:10, multiple=TRUE),
-        selectInput('label_white', 'White Dwarf Phase', choices=0:10, multiple=TRUE),
-        selectInput('label_WR', 'AGB Wolf-Rayet', choices=0:10, multiple=TRUE),
+        selectInput('label_AGB', 'AGB Phase', choices=-1:10, multiple=TRUE),
+        selectInput('label_white', 'White Dwarf Phase', choices=-1:10, multiple=TRUE),
+        selectInput('label_WR', 'AGB Wolf-Rayet', choices=-1:10, multiple=TRUE),
         actionButton("run_interp", "Run Interpolation"),
         br(), br(),
         actionButton("interp_done", "Return Interpolation Grids"),
@@ -45,24 +44,22 @@ ui = fluidPage(
 
       conditionalPanel(
         condition = "input.tabs == 'Make SSP'",
-        selectInput("imf", "IMF", choices = c("Chabrier" = "IMF_Chabrier", "Kroupa" = "IMF_Kroupa", "Salpeter" = "IMF_Salpeter")),
-        sliderInput('masslow', 'Low Mass IMF Cutoff', min=0.01, max=1, value=0.1, step=0.1),
-        sliderInput('massmax', 'High Mass IMF Cutoff', min=10, max=500, value=100, step=10),
+        selectInput("imf", "IMF", choices = c("Chabrier" = "IMF_Chabrier",
+                                              "Kroupa" = "IMF_Kroupa",
+                                              "Salpeter" = "IMF_Salpeter")),
+        actionButton("update_imf", "Change IMF Type"),
+        sliderInput('masslow', 'Low Mass IMF Cutoff', min=0.01, max=0.2, value=0.1, step=0.01),
+        sliderInput('massmax', 'High Mass IMF Cutoff', min=10, max=500, value=150, step=10),
+
+        tags$h4("IMF parameters:"),
+        uiOutput("dynamic_imf"),
+
+        numericInput("SSP_cores", "Number of Cores", value = 8, min = 1, step=1),
         actionButton("make_ssp", "Make SSP"),
         br(), br(),
         actionButton("check_ssp", "Check SSP"),
         br(), br(),
         actionButton("SSP_done", "Return SSP"),
-      ),
-
-      conditionalPanel(
-        condition = "input.tabs == 'Check SSP'",
-        selectInput("imf", "IMF", choices = c("Chabrier" = "IMF_Chabrier", "Kroupa" = "IMF_Kroupa", "Salpeter" = "IMF_Salpeter")),
-        sliderInput('masslow', 'Low Mass IMF Cutoff', min=0.01, max=1, value=0.1, step=0.1),
-        sliderInput('massmax', 'High Mass IMF Cutoff', min=10, max=500, value=100, step=10),
-        actionButton("make_ssp", "Run Interpolation"),
-        br(), br(),
-        actionButton("interp_done", "Return Interpolation Grids"),
       )
     ),
 
@@ -81,6 +78,7 @@ ui = fluidPage(
                            verbatimTextOutput("interp_status")
                   ),
                   tabPanel("Make SSP",
+                           plotOutput("plot_imf"),
                            verbatimTextOutput("SSP_status"),
                            verbatimTextOutput("SSP_check")
                   )
@@ -90,7 +88,12 @@ ui = fluidPage(
 )
 
 server = function(input, output, session) {
-  volumes = c(wd = getwd(), Home = '~/', getVolumes()())
+  ASGR_atmos_path = '/Volumes/Macintosh HD/Users/aaron/Google Drive/My Drive/ProGeny_atmos'
+  if(file.exists(ASGR_atmos_path)){
+    volumes = c(ASGR = ASGR_atmos_path, wd = getwd(), Home = '~/', getVolumes()())
+  }else{
+    volumes = c(wd = getwd(), Home = '~/', getVolumes()())
+  }
 
   shinyDirChoose(input, id = 'destpath', roots = volumes)
 
@@ -109,7 +112,7 @@ server = function(input, output, session) {
   observeEvent(input$iso_file, {
     req(input$iso_file)
     tryCatch({
-      iso_out = read_fst(input$iso_file$datapath, as.data.table = TRUE)
+      iso_out = fst::read_fst(input$iso_file$datapath, as.data.table = TRUE)
       iso_result(iso_out)
       output$iso_summary <- renderPrint(summary(iso_out))
       output$iso_status <- renderText("Isochrone file loaded successfully!")
@@ -119,31 +122,108 @@ server = function(input, output, session) {
     }, error = function(e) {
       output$iso_status <- renderText(paste("Error loading isochrone file:", e$message))
     })
+
+    print(input$iso_file$name)
+
+    if(grepl('Mist', input$iso_file$name)){
+      updateSelectInput(
+        session = getDefaultReactiveDomain(),
+        inputId = 'label_AGB',
+        choices = -1:10,
+        selected = c(4,5)
+      )
+
+      updateSelectInput(
+        session = getDefaultReactiveDomain(),
+        inputId = 'label_white',
+        choices = -1:10,
+        selected = c(6,7,8)
+      )
+
+      updateSelectInput(
+        session = getDefaultReactiveDomain(),
+        inputId = 'label_WR',
+        choices = -1:10,
+        selected = 9
+      )
+    }else if(grepl('Parsec', input$iso_file$name)){
+      updateSelectInput(
+        session = getDefaultReactiveDomain(),
+        inputId = 'label_AGB',
+        choices = -1:10,
+        selected = c(7,8)
+      )
+
+      updateSelectInput(
+        session = getDefaultReactiveDomain(),
+        inputId = 'label_white',
+        choices = -1:10,
+        selected = 9
+      )
+    }else if(grepl('Basti', input$iso_file$name)){
+      updateSelectInput(
+        session = getDefaultReactiveDomain(),
+        inputId = 'label_AGB',
+        choices = -1:10,
+        selected = c(3,4,5)
+      )
+
+      updateSelectInput(
+        session = getDefaultReactiveDomain(),
+        inputId = 'label_white',
+        choices = -1:10,
+        selected = 6
+      )
+    }else if(grepl('Padova', input$iso_file$name)){
+      updateSelectInput(
+        session = getDefaultReactiveDomain(),
+        inputId = 'label_AGB',
+        choices = -1:10,
+        selected = 5
+      )
+
+      updateSelectInput(
+        session = getDefaultReactiveDomain(),
+        inputId = 'label_white',
+        choices = -1:10,
+        selected = 6
+      )
+
+      updateSelectInput(
+        session = getDefaultReactiveDomain(),
+        inputId = 'label_WR',
+        choices = -1:10,
+        selected = 9
+      )
+    }
   })
 
   observeEvent(input$load_atmos, {
-    tryCatch({
-      atmos_out = progenyAtmosLoad(
-        destpath = parseDirPath(volumes, input$destpath),
-        base = input$base,
-        extend = input$extend,
-        hot = input$hot,
-        AGB = input$AGB,
-        white = input$white,
-        WR = input$WR,
-        wavegrid = NULL,
-        cores = input$cores
-      )
-      atmos_result(atmos_out)
-      output$atmos_status <- renderText("Atmosphere data loaded successfully!")
+    output$atmos_status <- renderText("Loading atmosphere data!")
+    #shinyjs::delay(100, {
+      tryCatch({
+        atmos_out = progenyAtmosLoad(
+          destpath = shinyFiles::parseDirPath(volumes, input$destpath),
+          base = input$base,
+          extend = input$extend,
+          hot = input$hot,
+          AGB = input$AGB,
+          white = input$white,
+          WR = input$WR,
+          wavegrid = NULL,
+          cores = input$atmos_cores
+        )
+        atmos_result(atmos_out)
+        output$atmos_status <- renderText("Atmosphere data loaded successfully!")
 
-      output$plot_atmos = renderPlot({
-        progenyIsoPlot(iso_result())
-        progenyAtmosPlot(atmos_out, add=TRUE)
+        output$plot_atmos = renderPlot({
+          progenyIsoPlot(iso_result())
+          progenyAtmosPlot(atmos_out, add=TRUE)
+        })
+      }, error = function(e) {
+        output$atmos_status <- renderText(paste("Error:", e$message))
       })
-    }, error = function(e) {
-      output$atmos_status <- renderText(paste("Error:", e$message))
-    })
+    #})
   })
 
   observeEvent(input$run_interp, {
@@ -177,6 +257,45 @@ server = function(input, output, session) {
     })
   })
 
+  observeEvent(input$update_imf, {
+    if(input$imf == 'IMF_Chabrier'){
+      output$plot_imf = renderPlot({
+        magcurve(IMF_Chabrier(x,
+                              alpha = input$chab_alpha,
+                              a = input$chab_a,
+                              b = input$chab_b,
+                              masslow = input$masslow,
+                              massmax = input$massmax),
+                 input$masslow, input$massmax, log='xy', xlab='Star Mass / Msol', ylab='dN/dM (1 Msol)',
+                 )
+      })
+    }else if(input$imf == 'IMF_Kroupa'){
+      output$plot_imf = renderPlot({
+        magcurve(IMF_Kroupa(x,
+                            alpha1 = input$kroupa_alpha1,
+                            alpha2 = input$kroupa_alpha2,
+                            alpha3 = input$kroupa_alpha3,
+                            mass1 = input$kroupa_mass1,
+                            mass2 = input$kroupa_mass2,
+                            masslow = input$masslow,
+                            massmax = input$massmax),
+
+                 input$masslow, input$massmax, log='xy', xlab='Star Mass / Msol', ylab='dN/dM (1 Msol)',
+                 )
+       })
+    }else if(input$imf == 'IMF_Salpeter'){
+      output$plot_imf = renderPlot({
+        magcurve(IMF_Salpeter(x,
+                              alpha = input$salp_alpha,
+                              masslow = input$masslow,
+                              massmax = input$massmax),
+                 input$masslow, input$massmax, log='xy', xlab='Star Mass / Msol', ylab='dN/dM (1 Msol)',
+                 )
+      })
+    }
+  }
+  )
+
   observeEvent(input$make_ssp, {
     tryCatch({
       iso_data <- iso_result()
@@ -184,15 +303,65 @@ server = function(input, output, session) {
       interp_data <- interp_all_result()
       IMF_function <- match.fun(input$imf)
 
-      SSP_out = progenyMakeSSP(
-        Iso = iso_data,
-        IMFfunc = IMF_function,
-        masslow = input$masslow,
-        massmax = input$massmax,
-        Spec_combine = atmos_data,
-        Interp_combine = interp_data,
-        cores = input$cores
-      )
+      if(is.null(iso_data)){
+        message('Missing Isochrone!')
+      }
+
+      if(is.null(atmos_data)){
+        message('Missing Atmospheres!')
+      }
+
+      if(is.null(interp_data)){
+        message('Missing Interpolation Grid!')
+      }
+
+      if(is.null(IMF_function)){
+        message('Missing IMF!')
+      }
+
+      if(input$imf == 'IMF_Chabrier'){
+        SSP_out = progenyMakeSSP(
+          Iso = iso_data,
+          IMFfunc = IMF_function,
+          alpha = input$chab_alpha,
+          a = input$chab_a,
+          b = input$chab_b,
+          masslow = input$masslow,
+          massmax = input$massmax,
+          Spec_combine = atmos_data,
+          Interp_combine = interp_data,
+          cores = input$SSP_cores
+        )
+      }else if(input$imf == 'IMF_Kroupa'){
+        SSP_out = progenyMakeSSP(
+          Iso = iso_data,
+          IMFfunc = IMF_function,
+          alpha1 = input$kroupa_alpha1,
+          alpha2 = input$kroupa_alpha2,
+          alpha3 = input$kroupa_alpha3,
+          mass1 = input$kroupa_mass1,
+          mass2 = input$kroupa_mass2,
+          masslow = input$masslow,
+          massmax = input$massmax,
+          Spec_combine = atmos_data,
+          Interp_combine = interp_data,
+          cores = input$SSP_cores
+        )
+      }else if(input$imf == 'IMF_Salpeter'){
+        print(input$salp_alpha)
+        print(input$masslow)
+        print(input$massmax)
+        SSP_out = progenyMakeSSP(
+          Iso = iso_data,
+          IMFfunc = IMF_function,
+          alpha = input$salp_alpha,
+          masslow = input$masslow,
+          massmax = input$massmax,
+          Spec_combine = atmos_data,
+          Interp_combine = interp_data,
+          cores = input$SSP_cores
+        )
+      }
 
       SSP_result(SSP_out)
       output$SSP_status <- renderText("SSP successfully run!")
@@ -201,11 +370,53 @@ server = function(input, output, session) {
     })
   })
 
+  output$dynamic_imf <- renderUI({
+    req(input$imf)
+    if(input$imf == 'IMF_Chabrier'){
+      tagList(
+        sliderInput('chab_alpha', 'alpha', min=1, max=3, value=2.3, step=0.1),
+        sliderInput('chab_a', 'a', min=0, max=1, value=0.08, step=0.01),
+        sliderInput('chab_b', 'b', min=0, max=1, value=0.69, step=0.01)
+      )
+    } else if(input$imf == 'IMF_Kroupa'){
+      tagList(
+        sliderInput('kroupa_alpha1', 'alpha_1', min=0, max=1, value=0.3, step=0.1),
+        sliderInput('kroupa_alpha2', 'alpha_2', min=1, max=2, value=1.3, step=0.1),
+        sliderInput('kroupa_alpha3', 'alpha_3', min=2, max=4, value=2.3, step=0.1),
+        sliderInput('kroupa_mass1', 'mass_1', min=0, max=1, value=0.08, step=0.01),
+        sliderInput('kroupa_mass2', 'mass_2', min=0, max=2, value=0.5, step=0.01)
+      )
+    }else if(input$imf == 'IMF_Salpeter'){
+      tagList(
+        sliderInput('salp_alpha', 'alpha', min=1, max=3, value=2.35, step=0.1)
+      )
+    }
+  })
+
+
+  # observeEvent(input$check_ssp, {
+  #   output$SSP_check <- renderText({
+  #     capture.output(ProSpect::speclib_check(SSP_result()))
+  #   })
+  # })
+
+
   observeEvent(input$check_ssp, {
     output$SSP_check <- renderText({
-      capture.output(ProSpect::speclib_check(SSP_result()))
+      messages <- character()
+      withCallingHandlers(
+        {
+          ProSpect::speclib_check(SSP_result())
+        },
+        message = function(m) {
+          messages <<- c(messages, conditionMessage(m))
+          invokeRestart("muffleMessage")
+        }
+      )
+      paste(messages, collapse = "\n")
     })
   })
+
 
   observeEvent(input$iso_done, {
     stopApp(iso_result())

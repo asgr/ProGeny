@@ -82,13 +82,13 @@ Logical; where a match to the white dwarf spectrum if available should it be pre
 Logical; where a match to the Wolf Rayet spectrum if available should it be preferred over the base and/or extend alternative? Depending on the physics used for the base and extend spectra (e.g. non-LTE, winds and line blanketing for Wolf Rayet stars) this may or may not be preferred.
 }
   \item{label_AGB}{
-Integer vector; the \option{Iso} column \option{label} value that corresponds specifically to AGB periods (where the AGB spectra is then preferred). For MIST the setting should probably be 4:5, for PARSEC it should probably be 7:8, and for BaSTI_FSPS it should probably be 3:5. If left as the default NULL then it will try to match the AGBs purely based of Teff and logG (ignoring any specific isochrone labels), this is appropriate for BaSTI_New (which has no labels).
+Integer vector; the \option{Iso} column \option{label} value that corresponds specifically to AGB periods (where the AGB spectra is then preferred). For MIST the setting should probably be 4:5, for PARSEC it should probably be 7:8, for Padova is should be 5, and for BaSTI_FSPS it should probably be 3:5. If left as the default NULL then it will try to match the AGBs purely based of Teff and logG (ignoring any specific isochrone labels), this is appropriate for BaSTI_New (which has no labels).
 }
   \item{label_white}{
-Integer vector; the \option{Iso} column \option{label} value that corresponds specifically to white dwarf periods (where the white dwarf spectra is then preferred). For MIST the setting should probably be 6:8 (note 9 is WR [Wolf-Rayet], which is a very different and very early phase of star formation, so avoid this!), for PARSEC it should probably be 9, and for BaSTI_FSPS it should probably be 6. If left as the default NULL then it will try to match the AGBs purely based of Teff and logG (ignoring any specific isochrone labels), this is appropriate for BaSTI_New (which has no labels).
+Integer vector; the \option{Iso} column \option{label} value that corresponds specifically to white dwarf periods (where the white dwarf spectra is then preferred). For MIST the setting should probably be 6:8 (note 9 is WR [Wolf-Rayet], which is a very different and very early phase of star formation, so avoid this!), for PARSEC it should probably be 9, for Padova is should be 6, and for BaSTI_FSPS it should probably be 6. If left as the default NULL then it will try to match the AGBs purely based of Teff and logG (ignoring any specific isochrone labels), this is appropriate for BaSTI_New (which has no labels).
 }
   \item{label_WR}{
-Integer vector; the \option{Iso} column \option{label} value that corresponds specifically to Wolf Rayet periods (where the Wolf Rayet spectra is then preferred). For MIST the setting should probably be 9. For PARSEC and BaSTI this is not explictly tracked, so either users need to create their own label, or do not use this option.
+Integer vector; the \option{Iso} column \option{label} value that corresponds specifically to Wolf Rayet periods (where the Wolf Rayet spectra is then preferred). For MIST the setting should probably be 9, for Padova is should be 9. For PARSEC and BaSTI this is not explictly tracked, so either users need to create their own label, or do not use this option.
 }
 }
 \details{
@@ -97,6 +97,8 @@ In MIST the isochrones labels are provided as: -1 = PreMS, 0 = MS, 2 = RGB, 3 = 
 In PARSEC the isochrones labels are provided as: 0 = PreMS, 1 = MS, 2 = SubGB, 3 = RGB, 4-6 = CHeB, 7 = eAGB, 8 = TP-AGB, 9 = PostAGB.
 
 In BaSTI the isochrones labels are provided as: -1 = PreMS, 0 = MS, 1 = RGB, 2 = CHeB, 3 = eAGB, 4-5 = AGB, 6 = PostAGB
+
+In Padova the isochrones labels are provided as: 0 = MS, 5 = AGB, 6 = PostAGB, 9 = WR
 
 In general:
 
@@ -116,7 +118,7 @@ eAGB: the early asymptotic giant branch, or a quick stage of red giant for massi
 
 TP-AGB: the thermally pulsing asymptotic giant branch
 
-Post-AGB: post asymptotic giant branch
+Post-AGB: post asymptotic giant branch (usually white dwarfs)
 }
 \value{
 \code{progenyInterpGrid} returns a list output that contain the various outputs of \code{\link{nn2}}, with an additional weights list item that contains our bespokely scaled weights that will be used when interpolating an Isochrone vs Atmosphere solution.

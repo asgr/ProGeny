@@ -126,7 +126,7 @@ curve(IMF_Lacey_evo(x, Age=6.9), 0.01, 150, log='xy', lty=2, add=TRUE, col='red'
 curve(IMF_Lacey_evo(x, Age=13.8), 0.01, 150, log='xy', lty=3, add=TRUE, col='red', lwd=2)
 
 legend('topright', legend=c('Kroupa Evo', 'Lacey Evo'), pch=16, col=c('black', 'red'))
-legend('bottomleft', legend=c('0 Gyrs', '6.9 Gyrs', '13.8 Gyrs'), lty=1:3, lwd=2)
+legend('bottomleft', legend=c('0 Gyrs', '6.9 Gyrs', '13.8 Gyrs'), lty=1:3, lwd=2, title='Lookback')
 
 #Second metallicity based evolution:
 
@@ -140,7 +140,7 @@ curve(IMF_Lacey_Zevo(x, logZ=-2), 0.01, 150, log='xy', lty=2, add=TRUE, col='red
 curve(IMF_Lacey_Zevo(x, logZ=-4), 0.01, 150, log='xy', lty=3, add=TRUE, col='red', lwd=2)
 
 legend('topright', legend=c('Kroupa Evo', 'Lacey Evo'), pch=16, col=c('black', 'red'))
-legend('bottomleft', legend=c('logZ: -4', 'logZ: -2', 'logZ: 0'), lty=3:1, lwd=2)
+legend('bottomleft', legend=c('logZ: 0', 'logZ: -2', 'logZ: -4'), lty=3:1, lwd=2)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory (show via RShowDoc("KEYWORDS")):

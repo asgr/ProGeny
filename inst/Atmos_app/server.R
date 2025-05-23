@@ -1,97 +1,3 @@
-ui = fluidPage(
-  titlePanel("ProGeny SSP Generator"),
-  sidebarLayout(
-    sidebarPanel(
-      conditionalPanel(
-        condition = "input.tabs == 'Isochrones'",
-        fileInput("iso_file", "Choose Isochrone File (.fst)", accept = ".fst"),
-        br(), br(),
-        actionButton("iso_done", "Return Isochrone"),
-        verbatimTextOutput("iso_summary")
-      ),
-
-      conditionalPanel(
-        condition = "input.tabs == 'Atmospheres'",
-        shinyDirButton("destpath", "Atmos Path", "Select a folder"),
-        selectInput("base", "Base", choices = c("C3K" = "combine_C3K_conroy", "Husser" = "combine_PHOENIX_husser", "Allard" = "combine_PHOENIX_Allard", "MILES" = "combine_MILES_vazdekis", "BASEL" = "combine_BASEL_wlbc")),
-        selectInput("extend", "Extend", choices = c("Allard" = "combine_PHOENIX_Allard", "ATLAS9" = "combine_ATLAS9_castelli")),
-        selectInput("hot", "Hot", choices = c("OB" = "combine_OB_PoWR", "hot" = "combine_hot")),
-        selectInput("AGB", "AGB", choices = "combine_AGB_lancon"),
-        selectInput("white", "White Dwarfs", choices = c("TMAP" = "combine_TMAP_werner", "white" = "combvine_white")),
-        selectInput("WR", "Wolf-Rayet", choices = c("PoWR" = "combine_WNE_PoWR")),
-        numericInput("atmos_cores", "Number of Cores", value = 8, min = 1, step=1),
-        actionButton("load_atmos", "Load Atmospheres"),
-        br(), br(),
-        actionButton("atmos_done", "Return Atmospheres")
-      ),
-
-      conditionalPanel(
-        condition = "input.tabs == 'Interpolate'",
-        sliderInput('radius', 'Search Radius', min=1, max=4, value=2),
-        sliderInput('weight_pow', 'Weight Power', min=1, max=4, value=2),
-        sliderInput('k', 'Search k', min=4, max=16, value=8, step=1),
-        checkboxInput('do_hot', 'Use Hot', value = TRUE),
-        checkboxInput('do_AGB', 'Use AGB', value = TRUE),
-        checkboxInput('do_white', 'Use White Dwarf', value = TRUE),
-        checkboxInput('do_WR', 'Use Wolf-Rayet', value = TRUE),
-        selectInput('label_AGB', 'AGB Phase', choices=-1:10, multiple=TRUE),
-        selectInput('label_white', 'White Dwarf Phase', choices=-1:10, multiple=TRUE),
-        selectInput('label_WR', 'AGB Wolf-Rayet', choices=-1:10, multiple=TRUE),
-        actionButton("run_interp", "Run Interpolation"),
-        br(), br(),
-        actionButton("interp_done", "Return Interpolation Grids"),
-      ),
-
-      conditionalPanel(
-        condition = "input.tabs == 'IMF'",
-        selectInput("imf", "IMF", choices = c("Chabrier" = "IMF_Chabrier",
-                                              "Kroupa" = "IMF_Kroupa",
-                                              "Salpeter" = "IMF_Salpeter",
-                                              "Kroupa_evo" = "IMF_Kroupa_evo",
-                                              "Kroupa_Zevo" = "IMF_Kroupa_Zevo",
-                                              "Lacey_evo" = "IMF_Lacey_evo",
-                                              "Lacey_Zevo" = "IMF_Lacey_Zevo")),
-        tags$h4("IMF parameters:"),
-        uiOutput("dynamic_imf")
-      ),
-
-      conditionalPanel(
-        condition = "input.tabs == 'Make SSP'",
-        numericInput("SSP_cores", "Number of Cores", value = 8, min = 1, step=1),
-        actionButton("make_ssp", "Make SSP"),
-        br(), br(),
-        actionButton("check_ssp", "Check SSP"),
-        br(), br(),
-        actionButton("SSP_done", "Return SSP"),
-      )
-    ),
-
-    mainPanel(
-      tabsetPanel(id = "tabs",
-                  tabPanel("Isochrones",
-                           verbatimTextOutput("iso_status"),
-                           plotOutput("plot_iso")
-                  ),
-                  tabPanel("Atmospheres",
-                           verbatimTextOutput("selectedPath"),
-                           verbatimTextOutput("atmos_status"),
-                           plotOutput("plot_atmos")
-                  ),
-                  tabPanel("Interpolate",
-                           verbatimTextOutput("interp_status")
-                  ),
-                  tabPanel("IMF",
-                           plotOutput("plot_imf")
-                  ),
-                  tabPanel("Make SSP",
-                           verbatimTextOutput("SSP_status"),
-                           verbatimTextOutput("SSP_check")
-                  )
-      )
-    )
-  )
-)
-
 server = function(input, output, session) {
   ASGR_atmos_path = '/Volumes/Macintosh HD/Users/aaron/Google Drive/My Drive/ProGeny_atmos'
   if(file.exists(ASGR_atmos_path)){
@@ -204,28 +110,28 @@ server = function(input, output, session) {
   observeEvent(input$load_atmos, {
     output$atmos_status <- renderText("Loading atmosphere data!")
     #shinyjs::delay(100, {
-      tryCatch({
-        atmos_out = progenyAtmosLoad(
-          destpath = shinyFiles::parseDirPath(volumes, input$destpath),
-          base = input$base,
-          extend = input$extend,
-          hot = input$hot,
-          AGB = input$AGB,
-          white = input$white,
-          WR = input$WR,
-          wavegrid = NULL,
-          cores = input$atmos_cores
-        )
-        atmos_result(atmos_out)
-        output$atmos_status <- renderText("Atmosphere data loaded successfully!")
+    tryCatch({
+      atmos_out = progenyAtmosLoad(
+        destpath = shinyFiles::parseDirPath(volumes, input$destpath),
+        base = input$base,
+        extend = input$extend,
+        hot = input$hot,
+        AGB = input$AGB,
+        white = input$white,
+        WR = input$WR,
+        wavegrid = NULL,
+        cores = input$atmos_cores
+      )
+      atmos_result(atmos_out)
+      output$atmos_status <- renderText("Atmosphere data loaded successfully!")
 
-        output$plot_atmos = renderPlot({
-          progenyIsoPlot(iso_result())
-          progenyAtmosPlot(atmos_out, add=TRUE)
-        })
-      }, error = function(e) {
-        output$atmos_status <- renderText(paste("Error:", e$message))
+      output$plot_atmos = renderPlot({
+        progenyIsoPlot(iso_result())
+        progenyAtmosPlot(atmos_out, add=TRUE)
       })
+    }, error = function(e) {
+      output$atmos_status <- renderText(paste("Error:", e$message))
+    })
     #})
   })
 
@@ -275,7 +181,7 @@ server = function(input, output, session) {
                             masslow = input$chab_masslow,
                             massmax = input$chab_massmax),
                input$chab_masslow, input$chab_massmax, log = 'xy',
-               xlab = 'Star Mass / Msol', ylab = 'dN/dM (1 Msol)')
+               xlab = 'Star Mass / Msol', ylab = 'dN/dM (1 Msol)', lwd=2)
     } else if (input$imf == 'IMF_Kroupa') {
       req(input$kroupa_masslow, input$kroupa_massmax,
           input$kroupa_alpha1, input$kroupa_alpha2, input$kroupa_alpha3,
@@ -290,7 +196,7 @@ server = function(input, output, session) {
                           masslow = input$kroupa_masslow,
                           massmax = input$kroupa_massmax),
                input$kroupa_masslow, input$kroupa_massmax, log = 'xy',
-               xlab = 'Star Mass / Msol', ylab = 'dN/dM (1 Msol)')
+               xlab = 'Star Mass / Msol', ylab = 'dN/dM (1 Msol)', lwd=2)
     } else if (input$imf == 'IMF_Salpeter') {
       req(input$salp_masslow, input$salp_massmax,
           input$salp_alpha)
@@ -300,7 +206,7 @@ server = function(input, output, session) {
                             masslow = input$salp_masslow,
                             massmax = input$salp_massmax),
                input$salp_masslow, input$salp_massmax, log = 'xy',
-               xlab = 'Star Mass / Msol', ylab = 'dN/dM (1 Msol)')
+               xlab = 'Star Mass / Msol', ylab = 'dN/dM (1 Msol)', lwd=2)
     } else if (input$imf == 'IMF_Kroupa_evo') {
       req(input$kroupa_masslow_lim, input$kroupa_massmax_lim, input$kroupa_Age_lim,
           input$kroupa_alpha1_lim, input$kroupa_alpha2_lim, input$kroupa_alpha3_lim,
@@ -309,7 +215,7 @@ server = function(input, output, session) {
           !is.null(input$kroupa_alpha1_lim_Rv),
           !is.null(input$kroupa_alpha2_lim_Rv),
           !is.null(input$kroupa_alpha3_lim_Rv)
-          )
+      )
 
       alpha1_lim = if(input$kroupa_alpha1_lim_Rv){rev(input$kroupa_alpha1_lim)}else{input$kroupa_alpha1_lim}
       alpha2_lim = if(input$kroupa_alpha2_lim_Rv){rev(input$kroupa_alpha2_lim)}else{input$kroupa_alpha2_lim}
@@ -330,7 +236,7 @@ server = function(input, output, session) {
       }
       magcurve(temp_func(x, Age=0),
                min(input$kroupa_masslow_lim), max(input$kroupa_massmax_lim), log = 'xy',
-               xlab = 'Star Mass / Msol', ylab = 'dN/dM (1 Msol)')
+               xlab = 'Star Mass / Msol', ylab = 'dN/dM (1 Msol)', lwd=2)
       curve(temp_func(x, Age=6.9), min(input$kroupa_masslow_lim), max(input$kroupa_massmax_lim), log='xy', lty=2, add=TRUE, lwd=2)
       curve(temp_func(x, Age=13.8), min(input$kroupa_masslow_lim), max(input$kroupa_massmax_lim), log='xy', lty=3, add=TRUE, lwd=2)
       legend('bottomleft', legend=c('0 Gyrs', '6.9 Gyrs', '13.8 Gyrs'), lty=1:3, lwd=2)
@@ -348,20 +254,20 @@ server = function(input, output, session) {
 
       temp_func = function(x, logZ=0){
         IMF_Kroupa_Zevo(x,
-                       logZ = logZ,
-                       logZ_lim = input$kroupa_logZ_lim,
-                       alpha1_lim = alpha1_lim,
-                       alpha2_lim = alpha2_lim,
-                       alpha3_lim = alpha3_lim,
-                       mass1 = input$kroupa_mass1_lim,
-                       mass2 = input$kroupa_mass2_lim,
-                       masslow = input$kroupa_masslow_lim,
-                       massmax = input$kroupa_massmax_lim
-                       )
+                        logZ = logZ,
+                        logZ_lim = input$kroupa_logZ_lim,
+                        alpha1_lim = alpha1_lim,
+                        alpha2_lim = alpha2_lim,
+                        alpha3_lim = alpha3_lim,
+                        mass1 = input$kroupa_mass1_lim,
+                        mass2 = input$kroupa_mass2_lim,
+                        masslow = input$kroupa_masslow_lim,
+                        massmax = input$kroupa_massmax_lim
+        )
       }
       magcurve(temp_func(x, logZ=0),
                min(input$kroupa_masslow_lim), max(input$kroupa_massmax_lim), log = 'xy',
-               xlab = 'Star Mass / Msol', ylab = 'dN/dM (1 Msol)')
+               xlab = 'Star Mass / Msol', ylab = 'dN/dM (1 Msol)', lwd=2)
       curve(temp_func(x, logZ=-2), min(input$kroupa_masslow_lim), max(input$kroupa_massmax_lim), log='xy', lty=2, add=TRUE, lwd=2)
       curve(temp_func(x, logZ=-4), min(input$kroupa_masslow_lim), max(input$kroupa_massmax_lim), log='xy', lty=3, add=TRUE, lwd=2)
       legend('bottomleft', legend=c('logZ: 0', 'logZ: -2', 'logZ: -4'), lty=1:3, lwd=2)
@@ -381,20 +287,20 @@ server = function(input, output, session) {
 
       temp_func = function(x, Age=0){
         IMF_Lacey_evo(x,
-                       Age = Age,
-                       Age_lim = input$lacey_Age_lim,
-                       alpha1_lim = alpha1_lim,
-                       alpha2_lim = alpha2_lim,
-                       alpha3_lim = alpha3_lim,
-                       mass1 = input$lacey_mass1_lim,
-                       mass2 = input$lacey_mass2_lim,
-                       masslow = input$lacey_masslow_lim,
-                       massmax = input$lacey_massmax_lim,
-                       Lookback_Age = input$lacey_Lookback_Age)
+                      Age = Age,
+                      Age_lim = input$lacey_Age_lim,
+                      alpha1_lim = alpha1_lim,
+                      alpha2_lim = alpha2_lim,
+                      alpha3_lim = alpha3_lim,
+                      mass1 = input$lacey_mass1_lim,
+                      mass2 = input$lacey_mass2_lim,
+                      masslow = input$lacey_masslow_lim,
+                      massmax = input$lacey_massmax_lim,
+                      Lookback_Age = input$lacey_Lookback_Age)
       }
       magcurve(temp_func(x, Age=0),
                min(input$lacey_masslow_lim), max(input$lacey_massmax_lim), log = 'xy',
-               xlab = 'Star Mass / Msol', ylab = 'dN/dM (1 Msol)')
+               xlab = 'Star Mass / Msol', ylab = 'dN/dM (1 Msol)', lwd=2)
       curve(temp_func(x, Age=6.9), min(input$lacey_masslow_lim), max(input$lacey_massmax_lim), log='xy', lty=2, add=TRUE, lwd=2)
       curve(temp_func(x, Age=13.8), min(input$lacey_masslow_lim), max(input$lacey_massmax_lim), log='xy', lty=3, add=TRUE, lwd=2)
       legend('bottomleft', legend=c('0 Gyrs', '6.9 Gyrs', '13.8 Gyrs'), lty=1:3, lwd=2, title='Lookback')
@@ -413,24 +319,26 @@ server = function(input, output, session) {
 
       temp_func = function(x, logZ=0){
         IMF_Lacey_Zevo(x,
-                        logZ = logZ,
-                        logZ_lim = input$lacey_logZ_lim,
-                        alpha1_lim = input$lacey_alpha1_lim,
-                        alpha2_lim = input$lacey_alpha2_lim,
-                        alpha3_lim = input$lacey_alpha3_lim,
-                        mass1 = input$lacey_mass1_lim,
-                        mass2 = input$lacey_mass2_lim,
-                        masslow = input$lacey_masslow_lim,
-                        massmax = input$lacey_massmax_lim
+                       logZ = logZ,
+                       logZ_lim = input$lacey_logZ_lim,
+                       alpha1_lim = input$lacey_alpha1_lim,
+                       alpha2_lim = input$lacey_alpha2_lim,
+                       alpha3_lim = input$lacey_alpha3_lim,
+                       mass1 = input$lacey_mass1_lim,
+                       mass2 = input$lacey_mass2_lim,
+                       masslow = input$lacey_masslow_lim,
+                       massmax = input$lacey_massmax_lim
         )
       }
       magcurve(temp_func(x, logZ=0),
                min(input$lacey_masslow_lim), max(input$lacey_massmax_lim), log = 'xy',
-               xlab = 'Star Mass / Msol', ylab = 'dN/dM (1 Msol)')
+               xlab = 'Star Mass / Msol', ylab = 'dN/dM (1 Msol)', lwd=2)
       curve(temp_func(x, logZ=-2), min(input$lacey_masslow_lim), max(input$lacey_massmax_lim), log='xy', lty=2, add=TRUE, lwd=2)
       curve(temp_func(x, logZ=-4), min(input$lacey_masslow_lim), max(input$lacey_massmax_lim), log='xy', lty=3, add=TRUE, lwd=2)
       legend('bottomleft', legend=c('logZ: 0', 'logZ: -2', 'logZ: -4'), lty=1:3, lwd=2)
     }
+    legend('topright', legend = c('User IMF', 'Ref Chab [0.01 - 150 Msol]'), col=c('black', 'darkgreen'), lty=c(1,3), lwd=2)
+    curve(IMF_Chabrier, 0.01, 150, add=TRUE, col='darkgreen', lty=3)
   })
 
   observeEvent(input$make_ssp, {
@@ -749,5 +657,3 @@ server = function(input, output, session) {
     }
   })
 }
-
-shinyApp(ui=ui, server=server)

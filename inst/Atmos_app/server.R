@@ -166,6 +166,28 @@ server = function(input, output, session) {
     })
   })
 
+  output$used_imf <- renderText({
+    Iso_exits = !is.null(iso_result())
+    Atmos_exist = !is.null(atmos_result())
+    Interp_exist = !is.null(interp_all_result())
+    SSP_exist = !is.null(SSP_result())
+
+    can_run_SSP = Iso_exits & Atmos_exist & Interp_exist
+
+    paste('Isochrone for SSP: ', input$iso_file$name, '\n',
+          'Isochrone loaded: ', Iso_exits, '\n',
+          'See (Isochrone) tab for parameter details.', '\n\n',
+          'Atmospheres for SSP loaded: ', Atmos_exist, '\n',
+          'See (Atmospheres) tab for parameter details.', '\n\n',
+          'Interpolation grid generated: ', Interp_exist, '\n',
+          'See (Interpolation) tab for parameter details.', '\n\n',
+          'IMF for SSP: ', input$imf, '\n',
+          'See (IMF) tab for parameter details.', '\n\n',
+          'Ready to [Make SSP]: ', can_run_SSP, '\n',
+          'Ready to [Check SSP]: ', SSP_exist, '\n',
+          'Ready to [Return SSP]: ', SSP_exist, '\n',
+          sep='')
+  })
 
   output$plot_imf <- renderPlot({
     req(input$imf)

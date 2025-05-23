@@ -3,7 +3,7 @@ ui = fluidPage(
   sidebarLayout(
     sidebarPanel(
       conditionalPanel(
-        condition = "input.tabs == 'Isochrones'",
+        condition = "input.tabs == 'Isochrone'",
         fileInput("iso_file", "Choose Isochrone File (.fst)", accept = ".fst"),
         br(), br(),
         actionButton("iso_done", "Return Isochrone"),
@@ -68,7 +68,7 @@ ui = fluidPage(
 
     mainPanel(
       tabsetPanel(id = "tabs",
-                  tabPanel("Isochrones",
+                  tabPanel("Isochrone",
                            verbatimTextOutput("iso_status"),
                            plotOutput("plot_iso", height = "600px")
                   ),
@@ -84,6 +84,7 @@ ui = fluidPage(
                            plotOutput("plot_imf", height = "600px")
                   ),
                   tabPanel("Make SSP",
+                           verbatimTextOutput("used_imf"),
                            verbatimTextOutput("SSP_status"),
                            verbatimTextOutput("SSP_check")
                   )

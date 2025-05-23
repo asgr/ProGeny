@@ -174,13 +174,12 @@ server = function(input, output, session) {
 
     can_run_SSP = Iso_exits & Atmos_exist & Interp_exist
 
-    paste('Isochrone for SSP: ', input$iso_file$name, '\n',
-          'Isochrone loaded: ', Iso_exits, '\n',
-          'See (Isochrone) tab for parameter details.', '\n\n',
+    paste('Isochrone loaded: ', Iso_exits, '\n',
+          'Isochrone for SSP: ', input$iso_file$name, '\n\n',
           'Atmospheres for SSP loaded: ', Atmos_exist, '\n',
           'See (Atmospheres) tab for parameter details.', '\n\n',
-          'Interpolation grid generated: ', Interp_exist, '\n',
-          'See (Interpolation) tab for parameter details.', '\n\n',
+          'Interpolated grid generated: ', Interp_exist, '\n',
+          'See (Interpolate) tab for parameter details.', '\n\n',
           'IMF for SSP: ', input$imf, '\n',
           'See (IMF) tab for parameter details.', '\n\n',
           'Ready to [Make SSP]: ', can_run_SSP, '\n',

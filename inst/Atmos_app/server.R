@@ -9,6 +9,7 @@ server = function(input, output, session) {
   shinyDirChoose(input, id = 'destpath', roots = volumes)
 
   atmos_result = reactiveVal(NULL)
+  wave_grid_result = reactiveVal(NULL)
   iso_result = reactiveVal(NULL)
   interp_all_result = reactiveVal(NULL)
   SSP_result = reactiveVal(NULL)
@@ -119,7 +120,7 @@ server = function(input, output, session) {
         AGB = input$AGB,
         white = input$white,
         WR = input$WR,
-        wavegrid = NULL,
+        wavegrid = wave_grid_result(),
         cores = input$atmos_cores
       )
       atmos_result(atmos_out)
@@ -133,6 +134,15 @@ server = function(input, output, session) {
       output$atmos_status <- renderText(paste("Error:", e$message))
     })
     #})
+  })
+
+  observeEvent(input$wave_file, {
+    req(input$wave_file)
+    tryCatch({
+      wave_grid_result(as.numeric(read.table(input$wave_file$datapath, header = FALSE)))
+    }, error = function(e) {
+      output$wave_status <- renderText(paste("Error loading wavegrid file:", e$message))
+    })
   })
 
   observeEvent(input$run_interp, {
@@ -166,7 +176,16 @@ server = function(input, output, session) {
     })
   })
 
-  output$used_imf <- renderText({
+
+  color_bool <- function(value) {
+    if (value) {
+      '<span style="color:green;">TRUE</span>'
+    } else {
+      '<span style="color:red;">FALSE</span>'
+    }
+  }
+
+  output$used_imf <- renderUI({
     Iso_exits = !is.null(iso_result())
     Atmos_exist = !is.null(atmos_result())
     Interp_exist = !is.null(interp_all_result())
@@ -174,18 +193,18 @@ server = function(input, output, session) {
 
     can_run_SSP = Iso_exits & Atmos_exist & Interp_exist
 
-    paste('Isochrone loaded: ', Iso_exits, '\n',
-          'Isochrone for SSP: ', input$iso_file$name, '\n\n',
-          'Atmospheres for SSP loaded: ', Atmos_exist, '\n',
-          'See (Atmospheres) tab for parameter details.', '\n\n',
-          'Interpolated grid generated: ', Interp_exist, '\n',
-          'See (Interpolate) tab for parameter details.', '\n\n',
-          'IMF for SSP: ', input$imf, '\n',
-          'See (IMF) tab for parameter details.', '\n\n',
-          'Ready to [Make SSP]: ', can_run_SSP, '\n',
-          'Ready to [Check SSP]: ', SSP_exist, '\n',
-          'Ready to [Return SSP]: ', SSP_exist, '\n',
-          sep='')
+    HTML(paste0('Isochrone loaded: ', color_bool(Iso_exits), '<br>',
+          'Isochrone for SSP: ', input$iso_file$name, '<br><br>',
+          'Atmospheres for SSP loaded: ', color_bool(Atmos_exist), '<br>',
+          'See (Atmospheres) tab for parameter details.', '<br><br>',
+          'Interpolated grid generated: ', color_bool(Interp_exist), '<br>',
+          'See (Interpolate) tab for parameter details.', '<br><br>',
+          'IMF for SSP: ', input$imf, '<br>',
+          'See (IMF) tab for parameter details.', '<br><br>',
+          'Ready to [Make SSP]: ', color_bool(can_run_SSP), '<br>',
+          'Ready to [Check SSP]: ', color_bool(SSP_exist), '<br>',
+          'Ready to [Return SSP]: ', color_bool(SSP_exist)
+          ))
   })
 
   output$plot_imf <- renderPlot({
@@ -235,12 +254,18 @@ server = function(input, output, session) {
           input$kroupa_Lookback_Age,
           !is.null(input$kroupa_alpha1_lim_Rv),
           !is.null(input$kroupa_alpha2_lim_Rv),
-          !is.null(input$kroupa_alpha3_lim_Rv)
+          !is.null(input$kroupa_alpha3_lim_Rv),
+          !is.null(input$kroupa_masslow_lim_Rv),
+          !is.null(input$kroupa_massmax_lim_Rv)
       )
 
       alpha1_lim = if(input$kroupa_alpha1_lim_Rv){rev(input$kroupa_alpha1_lim)}else{input$kroupa_alpha1_lim}
       alpha2_lim = if(input$kroupa_alpha2_lim_Rv){rev(input$kroupa_alpha2_lim)}else{input$kroupa_alpha2_lim}
       alpha3_lim = if(input$kroupa_alpha3_lim_Rv){rev(input$kroupa_alpha3_lim)}else{input$kroupa_alpha3_lim}
+      masslow_lim = if(input$kroupa_masslow_lim_Rv){rev(input$kroupa_masslow_lim)}else{input$kroupa_masslow_lim}
+      massmax_lim = if(input$kroupa_massmax_lim_Rv){rev(input$kroupa_massmax_lim)}else{input$kroupa_massmax_lim}
+      xmin = min(masslow_lim)
+      xmax = max(massmax_lim)
 
       temp_func = function(x, Age=0){
         IMF_Kroupa_evo(x,
@@ -251,15 +276,14 @@ server = function(input, output, session) {
                        alpha3_lim = alpha3_lim,
                        mass1 = input$kroupa_mass1_lim,
                        mass2 = input$kroupa_mass2_lim,
-                       masslow = input$kroupa_masslow_lim,
-                       massmax = input$kroupa_massmax_lim,
+                       masslow = masslow_lim,
+                       massmax = massmax_lim,
                        Lookback_Age = input$kroupa_Lookback_Age)
       }
-      magcurve(temp_func(x, Age=0),
-               min(input$kroupa_masslow_lim), max(input$kroupa_massmax_lim), log = 'xy',
-               xlab = 'Star Mass / Msol', ylab = 'dN/dM (1 Msol)', lwd=2)
-      curve(temp_func(x, Age=6.9), min(input$kroupa_masslow_lim), max(input$kroupa_massmax_lim), log='xy', lty=2, add=TRUE, lwd=2)
-      curve(temp_func(x, Age=13.8), min(input$kroupa_masslow_lim), max(input$kroupa_massmax_lim), log='xy', lty=3, add=TRUE, lwd=2)
+      magcurve(temp_func(x, Age=0), xmin, xmax, log = 'xy',
+               xlab = 'Star Mass / Msol', ylab = 'dN/dM (1 Msol)', lwd=2, xlim=c(xmin, xmax))
+      curve(temp_func(x, Age=6.9), xmin, xmax, log='xy', lty=2, add=TRUE, lwd=2)
+      curve(temp_func(x, Age=13.8), xmin, xmax, log='xy', lty=3, add=TRUE, lwd=2)
       legend('bottomleft', legend=c('0 Gyrs', '6.9 Gyrs', '13.8 Gyrs'), lty=1:3, lwd=2)
     } else if (input$imf == 'IMF_Kroupa_Zevo') {
       req(input$kroupa_masslow_lim, input$kroupa_massmax_lim, input$kroupa_logZ_lim,
@@ -267,11 +291,18 @@ server = function(input, output, session) {
           input$kroupa_mass1_lim, input$kroupa_mass2_lim,
           !is.null(input$kroupa_alpha1_lim_Rv),
           !is.null(input$kroupa_alpha2_lim_Rv),
-          !is.null(input$kroupa_alpha3_lim_Rv))
+          !is.null(input$kroupa_alpha3_lim_Rv),
+          !is.null(input$kroupa_masslow_lim_Rv),
+          !is.null(input$kroupa_massmax_lim_Rv)
+        )
 
       alpha1_lim = if(input$kroupa_alpha1_lim_Rv){rev(input$kroupa_alpha1_lim)}else{input$kroupa_alpha1_lim}
       alpha2_lim = if(input$kroupa_alpha2_lim_Rv){rev(input$kroupa_alpha2_lim)}else{input$kroupa_alpha2_lim}
       alpha3_lim = if(input$kroupa_alpha3_lim_Rv){rev(input$kroupa_alpha3_lim)}else{input$kroupa_alpha3_lim}
+      masslow_lim = if(input$kroupa_masslow_lim_Rv){rev(input$kroupa_masslow_lim)}else{input$kroupa_masslow_lim}
+      massmax_lim = if(input$kroupa_massmax_lim_Rv){rev(input$kroupa_massmax_lim)}else{input$kroupa_massmax_lim}
+      xmin = min(masslow_lim)
+      xmax = max(massmax_lim)
 
       temp_func = function(x, logZ=0){
         IMF_Kroupa_Zevo(x,
@@ -282,15 +313,14 @@ server = function(input, output, session) {
                         alpha3_lim = alpha3_lim,
                         mass1 = input$kroupa_mass1_lim,
                         mass2 = input$kroupa_mass2_lim,
-                        masslow = input$kroupa_masslow_lim,
-                        massmax = input$kroupa_massmax_lim
+                        masslow = masslow_lim,
+                        massmax = massmax_lim
         )
       }
-      magcurve(temp_func(x, logZ=0),
-               min(input$kroupa_masslow_lim), max(input$kroupa_massmax_lim), log = 'xy',
-               xlab = 'Star Mass / Msol', ylab = 'dN/dM (1 Msol)', lwd=2)
-      curve(temp_func(x, logZ=-2), min(input$kroupa_masslow_lim), max(input$kroupa_massmax_lim), log='xy', lty=2, add=TRUE, lwd=2)
-      curve(temp_func(x, logZ=-4), min(input$kroupa_masslow_lim), max(input$kroupa_massmax_lim), log='xy', lty=3, add=TRUE, lwd=2)
+      magcurve(temp_func(x, logZ=0), xmin, xmax, log = 'xy',
+               xlab = 'Star Mass / Msol', ylab = 'dN/dM (1 Msol)', lwd=2, xlim=c(xmin, xmax))
+      curve(temp_func(x, logZ=-2), xmin, xmax, log='xy', lty=2, add=TRUE, lwd=2)
+      curve(temp_func(x, logZ=-4), xmin, xmax, log='xy', lty=3, add=TRUE, lwd=2)
       legend('bottomleft', legend=c('logZ: 0', 'logZ: -2', 'logZ: -4'), lty=1:3, lwd=2)
     } else if (input$imf == 'IMF_Lacey_evo') {
       req(input$lacey_masslow_lim, input$lacey_massmax_lim, input$lacey_Age_lim,
@@ -299,12 +329,18 @@ server = function(input, output, session) {
           input$lacey_Lookback_Age,
           !is.null(input$lacey_alpha1_lim_Rv),
           !is.null(input$lacey_alpha2_lim_Rv),
-          !is.null(input$lacey_alpha3_lim_Rv)
+          !is.null(input$lacey_alpha3_lim_Rv),
+          !is.null(input$lacey_masslow_lim_Rv),
+          !is.null(input$lacey_massmax_lim_Rv)
       )
 
       alpha1_lim = if(input$lacey_alpha1_lim_Rv){rev(input$lacey_alpha1_lim)}else{input$lacey_alpha1_lim}
       alpha2_lim = if(input$lacey_alpha2_lim_Rv){rev(input$lacey_alpha2_lim)}else{input$lacey_alpha2_lim}
       alpha3_lim = if(input$lacey_alpha3_lim_Rv){rev(input$lacey_alpha3_lim)}else{input$lacey_alpha3_lim}
+      masslow_lim = if(input$lacey_masslow_lim_Rv){rev(input$lacey_masslow_lim)}else{input$lacey_masslow_lim}
+      massmax_lim = if(input$lacey_massmax_lim_Rv){rev(input$lacey_massmax_lim)}else{input$lacey_massmax_lim}
+      xmin = min(masslow_lim)
+      xmax = max(massmax_lim)
 
       temp_func = function(x, Age=0){
         IMF_Lacey_evo(x,
@@ -315,15 +351,14 @@ server = function(input, output, session) {
                       alpha3_lim = alpha3_lim,
                       mass1 = input$lacey_mass1_lim,
                       mass2 = input$lacey_mass2_lim,
-                      masslow = input$lacey_masslow_lim,
-                      massmax = input$lacey_massmax_lim,
+                      masslow = masslow_lim,
+                      massmax = massmax_lim,
                       Lookback_Age = input$lacey_Lookback_Age)
       }
-      magcurve(temp_func(x, Age=0),
-               min(input$lacey_masslow_lim), max(input$lacey_massmax_lim), log = 'xy',
-               xlab = 'Star Mass / Msol', ylab = 'dN/dM (1 Msol)', lwd=2)
-      curve(temp_func(x, Age=6.9), min(input$lacey_masslow_lim), max(input$lacey_massmax_lim), log='xy', lty=2, add=TRUE, lwd=2)
-      curve(temp_func(x, Age=13.8), min(input$lacey_masslow_lim), max(input$lacey_massmax_lim), log='xy', lty=3, add=TRUE, lwd=2)
+      magcurve(temp_func(x, Age=0), xmin, xmax, log = 'xy',
+               xlab = 'Star Mass / Msol', ylab = 'dN/dM (1 Msol)', lwd=2, xlim=c(xmin, xmax))
+      curve(temp_func(x, Age=6.9), xmin, xmax, log='xy', lty=2, add=TRUE, lwd=2)
+      curve(temp_func(x, Age=13.8), xmin, xmax, log='xy', lty=3, add=TRUE, lwd=2)
       legend('bottomleft', legend=c('0 Gyrs', '6.9 Gyrs', '13.8 Gyrs'), lty=1:3, lwd=2, title='Lookback')
     } else if (input$imf == 'IMF_Lacey_Zevo') {
 
@@ -332,11 +367,18 @@ server = function(input, output, session) {
           input$lacey_mass1_lim, input$lacey_mass2_lim,
           !is.null(input$lacey_alpha1_lim_Rv),
           !is.null(input$lacey_alpha2_lim_Rv),
-          !is.null(input$lacey_alpha3_lim_Rv))
+          !is.null(input$lacey_alpha3_lim_Rv),
+          !is.null(input$lacey_masslow_lim_Rv),
+          !is.null(input$lacey_massmax_lim_Rv)
+      )
 
       alpha1_lim = if(input$lacey_alpha1_lim_Rv){rev(input$lacey_alpha1_lim)}else{input$lacey_alpha1_lim}
       alpha2_lim = if(input$lacey_alpha2_lim_Rv){rev(input$lacey_alpha2_lim)}else{input$lacey_alpha2_lim}
       alpha3_lim = if(input$lacey_alpha3_lim_Rv){rev(input$lacey_alpha3_lim)}else{input$lacey_alpha3_lim}
+      masslow_lim = if(input$lacey_masslow_lim_Rv){rev(input$lacey_masslow_lim)}else{input$lacey_masslow_lim}
+      massmax_lim = if(input$lacey_massmax_lim_Rv){rev(input$lacey_massmax_lim)}else{input$lacey_massmax_lim}
+      xmin = min(masslow_lim)
+      xmax = max(massmax_lim)
 
       temp_func = function(x, logZ=0){
         IMF_Lacey_Zevo(x,
@@ -347,19 +389,18 @@ server = function(input, output, session) {
                        alpha3_lim = input$lacey_alpha3_lim,
                        mass1 = input$lacey_mass1_lim,
                        mass2 = input$lacey_mass2_lim,
-                       masslow = input$lacey_masslow_lim,
-                       massmax = input$lacey_massmax_lim
+                       masslow = masslow_lim,
+                       massmax = massmax_lim
         )
       }
-      magcurve(temp_func(x, logZ=0),
-               min(input$lacey_masslow_lim), max(input$lacey_massmax_lim), log = 'xy',
-               xlab = 'Star Mass / Msol', ylab = 'dN/dM (1 Msol)', lwd=2)
-      curve(temp_func(x, logZ=-2), min(input$lacey_masslow_lim), max(input$lacey_massmax_lim), log='xy', lty=2, add=TRUE, lwd=2)
-      curve(temp_func(x, logZ=-4), min(input$lacey_masslow_lim), max(input$lacey_massmax_lim), log='xy', lty=3, add=TRUE, lwd=2)
+      magcurve(temp_func(x, logZ=0), xmin, xmax, log = 'xy',
+               xlab = 'Star Mass / Msol', ylab = 'dN/dM (1 Msol)', lwd=2, xlim=c(xmin, xmax))
+      curve(temp_func(x, logZ=-2), xmin, xmax, log='xy', lty=2, add=TRUE, lwd=2)
+      curve(temp_func(x, logZ=-4), xmin, xmax, log='xy', lty=3, add=TRUE, lwd=2)
       legend('bottomleft', legend=c('logZ: 0', 'logZ: -2', 'logZ: -4'), lty=1:3, lwd=2)
     }
-    legend('topright', legend = c('User IMF', 'Ref Chab [0.01 - 150 Msol]'), col=c('black', 'darkgreen'), lty=c(1,3), lwd=2)
-    curve(IMF_Chabrier, 0.01, 150, add=TRUE, col='darkgreen', lty=3)
+    legend('topright', legend = c('User IMF', 'Ref Chab [0.1 - 150 Msol]'), col=c('black', 'darkgreen'), lty=c(1,3), lwd=2)
+    curve(IMF_Chabrier(x, masslow=0.1, massmax=150), 0.1, 150, add=TRUE, col='darkgreen', lty=3, lwd=2)
   })
 
   observeEvent(input$make_ssp, {
@@ -394,8 +435,8 @@ server = function(input, output, session) {
           alpha = input$chab_alpha,
           a = input$chab_a,
           b = input$chab_b,
-          masslow = input$masslow,
-          massmax = input$massmax,
+          masslow = input$chab_masslow,
+          massmax = input$chab_massmax,
           Spec_combine = atmos_data,
           Interp_combine = interp_data,
           cores = input$SSP_cores
@@ -409,8 +450,8 @@ server = function(input, output, session) {
           alpha3 = input$kroupa_alpha3,
           mass1 = input$kroupa_mass1,
           mass2 = input$kroupa_mass2,
-          masslow = input$masslow,
-          massmax = input$massmax,
+          masslow = input$kroupa_masslow,
+          massmax = input$kroupa_massmax,
           Spec_combine = atmos_data,
           Interp_combine = interp_data,
           cores = input$SSP_cores
@@ -420,8 +461,8 @@ server = function(input, output, session) {
           Iso = iso_data,
           IMFfunc = IMF_function,
           alpha = input$salp_alpha,
-          masslow = input$masslow,
-          massmax = input$massmax,
+          masslow = input$salp_masslow,
+          massmax = input$salp_massmax,
           Spec_combine = atmos_data,
           Interp_combine = interp_data,
           cores = input$SSP_cores
@@ -430,6 +471,8 @@ server = function(input, output, session) {
         alpha1_lim = if(input$kroupa_alpha1_lim_Rv){rev(input$kroupa_alpha1_lim)}else{input$kroupa_alpha1_lim}
         alpha2_lim = if(input$kroupa_alpha2_lim_Rv){rev(input$kroupa_alpha2_lim)}else{input$kroupa_alpha2_lim}
         alpha3_lim = if(input$kroupa_alpha3_lim_Rv){rev(input$kroupa_alpha3_lim)}else{input$kroupa_alpha3_lim}
+        masslow_lim = if(input$kroupa_masslow_lim_Rv){rev(input$kroupa_masslow_lim)}else{input$kroupa_masslow_lim}
+        massmax_lim = if(input$kroupa_massmax_lim_Rv){rev(input$kroupa_massmax_lim)}else{input$kroupa_massmax_lim}
 
         SSP_out = progenyMakeSSP(
           Iso = iso_data,
@@ -440,8 +483,8 @@ server = function(input, output, session) {
           alpha3_lim = alpha3_lim,
           mass1_lim = input$kroupa_mass1_lim,
           mass2_lim = input$kroupa_mass2_lim,
-          masslow_lim = input$kroupa_masslow_lim,
-          massmax_lim = input$kroupa_massmax_lim,
+          masslow_lim = masslow_lim,
+          massmax_lim = massmax_lim,
           Spec_combine = atmos_data,
           Interp_combine = interp_data,
           cores = input$SSP_cores
@@ -450,6 +493,8 @@ server = function(input, output, session) {
         alpha1_lim = if(input$kroupa_alpha1_lim_Rv){rev(input$kroupa_alpha1_lim)}else{input$kroupa_alpha1_lim}
         alpha2_lim = if(input$kroupa_alpha2_lim_Rv){rev(input$kroupa_alpha2_lim)}else{input$kroupa_alpha2_lim}
         alpha3_lim = if(input$kroupa_alpha3_lim_Rv){rev(input$kroupa_alpha3_lim)}else{input$kroupa_alpha3_lim}
+        masslow_lim = if(input$kroupa_masslow_lim_Rv){rev(input$kroupa_masslow_lim)}else{input$kroupa_masslow_lim}
+        massmax_lim = if(input$kroupa_massmax_lim_Rv){rev(input$kroupa_massmax_lim)}else{input$kroupa_massmax_lim}
 
         SSP_out = progenyMakeSSP(
           Iso = iso_data,
@@ -460,8 +505,8 @@ server = function(input, output, session) {
           alpha3_lim = alpha3_lim,
           mass1_lim = input$kroupa_mass1_lim,
           mass2_lim = input$kroupa_mass2_lim,
-          masslow_lim = input$kroupa_masslow_lim,
-          massmax_lim = input$kroupa_massmax_lim,
+          masslow_lim = masslow_lim,
+          massmax_lim = massmax_lim,
           Spec_combine = atmos_data,
           Interp_combine = interp_data,
           cores = input$SSP_cores
@@ -470,6 +515,8 @@ server = function(input, output, session) {
         alpha1_lim = if(input$lacey_alpha1_lim_Rv){rev(input$lacey_alpha1_lim)}else{input$lacey_alpha1_lim}
         alpha2_lim = if(input$lacey_alpha2_lim_Rv){rev(input$lacey_alpha2_lim)}else{input$lacey_alpha2_lim}
         alpha3_lim = if(input$lacey_alpha3_lim_Rv){rev(input$lacey_alpha3_lim)}else{input$lacey_alpha3_lim}
+        masslow_lim = if(input$lacey_masslow_lim_Rv){rev(input$lacey_masslow_lim)}else{input$lacey_masslow_lim}
+        massmax_lim = if(input$lacey_massmax_lim_Rv){rev(input$lacey_massmax_lim)}else{input$lacey_massmax_lim}
 
         SSP_out = progenyMakeSSP(
           Iso = iso_data,
@@ -480,8 +527,8 @@ server = function(input, output, session) {
           alpha3_lim = alpha3_lim,
           mass1_lim = input$lacey_mass1_lim,
           mass2_lim = input$lacey_mass2_lim,
-          masslow_lim = input$lacey_masslow_lim,
-          massmax_lim = input$lacey_massmax_lim,
+          masslow_lim = masslow_lim,
+          massmax_lim = massmax_lim,
           Spec_combine = atmos_data,
           Interp_combine = interp_data,
           cores = input$SSP_cores
@@ -490,6 +537,8 @@ server = function(input, output, session) {
         alpha1_lim = if(input$lacey_alpha1_lim_Rv){rev(input$lacey_alpha1_lim)}else{input$lacey_alpha1_lim}
         alpha2_lim = if(input$lacey_alpha2_lim_Rv){rev(input$lacey_alpha2_lim)}else{input$lacey_alpha2_lim}
         alpha3_lim = if(input$lacey_alpha3_lim_Rv){rev(input$lacey_alpha3_lim)}else{input$lacey_alpha3_lim}
+        masslow_lim = if(input$lacey_masslow_lim_Rv){rev(input$lacey_masslow_lim)}else{input$lacey_masslow_lim}
+        massmax_lim = if(input$lacey_massmax_lim_Rv){rev(input$lacey_massmax_lim)}else{input$lacey_massmax_lim}
 
         SSP_out = progenyMakeSSP(
           Iso = iso_data,
@@ -500,8 +549,8 @@ server = function(input, output, session) {
           alpha3_lim = alpha3_lim,
           mass1_lim = input$lacey_mass1_lim,
           mass2_lim = input$lacey_mass2_lim,
-          masslow_lim = input$lacey_masslow_lim,
-          massmax_lim = input$lacey_massmax_lim,
+          masslow_lim = masslow_lim,
+          massmax_lim = massmax_lim,
           Spec_combine = atmos_data,
           Interp_combine = interp_data,
           cores = input$SSP_cores
@@ -509,15 +558,19 @@ server = function(input, output, session) {
       }
 
       SSP_result(SSP_out)
-      output$SSP_status <- renderText("SSP successfully run!")
+      output$SSP_status <- renderUI(HTML('<span style="color:green;">SSP successfully run!</span>'))
     }, error = function(e) {
-      output$SSP_status <- renderText(paste("Error:", e$message))
+      output$SSP_status <- renderUI(HTML(paste('<span style="color:red;">Error:", e$message,"</span>"')))
     })
   })
 
   output$dynamic_imf <- renderUI({
     req(input$imf)
     if(input$imf == 'IMF_Chabrier'){
+      output$SSP_status <- renderUI(HTML('<span style="color:orange;">IMF updated, need to run [Make SSP]</span>'))
+      #output$SSP_status <- renderText("IMF updated, need to run [Make SSP]")
+      output$SSP_check <- renderUI(HTML('<span style="color:orange;">IMF updated, need to run [Make SSP] and then [Check SSP]</span>'))
+      #output$SSP_check <- renderText("IMF updated, need to run [Make SSP] and then [Check SSP]")
       tagList(
         sliderInput('chab_masslow', 'Low Mass IMF Cutoff', min=0.01, max=0.2, value=0.1, step=0.01),
         sliderInput('chab_massmax', 'High Mass IMF Cutoff', min=10, max=500, value=150, step=10),
@@ -526,6 +579,10 @@ server = function(input, output, session) {
         sliderInput('chab_b', 'b', min=0, max=1, value=0.69, step=0.01)
       )
     } else if(input$imf == 'IMF_Kroupa'){
+      output$SSP_status <- renderUI(HTML('<span style="color:orange;">IMF updated, need to run [Make SSP]</span>'))
+      #output$SSP_status <- renderText("IMF updated, need to run [Make SSP]")
+      output$SSP_check <- renderUI(HTML('<span style="color:orange;">IMF updated, need to run [Make SSP] and then [Check SSP]</span>'))
+      #output$SSP_check <- renderText("IMF updated, need to run [Make SSP] and then [Check SSP]")
       tagList(
         sliderInput('kroupa_masslow', 'Low Mass IMF Cutoff', min=0.01, max=0.2, value=0.1, step=0.01),
         sliderInput('kroupa_massmax', 'High Mass IMF Cutoff', min=10, max=500, value=150, step=10),
@@ -536,16 +593,30 @@ server = function(input, output, session) {
         sliderInput('kroupa_mass2', 'mass_2', min=0.2, max=2, value=0.5, step=0.1)
       )
     }else if(input$imf == 'IMF_Salpeter'){
+      output$SSP_status <- renderUI(HTML('<span style="color:orange;">IMF updated, need to run [Make SSP]</span>'))
+      #output$SSP_status <- renderText("IMF updated, need to run [Make SSP]")
+      output$SSP_check <- renderUI(HTML('<span style="color:orange;">IMF updated, need to run [Make SSP] and then [Check SSP]</span>'))
+      #output$SSP_check <- renderText("IMF updated, need to run [Make SSP] and then [Check SSP]")
       tagList(
         sliderInput('salp_masslow', 'Low Mass IMF Cutoff', min=0.01, max=0.2, value=0.1, step=0.01),
         sliderInput('salp_massmax', 'High Mass IMF Cutoff', min=10, max=500, value=150, step=10),
         sliderInput('salp_alpha', 'alpha', min=0, max=4, value=2.35, step=0.1)
       )
     }else if (input$imf == 'IMF_Kroupa_evo'){
+      output$SSP_status <- renderUI(HTML('<span style="color:orange;">IMF updated, need to run [Make SSP]</span>'))
+      #output$SSP_status <- renderText("IMF updated, need to run [Make SSP]")
+      output$SSP_check <- renderUI(HTML('<span style="color:orange;">IMF updated, need to run [Make SSP] and then [Check SSP]</span>'))
+      #output$SSP_check <- renderText("IMF updated, need to run [Make SSP] and then [Check SSP]")
       tagList(
-        sliderInput("kroupa_masslow_lim", "Mass Low", min=0.01, max = 0.2, value = c(0.1, 0.1), step = 0.01),
-        sliderInput("kroupa_massmax_lim", "Mass Max", min = 10, max = 500, value = c(150,150), step = 10),
         sliderInput("kroupa_Age_lim", "Age Lim (Gyr)", min = 0, max = 13.8, value = c(0,13.8), step=0.1),
+        fluidRow(
+          column(9, sliderInput("kroupa_masslow_lim", "Mass Low", min=0.01, max = 0.2, value = c(0.1, 0.1), step = 0.01)),
+          column(3, checkboxInput('kroupa_masslow_lim_Rv', 'Rv', value = FALSE))
+        ),
+        fluidRow(
+          column(9, sliderInput("kroupa_massmax_lim", "Mass Max", min = 10, max = 500, value = c(150,150), step = 10)),
+          column(3, checkboxInput('kroupa_massmax_lim_Rv', 'Rv', value = FALSE))
+        ),
         fluidRow(
           column(9, sliderInput("kroupa_alpha1_lim", "Alpha 1", min = 0, max = 4, value = c(0.3, 0.3), step=0.1)),
           column(3, checkboxInput('kroupa_alpha1_lim_Rv', 'Rv', value = TRUE))
@@ -563,10 +634,20 @@ server = function(input, output, session) {
         sliderInput("kroupa_Lookback_Age", "Lookback Age (Gyr)", min = 0, max = 13.8, value = 0, step=0.1)
       )
     }else if (input$imf == 'IMF_Kroupa_Zevo'){
+      output$SSP_status <- renderUI(HTML('<span style="color:orange;">IMF updated, need to run [Make SSP]</span>'))
+      #output$SSP_status <- renderText("IMF updated, need to run [Make SSP]")
+      output$SSP_check <- renderUI(HTML('<span style="color:orange;">IMF updated, need to run [Make SSP] and then [Check SSP]</span>'))
+      #output$SSP_check <- renderText("IMF updated, need to run [Make SSP] and then [Check SSP]")
       tagList(
-        sliderInput("kroupa_masslow_lim", "Mass Low", min=0.01, max = 0.2, value = c(0.1, 0.1), step = 0.01),
-        sliderInput("kroupa_massmax_lim", "Mass Max", min = 10, max = 500, value = c(150,150), step = 10),
         sliderInput("kroupa_logZ_lim", "log(Z/Zsol) Lim", min = -4, max = 1, value = c(-4,0), step=0.1),
+        fluidRow(
+          column(9, sliderInput("kroupa_masslow_lim", "Mass Low", min=0.01, max = 0.2, value = c(0.1, 0.1), step = 0.01)),
+          column(3, checkboxInput('kroupa_masslow_lim_Rv', 'Rv', value = TRUE))
+        ),
+        fluidRow(
+          column(9, sliderInput("kroupa_massmax_lim", "Mass Max", min = 10, max = 500, value = c(150,150), step = 10)),
+          column(3, checkboxInput('kroupa_massmax_lim_Rv', 'Rv', value = TRUE))
+        ),
         fluidRow(
           column(9, sliderInput("kroupa_alpha1_lim", "Alpha 1", min = 0, max = 4, value = c(0.3, 0.3), step=0.1)),
           column(3, checkboxInput('kroupa_alpha1_lim_Rv', 'Rv', value = FALSE))
@@ -583,10 +664,20 @@ server = function(input, output, session) {
         sliderInput("kroupa_mass2_lim", "Mass 2", min = 0.2, max = 2, value = c(0.5,0.5), step = 0.1)
       )
     }else if (input$imf == 'IMF_Lacey_evo'){
+      output$SSP_status <- renderUI(HTML('<span style="color:orange;">IMF updated, need to run [Make SSP]</span>'))
+      #output$SSP_status <- renderText("IMF updated, need to run [Make SSP]")
+      output$SSP_check <- renderUI(HTML('<span style="color:orange;">IMF updated, need to run [Make SSP] and then [Check SSP]</span>'))
+      #output$SSP_check <- renderText("IMF updated, need to run [Make SSP] and then [Check SSP]")
       tagList(
-        sliderInput("lacey_masslow_lim", "Mass Low", min=0.01, max = 0.2, value = c(0.1, 0.1), step = 0.01),
-        sliderInput("lacey_massmax_lim", "Mass Max", min = 10, max = 500, value = c(150,150), step = 10),
         sliderInput("lacey_Age_lim", "Age Lim (Gyr)", min = 0, max = 13.8, value = c(0,13.8), step=0.1),
+        fluidRow(
+          column(9, sliderInput("lacey_masslow_lim", "Mass Low", min=0.01, max = 0.2, value = c(0.1, 0.1), step = 0.01)),
+          column(3, checkboxInput('lacey_masslow_lim_Rv', 'Rv', value = FALSE))
+        ),
+        fluidRow(
+          column(9, sliderInput("lacey_massmax_lim", "Mass Max", min = 10, max = 500, value = c(150,150), step = 10)),
+          column(3, checkboxInput('lacey_massmax_lim_Rv', 'Rv', value = FALSE))
+        ),
         fluidRow(
           column(9, sliderInput("lacey_alpha1_lim", "Alpha 1", min = 0, max = 4, value = c(0.4, 2), step=0.1)),
           column(3, checkboxInput('lacey_alpha1_lim_Rv', 'Rv', value = FALSE))
@@ -605,10 +696,20 @@ server = function(input, output, session) {
 
       )
     }else if (input$imf == 'IMF_Lacey_Zevo'){
+      output$SSP_status <- renderUI(HTML('<span style="color:orange;">IMF updated, need to run [Make SSP]</span>'))
+      #output$SSP_status <- renderText("IMF updated, need to run [Make SSP]")
+      output$SSP_check <- renderUI(HTML('<span style="color:orange;">IMF updated, need to run [Make SSP] and then [Check SSP]</span>'))
+      #output$SSP_check <- renderText("IMF updated, need to run [Make SSP] and then [Check SSP]")
       tagList(
-        sliderInput("lacey_masslow_lim", "Mass Low", min=0.01, max = 0.2, value = c(0.1, 0.1), step = 0.01),
-        sliderInput("lacey_massmax_lim", "Mass Max", min = 10, max = 500, value = c(150,150), step = 10),
         sliderInput("lacey_logZ_lim", "log(Z/Zsol) Lim", min = -4, max = 1, value = c(-4,0), step=0.1),
+        fluidRow(
+          column(9, sliderInput("lacey_masslow_lim", "Mass Low", min=0.01, max = 0.2, value = c(0.1, 0.1), step = 0.01)),
+          column(3, checkboxInput('lacey_masslow_lim_Rv', 'Rv', value = TRUE))
+        ),
+        fluidRow(
+          column(9, sliderInput("lacey_massmax_lim", "Mass Max", min = 10, max = 500, value = c(150,150), step = 10)),
+          column(3, checkboxInput('lacey_massmax_lim_Rv', 'Rv', value = TRUE))
+        ),
         fluidRow(
           column(9, sliderInput("lacey_alpha1_lim", "Alpha 1", min = 0, max = 4, value = c(0.4, 2), step=0.1)),
           column(3, checkboxInput('lacey_alpha1_lim_Rv', 'Rv', value = TRUE))
@@ -628,30 +729,25 @@ server = function(input, output, session) {
   })
 
 
-  # observeEvent(input$check_ssp, {
-  #   output$SSP_check <- renderText({
-  #     capture.output(ProSpect::speclib_check(SSP_result()))
-  #   })
-  # })
-
-
   observeEvent(input$check_ssp, {
-    output$SSP_check <- renderText({
-      if(is.null(SSP_result())){
-        'No SSP has been generated - check failed!'
-      }else{
-        messages <- character()
-        withCallingHandlers(
-          {
-            ProSpect::speclib_check(SSP_result())
-          },
-          message = function(m) {
-            messages <<- c(messages, conditionMessage(m))
-            invokeRestart("muffleMessage")
-          }
-        )
-        paste(messages, collapse = "\n")
-      }
+    output$SSP_check <- renderUI({
+      HTML(
+        if(is.null(SSP_result())){
+          '<span style="color:red;">No SSP has been generated - check failed!</span>'
+        }else{
+          messages <- character()
+          withCallingHandlers(
+            {
+              ProSpect::speclib_check(SSP_result())
+            },
+            message = function(m) {
+              messages <<- c(messages, conditionMessage(m))
+              invokeRestart("muffleMessage")
+            }
+          )
+          paste(messages, collapse = "<br>")
+        }
+      )
     })
   })
 
@@ -670,8 +766,8 @@ server = function(input, output, session) {
 
   observeEvent(input$SSP_done, {
     if(is.null(SSP_result())){
-      output$SSP_check <- renderText({
-        'No SSP has been generated - nothing to return!'
+      output$SSP_return <- renderUI({
+        renderUI(HTML('<span style="color:orange;">No SSP has been generated - nothing to return!</span>'))
       })
     }else{
       stopApp(SSP_result())

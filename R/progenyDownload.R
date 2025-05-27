@@ -45,7 +45,12 @@ progenyAtmosLoad = function(destpath = '',
   }
 
   if(is.character(base)){
-    base = Rfits_read(paste0(destpath,'/',base,'.fits'), pointer=F, header=F)
+    base_file = paste0(destpath,'/',base,'.fits')
+    if(file.exists(base_file)){
+      base = Rfits_read(base_file, pointer=F, header=F)
+    }else{
+      stop('No file at: ', base_file)
+    }
 
     if(anyNA(base$spec)){
       base$spec[is.na(base$spec)] = 0
@@ -81,7 +86,12 @@ progenyAtmosLoad = function(destpath = '',
   }
 
   if(is.character(extend)){
-    extend = Rfits_read(paste0(destpath,'/',extend,'.fits'), pointer=F, header=F)
+    extend_file = paste0(destpath,'/',extend,'.fits')
+    if(file.exists(extend_file)){
+      extend = Rfits_read(extend_file, pointer=F, header=F)
+    }else{
+      stop('No file at: ', extend_file)
+    }
 
     if(anyNA(extend$spec)){
       extend$spec[is.na(extend$spec)] = 0
@@ -112,7 +122,12 @@ progenyAtmosLoad = function(destpath = '',
   }
 
   if(is.character(hot)){
-    hot = Rfits_read(paste0(destpath,'/',hot,'.fits'), pointer=F, header=F)
+    hot_file = paste0(destpath,'/',hot,'.fits')
+    if(file.exists(hot_file)){
+      hot = Rfits_read(hot_file, pointer=F, header=F)
+    }else{
+      stop('No file at: ', hot_file)
+    }
 
     if(anyNA(hot$spec)){
       hot$spec[is.na(hot$spec)] = 0
@@ -143,7 +158,12 @@ progenyAtmosLoad = function(destpath = '',
   }
 
   if(is.character(AGB)){
-    AGB = Rfits_read(paste0(destpath,'/',AGB,'.fits'), pointer=F, header=F)
+    AGB_file = paste0(destpath,'/',AGB,'.fits')
+    if(file.exists(AGB_file)){
+      AGB = Rfits_read(AGB_file, pointer=F, header=F)
+    }else{
+      stop('No file at: ', AGB_file)
+    }
 
     if(anyNA(AGB$spec)){
       AGB$spec[is.na(AGB$spec)] = 0
@@ -174,7 +194,12 @@ progenyAtmosLoad = function(destpath = '',
   }
 
   if(is.character(white)){
-    white = Rfits_read(paste0(destpath,'/',white,'.fits'), pointer=F, header=F)
+    white_file = paste0(destpath,'/',white,'.fits')
+    if(file.exists(white_file)){
+      white = Rfits_read(white_file, pointer=F, header=F)
+    }else{
+      stop('No file at: ', white_file)
+    }
 
     if(anyNA(white$spec)){
       white$spec[is.na(white$spec)] = 0

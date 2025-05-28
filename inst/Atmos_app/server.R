@@ -224,7 +224,19 @@ server = function(input, output, session) {
   observeEvent(input$wave_file, {
     req(input$wave_file)
     tryCatch({
-      wave_grid_result(as.numeric(read.table(input$wave_file$datapath, header = FALSE)))
+      wave_grid = as.numeric(read.table(input$wave_file$datapath, header = FALSE)[,1])
+      wave_grid_result(wave_grid)
+      output$loaded_wave_samp <- renderText({
+        'User defined wavelength grid has been loaded. Info below:'
+      })
+      output$summary_wave_samp <- renderPrint({
+        temp = summary(wave_grid_result())
+        temp_diff = summary(diff(wave_grid_result()))
+        data.frame(Stat=names(temp), 'Wave.Ang'=as.numeric(temp), 'Bin.Ang'=as.numeric(temp_diff))
+      })
+      output$plot_wave_samp <- renderPlot({
+        progenySampPlot(wave_grid_result())
+      })
     }, error = function(e) {
       output$wave_status <- renderText(paste("Error loading wavegrid file:", e$message))
     })

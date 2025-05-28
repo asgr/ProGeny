@@ -80,6 +80,9 @@ ui = fluidPage(
                   ),
                   tabPanel("Atmospheres",
                            verbatimTextOutput("selectedPath"),
+                           verbatimTextOutput("loaded_wave_samp"),
+                           verbatimTextOutput("summary_wave_samp"),
+                           plotOutput("plot_wave_samp", height = "400px"),
                            verbatimTextOutput("atmos_status"),
                            plotOutput("plot_atmos", height = "600px")
                   ),

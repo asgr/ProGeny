@@ -7,7 +7,7 @@ Maintainer: Aaron Robotham <aaron.robotham@uwa.edu.au>
 Description: Flexible generation of SSPs, where it is possible to vary the IMF, the isochrones and the spectral atmospheres, interpolate them together and create a stacked spectra SSP.
 License: LGPL-3
 Imports: foreach, doParallel, data.table, Rfits, RANN, NISTunits, celestial, magicaxis, ParmOff, knitr, checkmate
-Suggests: ProSpect, ProPane, akima, shiny, shinyFiles, fst
+Suggests: ProSpect, ProPane, akima, shiny, shinyFiles, shinybusy, fst
 Encoding: UTF-8
 LazyData: true
 LazyDataCompression: gzip

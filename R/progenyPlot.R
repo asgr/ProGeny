@@ -81,7 +81,9 @@ progenyIsoPlot = function(Iso, add=FALSE, Nsamp=1e4, seed=666, zsel='Lum', zunit
     ParmOff(magbar, .args = list(position='bottomright', range=zlim, col=col, log=(zstretch=='log'),
                                  title = paste(zsel, zunit, sep=' / ')), .pass_dots=FALSE, ...)
   }else{
-    legend('bottomright', legend=zlegend, col=col, pch=16, ...)
+    if(!isFALSE(zlegend)){
+      legend('bottomright', legend=zlegend, col=col, pch=16, ...)
+    }
   }
 
   if(draw_regions){

@@ -1,29 +1,31 @@
 ui = fluidPage(
+  shinybusy::use_busy_spinner(spin = "fading-circle"),
   titlePanel("ProGeny SSP Generator"),
   sidebarLayout(
     sidebarPanel(
       conditionalPanel(
         condition = "input.tabs == 'Isochrone'",
+        tags$h5("Allow 10 sec to load Iso File:"),
         fileInput("iso_file", "Choose Isochrone File [.fst]", accept = ".fst"),
-        br(), br(),
+        br(),
         actionButton("iso_done", "Return Isochrone"),
-        verbatimTextOutput("iso_summary")
       ),
 
       conditionalPanel(
         condition = "input.tabs == 'Atmospheres'",
         shinyFiles::shinyDirButton("destpath", "Atmos Path", "Select a folder"),
         selectInput("base", "Base", choices = c("C3K Conroy" = "combine_C3K_conroy", "PHOENIX Husser" = "combine_PHOENIX_husser", "PHOENIX Allard" = "combine_PHOENIX_Allard", "MILES Vazdekis" = "combine_MILES_vazdekis", "BaSeL-3.1 WLBC" = "combine_BASEL_wlbc")),
-        selectInput("extend", "Extend", choices = c("PHOENIX Allard" = "combine_PHOENIX_Allard", "ATLAS9 Castelli" = "combine_ATLAS9_castelli")),
-        selectInput("hot", "Hot", choices = c("PoWR" = "combine_OB_PoWR", "hot" = "combine_hot")),
-        selectInput("AGB", "AGB", choices = c("AGB Lancon" = "combine_AGB_lancon")),
-        selectInput("white", "White Dwarfs", choices = c("TMAP Werner" = "combine_TMAP_werner", "white" = "combine_white")),
-        selectInput("WR", "Wolf-Rayet", choices = c("PoWR" = "combine_WNE_PoWR")),
+        selectInput("extend", "Extend", choices = c("PHOENIX Allard" = "combine_PHOENIX_Allard", "ATLAS9 Castelli" = "combine_ATLAS9_castelli", "None" = "None")),
+        selectInput("hot", "Hot", choices = c("PoWR" = "combine_OB_PoWR", "hot" = "combine_hot", "None" = "None")),
+        selectInput("AGB", "AGB", choices = c("AGB Lancon" = "combine_AGB_lancon", "None" = "None")),
+        selectInput("white", "White Dwarfs", choices = c("TMAP Werner" = "combine_TMAP_werner", "white" = "combine_white", "None" = "None")),
+        selectInput("WR", "Wolf-Rayet", choices = c("PoWR" = "combine_WNE_PoWR", "None" = "None")),
         fileInput("wave_file", "User Wave (Ang) [.tab .dat .txt]", accept = c('tab', 'dat', 'txt')),
         numericInput("atmos_cores", "Number of Cores", value = 8, min = 1, step=1),
-        actionButton("load_atmos", "Load Atmospheres"),
+        tags$h5("Allow 30 sec to [Load Atmos]:"),
+        actionButton("load_atmos", "Load Atmos"),
         br(), br(),
-        actionButton("atmos_done", "Return Atmospheres")
+        actionButton("atmos_done", "Return Atmos")
       ),
 
       conditionalPanel(
@@ -38,9 +40,10 @@ ui = fluidPage(
         selectInput('label_AGB', 'AGB Phase', choices=-1:10, multiple=TRUE),
         selectInput('label_white', 'White Dwarf Phase', choices=-1:10, multiple=TRUE),
         selectInput('label_WR', 'AGB Wolf-Rayet', choices=-1:10, multiple=TRUE),
-        actionButton("run_interp", "Run Interpolation"),
+        tags$h5("Allow 30 sec to [Run Interp]:"),
+        actionButton("run_interp", "Run Interp"),
         br(), br(),
-        actionButton("interp_done", "Return Interpolation Grids"),
+        actionButton("interp_done", "Return Interp Grids"),
       ),
 
       conditionalPanel(
@@ -59,6 +62,7 @@ ui = fluidPage(
       conditionalPanel(
         condition = "input.tabs == 'Make SSP'",
         numericInput("SSP_cores", "Number of Cores", value = 8, min = 1, step=1),
+        tags$h5("Allow 2 min to [Make SSP]:"),
         actionButton("make_ssp", "Make SSP"),
         br(), br(),
         actionButton("check_ssp", "Check SSP"),
@@ -71,7 +75,8 @@ ui = fluidPage(
       tabsetPanel(id = "tabs",
                   tabPanel("Isochrone",
                            verbatimTextOutput("iso_status"),
-                           plotOutput("plot_iso", height = "600px")
+                           plotOutput("plot_iso", height = "600px"),
+                           verbatimTextOutput("iso_summary")
                   ),
                   tabPanel("Atmospheres",
                            verbatimTextOutput("selectedPath"),

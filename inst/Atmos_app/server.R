@@ -1,12 +1,12 @@
 server = function(input, output, session) {
   ASGR_atmos_path = '/Volumes/Macintosh HD/Users/aaron/Google Drive/My Drive/ProGeny_atmos'
   if(file.exists(ASGR_atmos_path)){
-    volumes = c(ASGR = ASGR_atmos_path, wd = getwd(), Home = '~/', getVolumes()())
+    volumes = c(ASGR = ASGR_atmos_path, wd = getwd(), Home = '~/', shinyFiles::getVolumes()())
   }else{
-    volumes = c(wd = getwd(), Home = '~/', getVolumes()())
+    volumes = c(wd = getwd(), Home = '~/', shinyFiles::getVolumes()())
   }
 
-  shinyDirChoose(input, id = 'destpath', roots = volumes)
+  shinyFiles::shinyDirChoose(input, id = 'destpath', roots = volumes)
 
   atmos_result = reactiveVal(NULL)
   wave_grid_result = reactiveVal(NULL)
@@ -14,15 +14,21 @@ server = function(input, output, session) {
   interp_all_result = reactiveVal(NULL)
   SSP_result = reactiveVal(NULL)
 
-  output$selectedPath <- renderText({
-    req(input$destpath)
-    parseDirPath(volumes, input$destpath)
+  observeEvent(input$destpath,{
+    output$selectedPath <- renderText({
+      req(input$destpath)
+      paste(
+        'Path to use: \n',
+        shinyFiles::parseDirPath(volumes, input$destpath)
+      )
+    })
   })
 
-  output$status <- renderText("Waiting...")
+  #output$status <- renderText("Waiting...")
 
   observeEvent(input$iso_file, {
     req(input$iso_file)
+    shinybusy::show_spinner()
     tryCatch({
       iso_out = fst::read_fst(input$iso_file$datapath, as.data.table = TRUE)
       iso_result(iso_out)
@@ -34,6 +40,7 @@ server = function(input, output, session) {
     }, error = function(e) {
       output$iso_status <- renderText(paste("Error loading isochrone file:", e$message))
     })
+    shinybusy::hide_spinner()
 
     if(grepl('Mist', input$iso_file$name)){
       updateSelectInput(
@@ -108,32 +115,110 @@ server = function(input, output, session) {
     }
   })
 
+  # observeEvent(input$load_atmos, {
+  #   output$atmos_status <- renderText("Loading atmosphere data, please be patient (~20 seconds)...")
+  # }, priority = 10)
+
   observeEvent(input$load_atmos, {
-    output$atmos_status <- renderText("Loading atmosphere data!")
+    shinybusy::show_spinner()
+    input_base = input$base
+    input_extend = input$extend
+    input_hot = input$hot
+    input_AGB = input$AGB
+    input_white = input$white
+    input_WR = input$WR
+
+    if(input_extend == 'None'){
+      input_extend = NULL
+    }
+
+    if(input_hot == 'None'){
+      input_hot = NULL
+    }
+
+    if(input_AGB == 'None'){
+      input_AGB = NULL
+    }
+
+    if(input_white == 'None'){
+      input_white = NULL
+    }
+
+    if(input_WR == 'None'){
+      input_WR = NULL
+    }
+
+    destpath = shinyFiles::parseDirPath(volumes, input$destpath)
+
+    if(!file.exists(paste0(destpath,'/',input_base,'.fits'))){
+      output$atmos_status <- renderText(paste("No base atmosphere at:", paste0(destpath,'/',input_base,'.fits')))
+      return()
+    }
+
+    if(!is.null(input_extend)){
+      if(!file.exists(paste0(destpath,'/',input_extend,'.fits'))){
+        output$atmos_status <- renderText(paste("No extend atmosphere at:", paste0(destpath,'/',input_extend,'.fits')))
+        return()
+      }
+    }
+
+    if(!is.null(input_hot)){
+      if(!file.exists(paste0(destpath,'/',input_hot,'.fits'))){
+        output$atmos_status <- renderText(paste("No hot atmosphere at:", paste0(destpath,'/',input$hot,'.fits')))
+        return()
+      }
+    }
+
+    if(!is.null(input_AGB)){
+      if(!file.exists(paste0(destpath,'/',input_AGB,'.fits'))){
+        output$atmos_status <- renderText(paste("No AGB atmosphere at:", paste0(destpath,'/',input_AGB,'.fits')))
+        return()
+      }
+    }
+
+    if(!is.null(input_white)){
+      if(!file.exists(paste0(destpath,'/',input_white,'.fits'))){
+        output$atmos_status <- renderText(paste("No white atmosphere at:", paste0(destpath,'/',input_white,'.fits')))
+        return()
+      }
+    }
+
+    if(!is.null(input_WR)){
+      if(!file.exists(paste0(destpath,'/',input_WR,'.fits'))){
+        output$atmos_status <- renderText(paste("No WR atmosphere at:", paste0(destpath,'/',input_WR,'.fits')))
+        return()
+      }
+    }
+
     #shinyjs::delay(100, {
     tryCatch({
       atmos_out = progenyAtmosLoad(
-        destpath = shinyFiles::parseDirPath(volumes, input$destpath),
-        base = input$base,
-        extend = input$extend,
-        hot = input$hot,
-        AGB = input$AGB,
-        white = input$white,
-        WR = input$WR,
+        destpath = destpath,
+        base = input_base,
+        extend = input_extend,
+        hot = input_hot,
+        AGB = input_AGB,
+        white = input_white,
+        WR = input_WR,
         wavegrid = wave_grid_result(),
         cores = input$atmos_cores
       )
       atmos_result(atmos_out)
+
       output$atmos_status <- renderText("Atmosphere data loaded successfully!")
 
       output$plot_atmos = renderPlot({
-        progenyIsoPlot(iso_result())
-        progenyAtmosPlot(atmos_out, add=TRUE)
+        if(is.null(iso_result())){
+          progenyAtmosPlot(atmos_out, add=FALSE)
+        }else{
+          progenyIsoPlot(iso_result())
+          progenyAtmosPlot(atmos_out, add=TRUE)
+        }
       })
     }, error = function(e) {
       output$atmos_status <- renderText(paste("Error:", e$message))
     })
-    #})
+    shinybusy::hide_spinner()
   })
 
   observeEvent(input$wave_file, {
@@ -146,6 +231,7 @@ server = function(input, output, session) {
   })
 
   observeEvent(input$run_interp, {
+    shinybusy::show_spinner()
     tryCatch({
       interp_all_out = progenyInterpGrid_All(
         Iso = iso_result(),
@@ -174,6 +260,7 @@ server = function(input, output, session) {
     }, error = function(e) {
       output$interp_status <- renderText(paste("Error:", e$message))
     })
+    shinybusy::hide_spinner()
   })
 
 
@@ -403,7 +490,12 @@ server = function(input, output, session) {
     curve(IMF_Chabrier(x, masslow=0.1, massmax=150), 0.1, 150, add=TRUE, col='darkgreen', lty=3, lwd=2)
   })
 
+  # observeEvent(input$make_ssp, {
+  #   output$SSP_status <- renderUI(HTML('<span style="color:purple;">SSP running, please be patient (~one minute)...</span>'))
+  # }, priority = 10)
+
   observeEvent(input$make_ssp, {
+    shinybusy::show_spinner()
     tryCatch({
       iso_data <- iso_result()
       atmos_data <- atmos_result()
@@ -562,6 +654,7 @@ server = function(input, output, session) {
     }, error = function(e) {
       output$SSP_status <- renderUI(HTML(paste('<span style="color:red;">Error:", e$message,"</span>"')))
     })
+    shinybusy::hide_spinner()
   })
 
   output$dynamic_imf <- renderUI({

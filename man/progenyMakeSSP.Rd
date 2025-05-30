@@ -9,8 +9,8 @@ The main interface via which users will likely use ProGeny to create SSPs. This 
 }
 \usage{
 progenyMakeSSP(Iso, IMFfunc = IMF_Chabrier, ..., rem_frac = 'get', Spec_combine,
-  Interp_combine, logAge_steps = NULL, logZ_steps = NULL, Zsol = 0.02, cores = 8,
-  Labels = list(Zlab = "Metallicity", Agelab = "Time since ZAM / Yrs",
+  Interp_combine, logAge_steps = NULL, logZ_steps = NULL, Mini_range = NULL, Zsol = 0.02,
+  cores = 8, Labels = list(Zlab = "Metallicity", Agelab = "Time since ZAM / Yrs",
   Wavelab = "Wavelength / Ang", Lumlab = "Lsun / Ang (for 1 Msun SF)",
   LumAgelab = "Lsun / Ang (for 1 Msun/Yr SFR)"))
 }
@@ -39,6 +39,9 @@ Numeric vector; if provided it is the log10(Age/yr) values that you want the out
 }
   \item{logZ_steps}{
 Numeric vector; if provided it is the log10(Z/Zsol) values that you want the output SSP to be interpolated at. If this argument is NULL we use the sorted unique logZ values from the \option{Iso} provided (the default). This means you can generate SSPs with fairly arbitrary metallicity grids, with the caveat the \option{logZ_steps} must be fully inside the logZ extremes in the provided \option{Iso} (we can only interpolate, not extrapolate).
+}
+  \item{Mini_range}{
+Numeric vector; optional. Lower and upper ranges of \option{Iso} Mini to use. This can be useful if wanting to combine mass ranges from different isochrone to make a better combined SSP (say one is better for low mass stars, and another better for high mass stars). If provided it must be length 2.
 }
   \item{Zsol}{
 Numeric scalar; value of the Sun's solar metallicity (to convert logZ to Z).

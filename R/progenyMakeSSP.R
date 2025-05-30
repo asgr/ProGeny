@@ -1,5 +1,5 @@
 progenyMakeSSP = function(Iso, IMFfunc = IMF_Chabrier, ..., rem_frac = 'get', Spec_combine,
-                          Interp_combine, logAge_steps = NULL, logZ_steps = NULL, Zsol=0.02,
+                          Interp_combine, logAge_steps = NULL, logZ_steps = NULL, Mini_range=NULL, Zsol=0.02,
                           cores=8, Labels = list(Zlab = "Metallicity", Agelab = "Time since ZAM / Yrs",
                           Wavelab = "Wavelength / Ang", Lumlab = "Lsun / Ang (for 1 Msun SF)",
                           LumAgelab = "Lsun / Ang (for 1 Msun/Yr SFR)")){
@@ -43,7 +43,88 @@ progenyMakeSSP = function(Iso, IMFfunc = IMF_Chabrier, ..., rem_frac = 'get', Sp
 
   #To be safe to not alter the original Isochrones
   Iso_temp = copy(Iso)
-  setkeyv(Iso_temp, c('logZ', 'logAge', 'Mini'))
+
+  if(!is.null(Mini_range)){
+    temp_Mini_cut = which(Iso_temp$Mini >= Mini_range[1] & Iso_temp$Mini <= Mini_range[2])
+    Iso_temp = Iso_temp[temp_Mini_cut,]
+
+    if(!is.null(Interp_combine$base)){
+      Interp_combine$base$nn.idx = Interp_combine$base$nn.idx[temp_Mini_cut,]
+      Interp_combine$base$nn.dists = Interp_combine$base$nn.dists[temp_Mini_cut,]
+      Interp_combine$base$weights = Interp_combine$base$weights[temp_Mini_cut,]
+    }
+
+    if(!is.null(Interp_combine$extend)){
+      Interp_combine$extend$nn.idx = Interp_combine$extend$nn.idx[temp_Mini_cut,]
+      Interp_combine$extend$nn.dists = Interp_combine$extend$nn.dists[temp_Mini_cut,]
+      Interp_combine$extend$weights = Interp_combine$extend$weights[temp_Mini_cut,]
+    }
+
+    if(!is.null(Interp_combine$hot)){
+      Interp_combine$hot$nn.idx = Interp_combine$hot$nn.idx[temp_Mini_cut,]
+      Interp_combine$hot$nn.dists = Interp_combine$hot$nn.dists[temp_Mini_cut,]
+      Interp_combine$hot$weights = Interp_combine$hot$weights[temp_Mini_cut,]
+    }
+
+    if(!is.null(Interp_combine$AGB)){
+      Interp_combine$AGB$nn.idx = Interp_combine$AGB$nn.idx[temp_Mini_cut,]
+      Interp_combine$AGB$nn.dists = Interp_combine$AGB$nn.dists[temp_Mini_cut,]
+      Interp_combine$AGB$weights = Interp_combine$AGB$weights[temp_Mini_cut,]
+    }
+
+    if(!is.null(Interp_combine$white)){
+      Interp_combine$white$nn.idx = Interp_combine$white$nn.idx[temp_Mini_cut,]
+      Interp_combine$white$nn.dists = Interp_combine$white$nn.dists[temp_Mini_cut,]
+      Interp_combine$white$weights = Interp_combine$white$weights[temp_Mini_cut,]
+    }
+
+    if(!is.null(Interp_combine$WR)){
+      Interp_combine$WR$nn.idx = Interp_combine$WR$nn.idx[temp_Mini_cut,]
+      Interp_combine$WR$nn.dists = Interp_combine$WR$nn.dists[temp_Mini_cut,]
+      Interp_combine$WR$weights = Interp_combine$WR$weights[temp_Mini_cut,]
+    }
+  }
+
+  temp_order = order(Iso_temp$logZ, Iso_temp$logAge, Iso_temp$Mini)
+  if(max(diff(temp_order)) > 1){
+    Iso_temp = Iso_temp[temp_order,]
+
+    if(!is.null(Interp_combine$base)){
+      Interp_combine$base$nn.idx = Interp_combine$base$nn.idx[temp_order,]
+      Interp_combine$base$nn.dists = Interp_combine$base$nn.dists[temp_order,]
+      Interp_combine$base$weights = Interp_combine$base$weights[temp_order,]
+    }
+
+    if(!is.null(Interp_combine$extend)){
+      Interp_combine$extend$nn.idx = Interp_combine$extend$nn.idx[temp_order,]
+      Interp_combine$extend$nn.dists = Interp_combine$extend$nn.dists[temp_order,]
+      Interp_combine$extend$weights = Interp_combine$extend$weights[temp_order,]
+    }
+
+    if(!is.null(Interp_combine$hot)){
+      Interp_combine$hot$nn.idx = Interp_combine$hot$nn.idx[temp_order,]
+      Interp_combine$hot$nn.dists = Interp_combine$hot$nn.dists[temp_order,]
+      Interp_combine$hot$weights = Interp_combine$hot$weights[temp_order,]
+    }
+
+    if(!is.null(Interp_combine$AGB)){
+      Interp_combine$AGB$nn.idx = Interp_combine$AGB$nn.idx[temp_order,]
+      Interp_combine$AGB$nn.dists = Interp_combine$AGB$nn.dists[temp_order,]
+      Interp_combine$AGB$weights = Interp_combine$AGB$weights[temp_order,]
+    }
+
+    if(!is.null(Interp_combine$white)){
+      Interp_combine$white$nn.idx = Interp_combine$white$nn.idx[temp_order,]
+      Interp_combine$white$nn.dists = Interp_combine$white$nn.dists[temp_order,]
+      Interp_combine$white$weights = Interp_combine$white$weights[temp_order,]
+    }
+
+    if(!is.null(Interp_combine$WR)){
+      Interp_combine$WR$nn.idx = Interp_combine$WR$nn.idx[temp_order,]
+      Interp_combine$WR$nn.dists = Interp_combine$WR$nn.dists[temp_order,]
+      Interp_combine$WR$weights = Interp_combine$WR$weights[temp_order,]
+    }
+  }
 
   logZ = logAge = Mini = Mass = NULL
 

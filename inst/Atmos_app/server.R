@@ -242,6 +242,23 @@ server = function(input, output, session) {
     })
   })
 
+  # output$iso_tab <- renderUI({
+  #   req(wave_grid_result())
+  #   if(is.null(wave_grid_result())){
+  #     tabPanel("Isochrone",
+  #              verbatimTextOutput("iso_status"),
+  #              plotOutput("plot_iso", height = "600px"),
+  #              verbatimTextOutput("iso_summary")
+  #     )
+  #   } else {
+  #     tabPanel(HTML("Isochrone <span style='color:green;'>&#10003;</span>"),
+  #              verbatimTextOutput("iso_status"),
+  #              plotOutput("plot_iso", height = "600px"),
+  #              verbatimTextOutput("iso_summary")
+  #     )
+  #   }
+  # })
+
   observeEvent(input$run_interp, {
     shinybusy::show_spinner()
     tryCatch({

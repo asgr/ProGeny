@@ -563,6 +563,15 @@ server = function(input, output, session) {
           Interp_combine = interp_data,
           cores = input$SSP_cores
         )
+
+        IMF_info = c(
+          IMF_type = 'Chabrier',
+          IMF_alpha = paste(input$chab_alpha, collapse = '-'),
+          IMF_a = paste(input$chab_a, collapse = '-'),
+          IMF_b = paste(input$chab_b, collapse = '-'),
+          IMF_masslow = paste(input$chab_masslow, collapse = '-'),
+          IMF_massmax = paste(input$chab_massmax, collapse = '-')
+        )
       }else if(input$imf == 'IMF_Kroupa'){
         SSP_out = progenyMakeSSP(
           Iso = iso_data,
@@ -578,6 +587,17 @@ server = function(input, output, session) {
           Interp_combine = interp_data,
           cores = input$SSP_cores
         )
+
+        IMF_info = c(
+          IMF_type = 'Kroupa',
+          IMF_alpha1 = paste(input$kroupa_alpha1, collapse = '-'),
+          IMF_alpha2 = paste(input$kroupa_alpha2, collapse = '-'),
+          IMF_alpha3 = paste(input$kroupa_alpha3, collapse = '-'),
+          IMF_masslow = paste(input$chab_mass1, collapse = '-'),
+          IMF_mass1 = paste(input$chab_mass2, collapse = '-'),
+          IMF_mass2 = paste(input$chab_masslow, collapse = '-'),
+          IMF_massmax = paste(input$chab_massmax, collapse = '-')
+        )#HERE
       }else if(input$imf == 'IMF_Salpeter'){
         SSP_out = progenyMakeSSP(
           Iso = iso_data,

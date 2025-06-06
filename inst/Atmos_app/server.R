@@ -331,7 +331,7 @@ server = function(input, output, session) {
       req(input$chab_masslow, input$chab_massmax,
           input$chab_alpha, input$chab_a, input$chab_b)
 
-      magcurve(IMF_Chabrier(x,
+      magicaxis::magcurve(IMF_Chabrier(x,
                             alpha = input$chab_alpha,
                             a = input$chab_a,
                             b = input$chab_b,
@@ -344,7 +344,7 @@ server = function(input, output, session) {
           input$kroupa_alpha1, input$kroupa_alpha2, input$kroupa_alpha3,
           input$kroupa_mass1, input$kroupa_mass2)
 
-      magcurve(IMF_Kroupa(x,
+      magicaxis::magcurve(IMF_Kroupa(x,
                           alpha1 = input$kroupa_alpha1,
                           alpha2 = input$kroupa_alpha2,
                           alpha3 = input$kroupa_alpha3,
@@ -358,7 +358,7 @@ server = function(input, output, session) {
       req(input$salp_masslow, input$salp_massmax,
           input$salp_alpha)
 
-      magcurve(IMF_Salpeter(x,
+      magicaxis::magcurve(IMF_Salpeter(x,
                             alpha = input$salp_alpha,
                             masslow = input$salp_masslow,
                             massmax = input$salp_massmax),
@@ -397,7 +397,7 @@ server = function(input, output, session) {
                        massmax = massmax_lim,
                        Lookback_Age = input$kroupa_Lookback_Age)
       }
-      magcurve(temp_func(x, Age=0), xmin, xmax, log = 'xy',
+      magicaxis::magcurve(temp_func(x, Age=0), xmin, xmax, log = 'xy',
                xlab = 'Star Mass / Msol', ylab = 'dN/dM (1 Msol)', lwd=2, xlim=c(xmin, xmax))
       curve(temp_func(x, Age=6.9), xmin, xmax, log='xy', lty=2, add=TRUE, lwd=2)
       curve(temp_func(x, Age=13.8), xmin, xmax, log='xy', lty=3, add=TRUE, lwd=2)
@@ -434,7 +434,7 @@ server = function(input, output, session) {
                         massmax = massmax_lim
         )
       }
-      magcurve(temp_func(x, logZ=0), xmin, xmax, log = 'xy',
+      magicaxis::magcurve(temp_func(x, logZ=0), xmin, xmax, log = 'xy',
                xlab = 'Star Mass / Msol', ylab = 'dN/dM (1 Msol)', lwd=2, xlim=c(xmin, xmax))
       curve(temp_func(x, logZ=-2), xmin, xmax, log='xy', lty=2, add=TRUE, lwd=2)
       curve(temp_func(x, logZ=-4), xmin, xmax, log='xy', lty=3, add=TRUE, lwd=2)
@@ -472,7 +472,7 @@ server = function(input, output, session) {
                       massmax = massmax_lim,
                       Lookback_Age = input$lacey_Lookback_Age)
       }
-      magcurve(temp_func(x, Age=0), xmin, xmax, log = 'xy',
+      magicaxis::magcurve(temp_func(x, Age=0), xmin, xmax, log = 'xy',
                xlab = 'Star Mass / Msol', ylab = 'dN/dM (1 Msol)', lwd=2, xlim=c(xmin, xmax))
       curve(temp_func(x, Age=6.9), xmin, xmax, log='xy', lty=2, add=TRUE, lwd=2)
       curve(temp_func(x, Age=13.8), xmin, xmax, log='xy', lty=3, add=TRUE, lwd=2)
@@ -510,7 +510,7 @@ server = function(input, output, session) {
                        massmax = massmax_lim
         )
       }
-      magcurve(temp_func(x, logZ=0), xmin, xmax, log = 'xy',
+      magicaxis::magcurve(temp_func(x, logZ=0), xmin, xmax, log = 'xy',
                xlab = 'Star Mass / Msol', ylab = 'dN/dM (1 Msol)', lwd=2, xlim=c(xmin, xmax))
       curve(temp_func(x, logZ=-2), xmin, xmax, log='xy', lty=2, add=TRUE, lwd=2)
       curve(temp_func(x, logZ=-4), xmin, xmax, log='xy', lty=3, add=TRUE, lwd=2)
@@ -922,7 +922,7 @@ server = function(input, output, session) {
     filename = paste0("SSP_", format(Sys.time(), "%y_%m_%d_%H_%M_%S"), ".fits"),
     content = function(file) {
       if(!is.null(SSP_result())){
-        Rfits_write_all(data = SSP_result(), filename = file, flatten = TRUE, compress = FALSE)
+        Rfits::Rfits_write_all(data = SSP_result(), filename = file, flatten = TRUE, compress = FALSE)
       }else{
         showNotification("SSP data is missing or invalid. Cannot generate FITS file.", type = "error")
         stop("SSP data is missing or invalid.")

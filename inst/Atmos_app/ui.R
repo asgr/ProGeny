@@ -5,7 +5,7 @@ ui = fluidPage(
     sidebarPanel(
       conditionalPanel(
         condition = "input.tabs == 'Isochrone'",
-        tags$h5("Allow 10 sec to load Iso File:"),
+        tags$h5("Allow 10 sec to load Iso File"),
         fileInput("iso_file", "Choose Isochrone File [.fst]", accept = ".fst"),
         br(),
         actionButton("iso_done", "Return Isochrone"),
@@ -22,7 +22,7 @@ ui = fluidPage(
         selectInput("WR", "Wolf-Rayet", choices = c("PoWR" = "combine_WNE_PoWR", "None" = "None")),
         fileInput("wave_file", "User Wave (Ang) [.tab .dat .txt]", accept = c('tab', 'dat', 'txt')),
         numericInput("atmos_cores", "Number of Cores", value = 8, min = 1, step=1),
-        tags$h5("Allow 30 sec to [Load Atmos]:"),
+        tags$h5("Allow 30 sec to [Load Atmos]"),
         actionButton("load_atmos", "Load Atmos"),
         br(), br(),
         actionButton("atmos_done", "Return Atmos")
@@ -40,7 +40,7 @@ ui = fluidPage(
         selectInput('label_AGB', 'AGB Phase', choices=-1:10, multiple=TRUE),
         selectInput('label_white', 'White Dwarf Phase', choices=-1:10, multiple=TRUE),
         selectInput('label_WR', 'AGB Wolf-Rayet', choices=-1:10, multiple=TRUE),
-        tags$h5("Allow 30 sec to [Run Interp]:"),
+        tags$h5("Allow 30 sec to [Run Interp]"),
         actionButton("run_interp", "Run Interp"),
         br(), br(),
         actionButton("interp_done", "Return Interp Grids"),
@@ -62,12 +62,14 @@ ui = fluidPage(
       conditionalPanel(
         condition = "input.tabs == 'Make SSP'",
         numericInput("SSP_cores", "Number of Cores", value = 8, min = 1, step=1),
-        tags$h5("Allow 2 min to [Make SSP]:"),
+        tags$h5("Allow 2 min to [Make SSP]"),
         actionButton("make_ssp", "Make SSP"),
         br(), br(),
         actionButton("check_ssp", "Check SSP"),
         br(), br(),
-        actionButton("SSP_done", "Return SSP"),
+        actionButton("return_ssp", "Return SSP"),
+        br(), br(),
+        downloadButton("download_ssp", "Download SSP [.fits]")
       )
     ),
 
@@ -81,10 +83,10 @@ ui = fluidPage(
                   tabPanel("Atmospheres",
                            verbatimTextOutput("selectedPath"),
                            verbatimTextOutput("loaded_wave_samp"),
+                           verbatimTextOutput("atmos_status"),
+                           plotOutput("plot_atmos", height = "600px"),
                            verbatimTextOutput("summary_wave_samp"),
                            plotOutput("plot_wave_samp", height = "400px"),
-                           verbatimTextOutput("atmos_status"),
-                           plotOutput("plot_atmos", height = "600px")
                   ),
                   tabPanel("Interpolate",
                            verbatimTextOutput("interp_status")
@@ -100,7 +102,9 @@ ui = fluidPage(
                            tags$h4("[Check SSP] Status:"),
                            uiOutput("SSP_check"),
                            tags$h4("[Return SSP] Status:"),
-                           uiOutput("SSP_return")
+                           uiOutput("SSP_return"),
+                           tags$h4("[Download SSP] Status:"),
+                           uiOutput("SSP_return"),
                   ),
 
                   tabPanel("Iso Info",

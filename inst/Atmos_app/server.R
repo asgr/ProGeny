@@ -319,7 +319,8 @@ server = function(input, output, session) {
           'See (IMF) tab for parameter details.', '<br><br>',
           'Ready to [Make SSP]: ', color_bool(can_run_SSP), '<br>',
           'Ready to [Check SSP]: ', color_bool(SSP_exist), '<br>',
-          'Ready to [Return SSP]: ', color_bool(SSP_exist)
+          'Ready to [Return SSP]: ', color_bool(SSP_exist), '<br>',
+          'Ready to [Download SSP]: ', color_bool(SSP_exist)
           ))
   })
 
@@ -886,7 +887,7 @@ server = function(input, output, session) {
     stopApp(interp_all_result())
   })
 
-  observeEvent(input$SSP_done, {
+  observeEvent(input$return_ssp, {
     if(is.null(SSP_result())){
       output$SSP_return <- renderUI({
         renderUI(HTML('<span style="color:orange;">No SSP has been generated - nothing to return!</span>'))
@@ -895,4 +896,20 @@ server = function(input, output, session) {
       stopApp(SSP_result())
     }
   })
+
+
+  output$download_ssp <- downloadHandler(
+    filename = paste0("SSP_", format(Sys.time(), "%y_%m_%d_%H_%M_%S"), ".fits"),
+    content = function(file) {
+      if(!is.null(SSP_result())){
+        Rfits_write_all(data = SSP_result(), filename = file, flatten = TRUE, compress = FALSE)
+      }else{
+        showNotification("SSP data is missing or invalid. Cannot generate FITS file.", type = "error")
+        stop("SSP data is missing or invalid.")
+
+      }
+    },
+    contentType = 'FITS'
+  )
+
 }

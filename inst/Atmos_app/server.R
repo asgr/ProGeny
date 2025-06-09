@@ -215,6 +215,20 @@ server = function(input, output, session) {
           progenyAtmosPlot(atmos_out, add=TRUE)
         }
       })
+
+      # output$loaded_wave_samp <- renderText({
+      #   'Wavelength grid info below:'
+      # })
+
+      output$summary_wave_samp <- renderPrint({
+        temp = summary(atmos_out$base$wave)
+        temp_diff = summary(diff(atmos_out$base$wave))
+        data.frame(Stat=names(temp), 'Wave.Ang'=as.numeric(temp), 'Bin.Ang'=as.numeric(temp_diff))
+      })
+
+      output$plot_wave_samp <- renderPlot({
+        progenySampPlot(atmos_out$base$wave)
+      })
     }, error = function(e) {
       output$atmos_status <- renderText(paste("Error:", e$message))
     })
@@ -226,17 +240,6 @@ server = function(input, output, session) {
     tryCatch({
       wave_grid = as.numeric(read.table(input$wave_file$datapath, header = FALSE)[,1])
       wave_grid_result(wave_grid)
-      output$loaded_wave_samp <- renderText({
-        'User defined wavelength grid has been loaded. Info below:'
-      })
-      output$summary_wave_samp <- renderPrint({
-        temp = summary(wave_grid_result())
-        temp_diff = summary(diff(wave_grid_result()))
-        data.frame(Stat=names(temp), 'Wave.Ang'=as.numeric(temp), 'Bin.Ang'=as.numeric(temp_diff))
-      })
-      output$plot_wave_samp <- renderPlot({
-        progenySampPlot(wave_grid_result())
-      })
     }, error = function(e) {
       output$wave_status <- renderText(paste("Error loading wavegrid file:", e$message))
     })

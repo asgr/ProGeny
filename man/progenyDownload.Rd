@@ -76,7 +76,8 @@ The download functions are currently just re-directs to the DropBox page hosting
 \code{progenyIsoFormat} will correctly sort the columns of the isochrone: should be logZ, logAge, Mini ordered [slowest to fastest changing]). Returns the new Iso as the output.
 }
 \references{
-Nothing yet
+Robotham & Bellstedt, 2025, RASTI, Vol, Page \cr
+Bellstedt & Robotham, 2025, MNRAS, Vol, Page
 }
 \author{
 Aaron Robotham

@@ -42,7 +42,8 @@ This is a lower level function that can create a single realisation spectra for 
 Numeric vector; the stacked spectrum. Units will be Lsol/Ang.
 }
 \references{
-Nothing yet
+Robotham & Bellstedt, 2025, RASTI, Vol, Page \cr
+Bellstedt & Robotham, 2025, MNRAS, Vol, Page
 }
 \author{
 Aaron Robotham

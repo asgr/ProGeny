@@ -69,7 +69,8 @@ A \code{ProSpect} compatible speclib (SSP) format looks like a list containing:
 \item{Zevo}{List containing the mean evolutionary tracks of the SSPs (as determined by the route isochrones). The list must correspond to the 'Z' vector metallicities. Each list item is a data.frame with columns 'SMstar' (fraction of mass in luminous stars) 'SMgas' (fraction of mass in gas) 'SMtot' (fraction of total mass, always 1 in practice) 'SFR' (star formation rate, always 0 in practice) 'SMrem' (fraction of mass in stellar remnants, e.g. black holes etc). Nrow should be equal to the number of age bins (corresponding with 'Age').}
 }
 \references{
-Nothing yet
+Robotham & Bellstedt, 2025, RASTI, Vol, Page \cr
+Bellstedt & Robotham, 2025, MNRAS, Vol, Page
 }
 \author{
 Aaron Robotham

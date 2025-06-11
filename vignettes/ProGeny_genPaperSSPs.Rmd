@@ -46,8 +46,8 @@ BasIso = read.fst(file.path(path_to_isochrone,'BastiIso_FSPS.fst'), as.data.tabl
 Next we load four different base spectra options: C3K, PHOENIX (Husser), MILES and BaSeL (mostly referred to as BASEL below for simplicity). To get these locally you will need to run *progenyAtmosDownload*. The below might take about a minute to run (depending on the speed of your HDD or SSD).
 
 ```{r}
-Spec_PHOENIX = progenyAtmosLoad(path_to_atmos, base='combine_PHOENIX_husser')
 Spec_C3K = progenyAtmosLoad(path_to_atmos, base='combine_C3K_conroy')
+Spec_PHOENIX = progenyAtmosLoad(path_to_atmos, base='combine_PHOENIX_husser')
 Spec_MILES = progenyAtmosLoad(path_to_atmos, base='combine_MILES_vazdekis')
 Spec_BASEL = progenyAtmosLoad(path_to_atmos, base='combine_BASEL_wlbc')
 ```

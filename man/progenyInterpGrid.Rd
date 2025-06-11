@@ -2,6 +2,7 @@
 \alias{progenyInterpGrid}
 \alias{progenyInterpGrid_All}
 \alias{progenyInterpBest}
+\alias{progenyInterpStat}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Interpolate Isochrone Grids onto Stellar Atmosphere Grids
@@ -18,6 +19,8 @@ progenyInterpBest(Iso, Interp_combine, do_base = TRUE, do_extend = TRUE,
     b2e = 1.5, do_hot = TRUE, do_AGB = TRUE, do_white = TRUE, do_WR = TRUE,
     prefer_hot = FALSE, prefer_AGB = FALSE, prefer_white = FALSE, prefer_WR = FALSE,
     label_AGB = NULL, label_white = NULL, label_WR = NULL)
+
+progenyInterpStat(Iso, Spec_combine, Interp_combine)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -126,9 +129,12 @@ Post-AGB: post asymptotic giant branch (usually white dwarfs)
 \code{progenyInterpGrid_All} returns a list output from \code{progenyInterpGrid} for each spectral atmosphere present in \option{Spec_combine}.
 
 \code{progenyInterpBest} adds a modifed \option{label} column to \option{Iso}, otherwise the format is the same as the \option{Iso} input.
+
+\code{progenyInterpStat} should be run with the Iso output of \code{progenyInterpBest}. It gives users additional information about the quality of isochrone property matching including the minimum and mean distance between the isochrone and the preferred atmosphere for logTeff, logG and logZ. This can be plotted using the \option{zsel} argument in \code{\link{progenyIsoPlot}} to provide insights into where the matching might be lacking.
 }
 \references{
-Nothing yet
+Robotham & Bellstedt, 2025, RASTI, Vol, Page \cr
+Bellstedt & Robotham, 2025, MNRAS, Vol, Page
 }
 \author{
 Aaron Robotham

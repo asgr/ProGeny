@@ -353,7 +353,6 @@ server = function(input, output, session) {
     interp_info_result(interp_info)
   })
 
-
   color_bool <- function(value) {
     if (value) {
       '<span style="color:green;">TRUE</span>'

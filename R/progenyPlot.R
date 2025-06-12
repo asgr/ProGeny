@@ -121,3 +121,50 @@ progenySampPlot = function(wave, z=0, v=NULL, h=NULL, add=FALSE, xlim='auto',
   abline(h=h, lty=3, col='blue')
   return(invisible(data.frame(wave=wave_grid, res=samp_res)))
 }
+
+progenyIsoBestPlot = function(Iso, xsel='logZ', col = c('black', 'grey', 'blue', 'red', 'darkgreen', 'orange', 'purple'), log='', Nsamp=1e4, seed=666){
+
+  if(tolower(Nsamp) == 'all'){
+    sel = TRUE
+  }else{
+    set.seed(seed)
+    sel = sample(dim(Iso)[1], Nsamp)
+  }
+
+  magplot(NA, NA, xlim=range(Iso[,..xsel], na.rm = TRUE), ylim=c(0,1), xlab=xsel, ylab='Atmos Type Frac', log=log)
+
+  for(i in 1:6){
+    lines(magrun(Iso[sel,list(.SD, best == i), .SDcols=xsel], type = 'mean', log=log, equalN=FALSE, bins=10), col=col[i], lwd=3)
+  }
+  lines(magrun(Iso[sel,list(.SD, best == 0), .SDcols=xsel], type = 'mean', log=log, equalN=FALSE, bins=10), col=col[7], lwd=3)
+  legend('bottomleft', legend=c('base','extend','hot','AGB','white','WR', 'BB'), col=col, lty=1, lwd=3)
+}
+
+progenyAtmosErrorPlot = function(Iso, xsel='logZ', log='', Nsamp=1e4, seed=666){
+
+  if(tolower(Nsamp) == 'all'){
+    sel = TRUE
+  }else{
+    set.seed(seed)
+    sel = sample(dim(Iso)[1], Nsamp)
+  }
+
+  magplot(NA, NA, xlim=range(Iso[,..xsel], na.rm = TRUE), ylim=c(-0.3,0.3), xlab=xsel, ylab='Median Delta', log=log)
+
+  temp_run = magrun(Iso[sel,list(.SD, logZ_diff), .SDcols=xsel], type = 'median', log=log, equalN=FALSE, bins=10)
+  lines(temp_run, col='blue', lwd=3)
+  lines(temp_run$x, temp_run$yquan[,1], col='blue', lwd=1, lty=2)
+  lines(temp_run$x, temp_run$yquan[,2], col='blue', lwd=1, lty=2)
+
+  temp_run = magrun(Iso[sel,list(.SD, logG_diff), .SDcols=xsel], type = 'median', log=log, equalN=FALSE, bins=10)
+  lines(temp_run, col='darkgreen', lwd=3)
+  lines(temp_run$x, temp_run$yquan[,1], col='darkgreen', lwd=1, lty=2)
+  lines(temp_run$x, temp_run$yquan[,2], col='darkgreen', lwd=1, lty=2)
+
+  temp_run = magrun(Iso[sel,list(.SD, logT_diff), .SDcols=xsel], type = 'median', log=log, equalN=FALSE, bins=10)
+  lines(temp_run, col='red', lwd=3)
+  lines(temp_run$x, temp_run$yquan[,1], col='red', lwd=1, lty=2)
+  lines(temp_run$x, temp_run$yquan[,2], col='red', lwd=1, lty=2)
+
+  legend('bottomleft', legend=c('logZ', 'logG', 'logT'), col=c('blue', 'darkgreen', 'red'), lty=1, lwd=3)
+}

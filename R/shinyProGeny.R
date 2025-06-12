@@ -18,5 +18,5 @@ runShinyProGeny = function(){
         stop("Could not find Atmos_app directory. Try re-installing ProGeny.", call. = FALSE)
     }
 
-    return(runApp(appDir, display.mode = "normal"))
+    return(shiny::runApp(appDir, display.mode = "normal"))
 }

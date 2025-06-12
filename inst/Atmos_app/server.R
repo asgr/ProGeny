@@ -67,7 +67,7 @@ server = function(input, output, session) {
         choices = -1:10,
         selected = 9
       )
-      
+
       Iso_info = c(Iso_type = 'MIST')
     }else if(grepl('Parsec', input$iso_file$name)){
       updateSelectInput(
@@ -83,7 +83,7 @@ server = function(input, output, session) {
         choices = -1:10,
         selected = 9
       )
-      
+
       Iso_info = c(Iso_type = 'Parsec')
     }else if(grepl('Basti', input$iso_file$name)){
       updateSelectInput(
@@ -99,7 +99,7 @@ server = function(input, output, session) {
         choices = -1:10,
         selected = 6
       )
-      
+
       Iso_info = c(Iso_type = 'BaSTI')
     }else if(grepl('Padova', input$iso_file$name)){
       updateSelectInput(
@@ -245,7 +245,7 @@ server = function(input, output, session) {
       output$atmos_status <- renderText(paste("Error:", e$message))
     })
     shinybusy::hide_spinner()
-    
+
     atmos_info = c(
       atmos_base = input_base,
       atmos_extend = input_extend,
@@ -254,7 +254,7 @@ server = function(input, output, session) {
       atmos_white = input_white,
       atmos_WR = input_WR
     )
-    
+
     atmos_info_result(atmos_info)
   })
 
@@ -305,6 +305,10 @@ server = function(input, output, session) {
         do_AGB = input$do_AGB,
         do_white = input$do_white,
         do_WR = input$do_WR,
+        prefer_hot = input$prefer_hot,
+        prefer_AGB = input$prefer_AGB,
+        prefer_white = input$prefer_white,
+        prefer_WR = input$prefer_WR,
         label_AGB = input$label_AGB,
         label_white = input$label_white,
         label_WR = input$label_WR
@@ -316,19 +320,36 @@ server = function(input, output, session) {
       output$interp_status <- renderText(paste("Error:", e$message))
     })
     shinybusy::hide_spinner()
-    
+
+    output$plot_iso_best_logZ = renderPlot({progenyIsoBestPlot(new_iso, xsel = 'logZ')})
+    output$plot_iso_best_logG = renderPlot({progenyIsoBestPlot(new_iso, xsel = 'logG')})
+    output$plot_iso_best_logT = renderPlot({progenyIsoBestPlot(new_iso, xsel = 'Teff', log='x')})
+
+    interp_stat = progenyInterpStat(new_iso, atmos_result(), interp_all_out)
+
+    output$interp_summary = renderPrint({interp_stat$stat})
+
+    output$plot_atmos_error_logZ = renderPlot({progenyAtmosErrorPlot(interp_stat$Iso, xsel = 'logZ')})
+    output$plot_atmos_error_logG = renderPlot({progenyAtmosErrorPlot(interp_stat$Iso, xsel = 'logG')})
+    output$plot_atmos_error_logT = renderPlot({progenyAtmosErrorPlot(interp_stat$Iso, xsel = 'Teff', log='x')})
+
     interp_info = c(
       interp_radius = input$radius,
       interp_weight_pow = input$weight_pow,
       interp_k = input$k,
       interp_do_hot = input$do_hot,
+      interp_do_AGB = input$do_AGB,
       interp_do_white = input$do_white,
       interp_do_WR = input$do_WR,
-      interp_lab_hot = input$label_hot,
-      interp_lab_white = input$label_white,
-      interp_lab_WR = input$label_WR
+      interp_prefer_hot = input$prefer_hot,
+      interp_prefer_AGB = input$prefer_AGB,
+      interp_prefer_white = input$prefer_white,
+      interp_prefer_WR = input$prefer_WR,
+      interp_lab_AGB = paste(input$label_AGB, collapse=' / '),
+      interp_lab_white =  paste(input$label_white, collapse=' / '),
+      interp_lab_WR =  paste(input$label_WR, collapse=' / ')
     )
-    
+
     interp_info_result(interp_info)
   })
 
@@ -606,11 +627,11 @@ server = function(input, output, session) {
 
         IMF_info = c(
           IMF_type = 'Chabrier',
-          IMF_alpha = paste(input$chab_alpha, collapse = '-'),
-          IMF_a = paste(input$chab_a, collapse = '-'),
-          IMF_b = paste(input$chab_b, collapse = '-'),
-          IMF_masslow = paste(input$chab_masslow, collapse = '-'),
-          IMF_massmax = paste(input$chab_massmax, collapse = '-')
+          IMF_alpha = paste(input$chab_alpha, collapse = ' - '),
+          IMF_a = paste(input$chab_a, collapse = ' - '),
+          IMF_b = paste(input$chab_b, collapse = ' - '),
+          IMF_masslow = paste(input$chab_masslow, collapse = ' - '),
+          IMF_massmax = paste(input$chab_massmax, collapse = ' - ')
         )
       }else if(input$imf == 'IMF_Kroupa'){
         SSP_out = progenyMakeSSP(
@@ -630,13 +651,13 @@ server = function(input, output, session) {
 
         IMF_info = c(
           IMF_type = 'Kroupa',
-          IMF_alpha1 = paste(input$kroupa_alpha1, collapse = '-'),
-          IMF_alpha2 = paste(input$kroupa_alpha2, collapse = '-'),
-          IMF_alpha3 = paste(input$kroupa_alpha3, collapse = '-'),
-          IMF_mass1 = paste(input$kroupa_mass1, collapse = '-'),
-          IMF_mass2 = paste(input$kroupa_mass2, collapse = '-'),
-          IMF_masslow = paste(input$kroupa_masslow, collapse = '-'),
-          IMF_massmax = paste(input$kroupa_massmax, collapse = '-')
+          IMF_alpha1 = paste(input$kroupa_alpha1, collapse = ' - '),
+          IMF_alpha2 = paste(input$kroupa_alpha2, collapse = ' - '),
+          IMF_alpha3 = paste(input$kroupa_alpha3, collapse = ' - '),
+          IMF_mass1 = paste(input$kroupa_mass1, collapse = ' - '),
+          IMF_mass2 = paste(input$kroupa_mass2, collapse = ' - '),
+          IMF_masslow = paste(input$kroupa_masslow, collapse = ' - '),
+          IMF_massmax = paste(input$kroupa_massmax, collapse = ' - ')
         )
       }else if(input$imf == 'IMF_Salpeter'){
         SSP_out = progenyMakeSSP(
@@ -649,12 +670,12 @@ server = function(input, output, session) {
           Interp_combine = interp_data,
           cores = input$SSP_cores
         )
-        
+
         IMF_info = c(
           IMF_type = 'Salpeter',
-          IMF_alpha = paste(input$salp_alpha, collapse = '-'),
-          IMF_masslow = paste(input$salp_mass1, collapse = '-'),
-          IMF_massmax = paste(input$salp_massmax, collapse = '-')
+          IMF_alpha = paste(input$salp_alpha, collapse = ' - '),
+          IMF_masslow = paste(input$salp_mass1, collapse = ' - '),
+          IMF_massmax = paste(input$salp_massmax, collapse = ' - ')
         )
       }else if(input$imf == 'IMF_Kroupa_evo'){
         alpha1_lim = if(input$kroupa_alpha1_lim_Rv){rev(input$kroupa_alpha1_lim)}else{input$kroupa_alpha1_lim}
@@ -678,17 +699,17 @@ server = function(input, output, session) {
           Interp_combine = interp_data,
           cores = input$SSP_cores
         )
-        
+
         IMF_info = c(
           IMF_type = 'Kroupa_evo',
-          IMF_age_lim = paste(input$kroupa_Age_lim, collapse = '-'),
-          IMF_alpha1_lim = paste(alpha1_lim, collapse = '-'),
-          IMF_alpha2_lim = paste(alpha2_lim, collapse = '-'),
-          IMF_alpha3_lim = paste(alpha3_lim, collapse = '-'),
-          IMF_mass1_lim = paste(input$kroupa_mass1_lim, collapse = '-'),
-          IMF_mass2_lim = paste(input$kroupa_mass2_lim, collapse = '-'),
-          IMF_masslow_lim = paste(masslow_lim, collapse = '-'),
-          IMF_massmax_lim = paste(massmax_lim, collapse = '-')
+          IMF_age_lim = paste(input$kroupa_Age_lim, collapse = ' - '),
+          IMF_alpha1_lim = paste(alpha1_lim, collapse = ' - '),
+          IMF_alpha2_lim = paste(alpha2_lim, collapse = ' - '),
+          IMF_alpha3_lim = paste(alpha3_lim, collapse = ' - '),
+          IMF_mass1_lim = paste(input$kroupa_mass1_lim, collapse = ' - '),
+          IMF_mass2_lim = paste(input$kroupa_mass2_lim, collapse = ' - '),
+          IMF_masslow_lim = paste(masslow_lim, collapse = ' - '),
+          IMF_massmax_lim = paste(massmax_lim, collapse = ' - ')
         )
       }else if(input$imf == 'IMF_Kroupa_Zevo'){
         alpha1_lim = if(input$kroupa_alpha1_lim_Rv){rev(input$kroupa_alpha1_lim)}else{input$kroupa_alpha1_lim}
@@ -712,17 +733,17 @@ server = function(input, output, session) {
           Interp_combine = interp_data,
           cores = input$SSP_cores
         )
-        
+
         IMF_info = c(
           IMF_type = 'Kroupa_Zevo',
-          IMF_Z_lim = paste(input$kroupa_Age_lim, collapse = '-'),
-          IMF_alpha1_lim = paste(alpha1_lim, collapse = '-'),
-          IMF_alpha2_lim = paste(alpha2_lim, collapse = '-'),
-          IMF_alpha3_lim = paste(alpha3_lim, collapse = '-'),
-          IMF_mass1_lim = paste(input$kroupa_mass1_lim, collapse = '-'),
-          IMF_mass2_lim = paste(input$kroupa_mass2_lim, collapse = '-'),
-          IMF_masslow_lim = paste(masslow_lim, collapse = '-'),
-          IMF_massmax_lim = paste(massmax_lim, collapse = '-')
+          IMF_Z_lim = paste(input$kroupa_logZ_lim, collapse = ' - '),
+          IMF_alpha1_lim = paste(alpha1_lim, collapse = ' - '),
+          IMF_alpha2_lim = paste(alpha2_lim, collapse = ' - '),
+          IMF_alpha3_lim = paste(alpha3_lim, collapse = ' - '),
+          IMF_mass1_lim = paste(input$kroupa_mass1_lim, collapse = ' - '),
+          IMF_mass2_lim = paste(input$kroupa_mass2_lim, collapse = ' - '),
+          IMF_masslow_lim = paste(masslow_lim, collapse = ' - '),
+          IMF_massmax_lim = paste(massmax_lim, collapse = ' - ')
         )
       }else if(input$imf == 'IMF_Lacey_evo'){
         alpha1_lim = if(input$lacey_alpha1_lim_Rv){rev(input$lacey_alpha1_lim)}else{input$lacey_alpha1_lim}
@@ -746,17 +767,17 @@ server = function(input, output, session) {
           Interp_combine = interp_data,
           cores = input$SSP_cores
         )
-        
+
         IMF_info = c(
           IMF_type = 'Lacey_evo',
-          IMF_age_lim = paste(input$lacey_Age_lim, collapse = '-'),
-          IMF_alpha1_lim = paste(alpha1_lim, collapse = '-'),
-          IMF_alpha2_lim = paste(alpha2_lim, collapse = '-'),
-          IMF_alpha3_lim = paste(alpha3_lim, collapse = '-'),
-          IMF_mass1_lim = paste(input$lacey_mass1_lim, collapse = '-'),
-          IMF_mass2_lim = paste(input$lacey_mass2_lim, collapse = '-'),
-          IMF_masslow_lim = paste(masslow_lim, collapse = '-'),
-          IMF_massmax_lim = paste(massmax_lim, collapse = '-')
+          IMF_age_lim = paste(input$lacey_Age_lim, collapse = ' - '),
+          IMF_alpha1_lim = paste(alpha1_lim, collapse = ' - '),
+          IMF_alpha2_lim = paste(alpha2_lim, collapse = ' - '),
+          IMF_alpha3_lim = paste(alpha3_lim, collapse = ' - '),
+          IMF_mass1_lim = paste(input$lacey_mass1_lim, collapse = ' - '),
+          IMF_mass2_lim = paste(input$lacey_mass2_lim, collapse = ' - '),
+          IMF_masslow_lim = paste(masslow_lim, collapse = ' - '),
+          IMF_massmax_lim = paste(massmax_lim, collapse = ' - ')
         )
       }else if(input$imf == 'IMF_Lacey_Zevo'){
         alpha1_lim = if(input$lacey_alpha1_lim_Rv){rev(input$lacey_alpha1_lim)}else{input$lacey_alpha1_lim}
@@ -780,20 +801,20 @@ server = function(input, output, session) {
           Interp_combine = interp_data,
           cores = input$SSP_cores
         )
-        
+
         IMF_info = c(
           IMF_type = 'Lacey_Zevo',
-          IMF_Z_lim = paste(input$lacey_Z_lim, collapse = '-'),
-          IMF_alpha1_lim = paste(alpha1_lim, collapse = '-'),
-          IMF_alpha2_lim = paste(alpha2_lim, collapse = '-'),
-          IMF_alpha3_lim = paste(alpha3_lim, collapse = '-'),
-          IMF_mass1_lim = paste(input$lacey_mass1_lim, collapse = '-'),
-          IMF_mass2_lim = paste(input$lacey_mass2_lim, collapse = '-'),
-          IMF_masslow_lim = paste(masslow_lim, collapse = '-'),
-          IMF_massmax_lim = paste(massmax_lim, collapse = '-')
+          IMF_Z_lim = paste(input$lacey_logZ_lim, collapse = ' - '),
+          IMF_alpha1_lim = paste(alpha1_lim, collapse = ' - '),
+          IMF_alpha2_lim = paste(alpha2_lim, collapse = ' - '),
+          IMF_alpha3_lim = paste(alpha3_lim, collapse = ' - '),
+          IMF_mass1_lim = paste(input$lacey_mass1_lim, collapse = ' - '),
+          IMF_mass2_lim = paste(input$lacey_mass2_lim, collapse = ' - '),
+          IMF_masslow_lim = paste(masslow_lim, collapse = ' - '),
+          IMF_massmax_lim = paste(massmax_lim, collapse = ' - ')
         )
       }
-      
+
       SSP_out$PG_info = data.frame(
         name = c(
           names(iso_info_result()),
@@ -801,19 +822,21 @@ server = function(input, output, session) {
           names(interp_info_result()),
           names(IMF_info)
         ),
-        value = c(
+        value = as.character(c(
           iso_info_result(),
           atmos_info_result(),
           interp_info_result(),
           IMF_info
-        ),
-        row.names = FALSE
+        )),
+        row.names = NULL
       )
+
+      output$PG_info = renderPrint({SSP_out$PG_info})
 
       SSP_result(SSP_out)
       output$SSP_status <- renderUI(HTML('<span style="color:green;">SSP successfully run!</span>'))
     }, error = function(e) {
-      output$SSP_status <- renderUI(HTML(paste('<span style="color:red;">Error:", e$message,"</span>"')))
+      output$SSP_status <- renderUI(HTML(paste('<span style="color:red;">Error:', e$message,'</span>')))
     })
     shinybusy::hide_spinner()
   })

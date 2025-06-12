@@ -130,8 +130,19 @@ progenyIsoBestPlot = function(Iso, xsel='logZ', col = c('black', 'grey', 'blue',
     set.seed(seed)
     sel = sample(dim(Iso)[1], Nsamp)
   }
+  
+  if(xsel == 'Teff'){
+    xlab = 'Isochrone Teff / K'
+  }else if(xsel == 'logG'){
+    xlab = expression('Isochrone '*log(g / cm.s^{-2}))
+  }else if(xsel == 'logZ'){
+    xlab = 'Isochrone log(Z / Zsol)'
+  }else{
+    xlab = paste(Isochrone, xsel)
+  }
+  ylab = 'Atmos Type Frac'
 
-  magplot(NA, NA, xlim=range(Iso[,..xsel], na.rm = TRUE), ylim=c(0,1), xlab=xsel, ylab='Atmos Type Frac', log=log)
+  magplot(NA, NA, xlim=range(Iso[,..xsel], na.rm = TRUE), ylim=c(0,1), xlab=xlab, ylab=ylab, log=log)
 
   for(i in 1:6){
     lines(magrun(Iso[sel,list(.SD, best == i), .SDcols=xsel], type = 'mean', log=log, equalN=FALSE, bins=10), col=col[i], lwd=3)
@@ -148,8 +159,19 @@ progenyAtmosErrorPlot = function(Iso, xsel='logZ', log='', Nsamp=1e4, seed=666){
     set.seed(seed)
     sel = sample(dim(Iso)[1], Nsamp)
   }
+  
+  if(xsel == 'Teff'){
+    xlab = 'Isochrone Teff / K'
+  }else if(xsel == 'logG'){
+    xlab = expression('Isochrone '*log(g / cm.s^{-2}))
+  }else if(xsel == 'logZ'){
+    xlab = 'Isochrone log(Z / Zsol)'
+  }else{
+    xlab = paste(Isochrone, xsel)
+  }
+    ylab = expression('Median '*Delta)
 
-  magplot(NA, NA, xlim=range(Iso[,..xsel], na.rm = TRUE), ylim=c(-0.3,0.3), xlab=xsel, ylab='Median Delta', log=log)
+  magplot(NA, NA, xlim=range(Iso[,..xsel], na.rm = TRUE), ylim=c(-0.3,0.3), xlab=xlab, ylab=ylab, log=log)
 
   temp_run = magrun(Iso[sel,list(.SD, logZ_diff), .SDcols=xsel], type = 'median', log=log, equalN=FALSE, bins=10)
   lines(temp_run, col='blue', lwd=3)

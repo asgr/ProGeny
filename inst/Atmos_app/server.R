@@ -1052,7 +1052,7 @@ server = function(input, output, session) {
 
 
   output$download_ssp <- downloadHandler(
-    filename = paste0("SSP_", format(Sys.time(), "%y_%m_%d_%H_%M_%S"), ".fits"),
+    filename = paste0("PG_SSP_", format(Sys.time(), "%y_%m_%d_%H_%M_%S"), ".fits"),
     content = function(file) {
       if(!is.null(SSP_result())){
         Rfits::Rfits_write_all(data = SSP_result(), filename = file, flatten = TRUE, compress = FALSE)

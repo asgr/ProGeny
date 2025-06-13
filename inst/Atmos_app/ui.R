@@ -4,8 +4,13 @@ ui = fluidPage(
   sidebarLayout(
     sidebarPanel(
       conditionalPanel(
+        condition = "input.tabs == 'Overview'",
+        tags$h5("User options will appear here for each tab"),
+      ),
+
+      conditionalPanel(
         condition = "input.tabs == 'Isochrone'",
-        tags$h5("Allow 10 sec to load Iso File"),
+        tags$h5("Allow 1 sec to load Iso File"),
         fileInput("iso_file", "Choose Isochrone File [.fst]", accept = ".fst"),
         br(),
         actionButton("iso_done", "Return Isochrone"),
@@ -22,7 +27,7 @@ ui = fluidPage(
         selectInput("WR", "Wolf-Rayet", choices = c("PoWR" = "combine_WNE_PoWR", "None" = "None")),
         fileInput("wave_file", "User Wave (Ang) [.tab .dat .txt]", accept = c('tab', 'dat', 'txt')),
         numericInput("atmos_cores", "Number of Cores", value = 8, min = 1, step=1),
-        tags$h5("Allow 30 sec to [Load Atmos]"),
+        tags$h5("Allow 10 sec to [Load Atmos]"),
         actionButton("load_atmos", "Load Atmos"),
         br(), br(),
         actionButton("atmos_done", "Return Atmos")
@@ -73,6 +78,7 @@ ui = fluidPage(
 
       conditionalPanel(
         condition = "input.tabs == 'Make SSP'",
+        numericInput("Zsol", "Zsol", value = 0.02, min = 0.01, max = 0.03, step=0.001),
         numericInput("SSP_cores", "Number of Cores", value = 8, min = 1, step=1),
         tags$h5("Allow 2 min to [Make SSP]"),
         actionButton("make_ssp", "Make SSP"),
@@ -82,6 +88,12 @@ ui = fluidPage(
         actionButton("return_ssp", "Return SSP"),
         br(), br(),
         downloadButton("download_ssp", "Download SSP [.fits]")
+      ),
+
+      conditionalPanel(
+        condition =  "input.tabs == 'Test SSP'",
+        sliderInput("logAge", "logAge", value = 9, min = 5, max = 10.3, step=0.1),
+        sliderInput("logZ", "logZ", value = 0, min = -2.3, max = 0.3, step=0.1),
       )
     ),
 
@@ -219,6 +231,9 @@ ui = fluidPage(
                            uiOutput("SSP_return"),
                            tags$h4("[Download SSP] Status:"),
                            uiOutput("SSP_return")
+                  ),
+                  tabPanel("Test SSP",
+                           plotOutput("plot_spec", height = "600px")
                   ),
                   tabPanel("Iso Info",
                            HTML("

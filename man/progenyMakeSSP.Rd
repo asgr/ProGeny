@@ -44,7 +44,7 @@ Numeric vector; if provided it is the log10(Z/Zsol) values that you want the out
 Numeric vector; optional. Lower and upper ranges of \option{Iso} Mini to use. This can be useful if wanting to combine mass ranges from different isochrone to make a better combined SSP (say one is better for low mass stars, and another better for high mass stars). If provided it must be length 2.
 }
   \item{Zsol}{
-Numeric scalar; value of the Sun's solar metallicity (to convert logZ to Z).
+Numeric scalar; value of the Sun's solar metallicity (to convert logZ to Z). Sensible values to use are 0.02 (the standard BC03 and many other SPLs) or 0.014 (Asplund). Conflicting works have measured values as low as 0.013 and as high as 0.02 even in recent years so this should be treated a bit like H0, where values relative to the assumed value of solar are what we are really measuring with any resulting SSP.
 }
   \item{cores}{
 Integer scalar; how many cores to run on.

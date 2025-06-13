@@ -6,6 +6,8 @@ server = function(input, output, session) {
     volumes = c(wd = getwd(), Home = '~/', shinyFiles::getVolumes()())
   }
 
+  data(BC03lr)
+
   shinyFiles::shinyDirChoose(input, id = 'destpath', roots = volumes)
 
   atmos_result = reactiveVal(NULL)
@@ -621,6 +623,7 @@ server = function(input, output, session) {
           massmax = input$chab_massmax,
           Spec_combine = atmos_data,
           Interp_combine = interp_data,
+          Zsol = input$Zsol,
           cores = input$SSP_cores
         )
 
@@ -645,6 +648,7 @@ server = function(input, output, session) {
           massmax = input$kroupa_massmax,
           Spec_combine = atmos_data,
           Interp_combine = interp_data,
+          Zsol = input$Zsol,
           cores = input$SSP_cores
         )
 
@@ -667,6 +671,7 @@ server = function(input, output, session) {
           massmax = input$salp_massmax,
           Spec_combine = atmos_data,
           Interp_combine = interp_data,
+          Zsol = input$Zsol,
           cores = input$SSP_cores
         )
 
@@ -696,6 +701,7 @@ server = function(input, output, session) {
           massmax_lim = massmax_lim,
           Spec_combine = atmos_data,
           Interp_combine = interp_data,
+          Zsol = input$Zsol,
           cores = input$SSP_cores
         )
 
@@ -730,6 +736,7 @@ server = function(input, output, session) {
           massmax_lim = massmax_lim,
           Spec_combine = atmos_data,
           Interp_combine = interp_data,
+          Zsol = input$Zsol,
           cores = input$SSP_cores
         )
 
@@ -764,6 +771,7 @@ server = function(input, output, session) {
           massmax_lim = massmax_lim,
           Spec_combine = atmos_data,
           Interp_combine = interp_data,
+          Zsol = input$Zsol,
           cores = input$SSP_cores
         )
 
@@ -798,6 +806,7 @@ server = function(input, output, session) {
           massmax_lim = massmax_lim,
           Spec_combine = atmos_data,
           Interp_combine = interp_data,
+          Zsol = input$Zsol,
           cores = input$SSP_cores
         )
 
@@ -819,13 +828,15 @@ server = function(input, output, session) {
           names(iso_info_result()),
           names(atmos_info_result()),
           names(interp_info_result()),
-          names(IMF_info)
+          names(IMF_info),
+          'SSP_Zsol'
         ),
         value = as.character(c(
           iso_info_result(),
           atmos_info_result(),
           interp_info_result(),
-          IMF_info
+          IMF_info,
+          input$Zsol
         )),
         row.names = NULL
       )
@@ -1025,6 +1036,21 @@ server = function(input, output, session) {
         }
       )
     })
+  })
+
+  output$plot_spec <- renderPlot({
+    PG_SSP = SSP_result()
+    req(PG_SSP)
+    if(!is.null(PG_SSP)){
+      magicaxis::magplot(ProSpect::speclibReGrid(BC03lr, input$logAge, input$logZ, Zsol=0.02),
+              type='l', log='xy', col='grey',
+              xlab = BC03lr$Labels$Wavelab,
+              ylab = BC03lr$Labels$Lumlab
+              )
+      lines(ProSpect::speclibReGrid(SSP_result(), input$logAge, input$logZ, Zsol=input$Zsol))
+      legend('topright', legend = c('ProGeny', 'BC03'), col=c('black', 'grey'), lty=1, lwd=2, bty='n')
+      legend('topleft', legend = c(paste('logAge:', input$logAge), paste('logZ:', input$logZ)))
+    }
   })
 
 

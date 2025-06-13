@@ -95,3 +95,25 @@ progenyIso2Spec = function(logAge=8.4, logZ=0, Iso, IMFint, Spec_combine, Interp
 
   return(invisible(spec_stack))
 }
+
+# progenySSP2Spec = function(speclib, logAge=8.4, logZ=0, Zsol=0.02){
+#   interp = FALSE
+#
+#   SSP_logAge_steps = log10(speclib$Age)
+#   if(min(logAge) < min(SSP_logAge_steps)){
+#     stop('logAge minimum is less than minimum logAge present in the provided SSP!')
+#   }
+#   if(max(logAge) > max(SSP_logAge_steps)){
+#     stop('logAge maximum is more than maximum logAge present in the provided SSP!')
+#   }
+#   interp = TRUE
+#
+#   SSP_logZ_steps = log10(speclib$Z/Zsol)
+#   if(min(logZ) < min(SSP_logZ_steps)){
+#     stop('logAge minimum is less than minimum logAge present in the provided SSP!')
+#   }
+#   if(max(logAge) > max(Iso_logAge_steps)){
+#     stop('logAge maximum is more than maximum logAge present in the provided SSP!')
+#   }
+#   interp = TRUE
+# }

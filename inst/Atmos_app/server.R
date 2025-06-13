@@ -6,7 +6,7 @@ server = function(input, output, session) {
     volumes = c(wd = getwd(), Home = '~/', shinyFiles::getVolumes()())
   }
 
-  data(BC03lr)
+  data(BC03lr, package='ProSpectData')
 
   shinyFiles::shinyDirChoose(input, id = 'destpath', roots = volumes)
 

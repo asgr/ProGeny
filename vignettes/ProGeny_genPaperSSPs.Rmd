@@ -10,7 +10,7 @@ vignette: >
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(eval = FALSE)
+knitr::opts_chunk$set(eval = TRUE)
 ```
 
 Below we will make all SSPs used in the ProGeny papers (Robotham & Bellstedt, and the companion paper and Bellstedt & Robotham). This covers the full grid of three isochrones (MIST, PARSEC, BaSTI); four stellar atmospheres (C3K, PHOENIX, MILES, BaSeL); three IMFs (Chabrier, Kroupa, Salpeter), i.e. 3 x 3 x 4 = 36 SSPs. Additionally there are Kroupa age and Z evolving IMFs for all four stellar atmosphere (MIST only), i.e. 2 x 4 = 8. And finally there is a Lacey age evolving IMF (MIST and C3K only). This makes 45 variants in total. Running all of the below on a modern machine with 8 cores will take about half an hour and require about 16 GB of RAM if you do not delete objects as you go along (to delete things you can run `rm(PG_Ch_Mi_C3K)` or similar after you have saved the relevant FITS output).
@@ -28,9 +28,9 @@ library(data.table)
 Set some paths (these need to be correct for your system).
 
 ```{r}
-path_to_isochrone = 'ProGeny_isochrone/'
-path_to_atmos = 'ProGeny_atmos/'
-path_to_SSP = 'ProGeny_SSP/'
+path_to_isochrone = '~/Google Drive/My Drive/ProGeny_isochrone/'
+path_to_atmos = '~/Google Drive/My Drive/ProGeny_atmos/'
+path_to_SSP = '~/ProGeny_SSP/'
 ```
 
 # Load all the things!
@@ -78,7 +78,8 @@ Now we find our preferred stellar atmosphere for C3K:
 MistIso_C3K = progenyInterpBest(Iso = MistIso,
                                     Interp_combine = Interp_Mist_C3K,
                                     label_AGB = 4:5, #7:8 [PC] / 4:5 [Mist]
-                                    label_white = 6:8 # 9 [PC] / 6:8 [Mist]
+                                    label_white = 6:8, # 9 [PC] / 6:8 [Mist]
+                                    label_WR = 9 # 9 [MIST]
 )
 ParIso_C3K = progenyInterpBest(Iso = ParIso,
                                    Interp_combine = Interp_Par_C3K,
@@ -97,7 +98,8 @@ Now we find our preferred stellar atmosphere for PHOENIX (Husser):
 MistIso_PHOENIX = progenyInterpBest(Iso = MistIso,
                                 Interp_combine = Interp_Mist_PHOENIX,
                                 label_AGB = 4:5, #7:8 [PC] / 4:5 [Mist]
-                                label_white = 6:8 # 9 [PC] / 6:8 [Mist]
+                                label_white = 6:8, # 9 [PC] / 6:8 [Mist]
+                                label_WR = 9 # 9 [MIST]
 )
 ParIso_PHOENIX = progenyInterpBest(Iso = ParIso,
                                     Interp_combine = Interp_Par_PHOENIX,
@@ -116,7 +118,8 @@ Now we find our preferred stellar atmosphere for MILES:
 MistIso_MILES = progenyInterpBest(Iso = MistIso,
                                 Interp_combine = Interp_Mist_MILES,
                                 label_AGB = 4:5, #7:8 [PC] / 4:5 [Mist]
-                                label_white = 6:8 # 9 [PC] / 6:8 [Mist]
+                                label_white = 6:8, # 9 [PC] / 6:8 [Mist]
+                                label_WR = 9 # 9 [MIST]
 )
 ParIso_MILES = progenyInterpBest(Iso = ParIso,
                                Interp_combine = Interp_Par_MILES,
@@ -136,7 +139,8 @@ Now we find our preferred stellar atmosphere for BaSeL (Husser):
 MistIso_BASEL = progenyInterpBest(Iso = MistIso,
                                   Interp_combine = Interp_Mist_BASEL,
                                   label_AGB = 4:5, #7:8 [PC] / 4:5 [Mist]
-                                  label_white = 6:8 # 9 [PC] / 6:8 [Mist]
+                                  label_white = 6:8, # 9 [PC] / 6:8 [Mist]
+                                  label_WR = 9 # 9 [MIST]
 )
 ParIso_BASEL = progenyInterpBest(Iso = ParIso,
                                  Interp_combine = Interp_Par_BASEL,
@@ -599,8 +603,16 @@ PG_LcE_Mi_C3K = progenyMakeSSP(Iso=MistIso_C3K,
                                Spec_combine = Spec_C3K, 
                                Interp_combine = Interp_Mist_C3K
 )
+PG_LcZE_Mi_C3K = progenyMakeSSP(Iso=MistIso_C3K,
+                               IMFfunc=IMF_Lacey_Zevo,
+                               masslow_lim = c(0.1,0.1),
+                               massmax_lim = c(100,100),
+                               Spec_combine = Spec_C3K, 
+                               Interp_combine = Interp_Mist_C3K
+)
 
 Rfits_write(PG_LcE_Mi_C3K, file.path(path_to_SSP,'PG_LcE_Mi_C3K.fits'), flatten = T)
+Rfits_write(PG_LcZE_Mi_C3K, file.path(path_to_SSP,'PG_LcZE_Mi_C3K.fits'), flatten = T)
 ```
 
 You now have all 45 SSPs. Well done! Give your computer a pat on the back :-D

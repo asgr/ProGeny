@@ -263,50 +263,50 @@ progenyAtmosLoad = function(destpath = '',
   wavegrid = base$wave
 
   if(length(wavegrid) != length(base$wave)){
-    stop('base wave does not much wavegrid!')
+    stop('base wave does not match wavegrid!')
   }
 
   if(length(wavegrid) != dim(base$spec)[2]){
-    stop('base spec matrix does not much wavegrid!')
+    stop('base spec matrix does not match wavegrid!')
   }
 
   if(!is.null(extend)){
     if(length(wavegrid) != length(extend$wave)){
-      stop('extend wave does not much wavegrid!')
+      stop('extend wave does not match wavegrid!')
     }
 
     if(length(wavegrid) != dim(extend$spec)[2]){
-      stop('extend spec matrix does not much wavegrid!')
+      stop('extend spec matrix does not match wavegrid!')
     }
   }
 
   if(!is.null(hot)){
     if(length(wavegrid) != length(hot$wave)){
-      stop('hot wave does not much wavegrid!')
+      stop('hot wave does not match wavegrid!')
     }
 
     if(length(wavegrid) != dim(hot$spec)[2]){
-      stop('hot spec matrix does not much wavegrid!')
+      stop('hot spec matrix does not match wavegrid!')
     }
   }
 
   if(!is.null(AGB)){
     if(length(wavegrid) != length(AGB$wave)){
-      stop('AGB wave does not much wavegrid!')
+      stop('AGB wave does not match wavegrid!')
     }
 
     if(length(wavegrid) != dim(AGB$spec)[2]){
-      stop('AGB spec matrix does not much wavegrid!')
+      stop('AGB spec matrix does not match wavegrid!')
     }
   }
 
   if(!is.null(white)){
     if(length(wavegrid) != length(white$wave)){
-      stop('white wave does not much wavegrid!')
+      stop('white wave does not match wavegrid!')
     }
 
     if(length(wavegrid) != dim(white$spec)[2]){
-      stop('white spec matrix does not much wavegrid!')
+      stop('white spec matrix does not match wavegrid!')
     }
   }
 

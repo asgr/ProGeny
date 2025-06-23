@@ -190,6 +190,21 @@ ui = fluidPage(
  </ul>
  </li>
  </ul>
+
+ <h4>Test SSP</h4>
+ <p>
+ Basic interacgive spectral viewing tool. This will interpolate the currently generated SSP to the values shown on the sliders, doing the same for our reference BC03 SSP. Seeing for what values of logAge and logZ the SSP looks similar too (or different to) BC03 can be useful for understanding SED fitting biases.
+ </p>
+
+ <h4>Iso Info</h4>
+ <p>
+ Basic info about the available isochrones (more information is available in the ProGeny package itself).
+ </p>
+
+ <h4>Atmos Info</h4>
+ <p>
+ Basic info about the available spectral atmospheres (more information is available in the ProGeny package itself).
+ </p>
  ")
                   ),
                   tabPanel("Isochrone",

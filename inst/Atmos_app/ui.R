@@ -1,3 +1,5 @@
+app_mode = getOption("app_mode", default = "user")
+
 ui = fluidPage(
   shinybusy::use_busy_spinner(spin = "fading-circle"),
   titlePanel("ProGeny SSP Generator"),
@@ -8,8 +10,10 @@ ui = fluidPage(
         tags$h5("User options will appear here for each tab"),
       ),
 
+      #The below syntax basically works to let me switch App modes from user to server. Need to user throughout (and fix some of the server code expecting particular objects to appear, like input$iso_file$name). That shouldn't be too hard though!
       conditionalPanel(
-        condition = "input.tabs == 'Isochrone'",
+        # condition = "input.tabs == 'Isochrone'",
+        condition = paste("input.tabs == 'Isochrone'", sprintf("'%s' === 'user'", app_mode), sep=' & '),
         tags$h5("Allow 1 sec to load Iso File"),
         fileInput("iso_file", "Choose Isochrone File [.fst]", accept = ".fst"),
         br(),
@@ -17,7 +21,14 @@ ui = fluidPage(
       ),
 
       conditionalPanel(
-        condition = "input.tabs == 'Atmospheres'",
+        # condition = "input.tabs == 'Isochrone'",
+        condition = paste("input.tabs == 'Isochrone'", sprintf("'%s' === 'server'", app_mode), sep=' & '),
+        tags$h5("Select isochrone:"),
+        selectInput("iso_choice", "Isochrone", choices = c("MIST" = "MistIso.fst", "PARSEC" = "ParsecIso.fst", "BaSTI" = "BastiIso_FSPS.fst")),
+      ),
+
+      conditionalPanel(
+        condition = paste("input.tabs == 'Atmospheres'", sprintf("'%s' === 'user'", app_mode), sep=' & '),
         shinyFiles::shinyDirButton("destpath", "Atmos Path", "Select a folder"),
         selectInput("base", "Base", choices = c("C3K Conroy" = "combine_C3K_conroy", "PHOENIX Husser" = "combine_PHOENIX_husser", "PHOENIX Allard" = "combine_PHOENIX_Allard", "MILES Vazdekis" = "combine_MILES_vazdekis", "BaSeL-3.1 WLBC" = "combine_BASEL_wlbc")),
         selectInput("extend", "Extend", choices = c("PHOENIX Allard" = "combine_PHOENIX_Allard", "ATLAS9 Castelli" = "combine_ATLAS9_castelli", "None" = "None")),

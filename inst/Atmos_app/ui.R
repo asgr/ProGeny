@@ -28,7 +28,7 @@ ui = fluidPage(
         # condition = "input.tabs == 'Isochrone'",
         condition = paste("input.tabs == 'Isochrone'", sprintf("'%s' === 'server'", ProGeny_app_mode), sep=' & '),
         tags$h5("Select isochrone:"),
-        selectInput("iso_choice", "Isochrone", choices = c("MIST" = "MistIso.fst", "PARSEC" = "ParsecIso.fst", "BaSTI" = "BastiIso_FSPS.fst")),
+        selectInput("iso_choice", "Isochrone", choices = c("MIST" = "MistIso.fst", "PARSEC" = "ParsecIso.fst", "BaSTI" = "BastiIso_FSPS.fst", "Padova" = "PadovaIso_FSPS.fst")),
         br(),
         actionButton("iso_load", "Load Isochrone"),
       ),
@@ -66,8 +66,8 @@ ui = fluidPage(
       ),
 
       conditionalPanel(
-        condition = "input.tabs == 'Interpolate'",
-        #condition = paste("input.tabs == 'Interpolate'", sprintf("'%s' === 'user'", ProGeny_app_mode), sep=' & '),
+        #condition = "input.tabs == 'Interpolate'",
+        condition = paste("input.tabs == 'Interpolate'", sprintf("'%s' === 'user'", ProGeny_app_mode), sep=' & '),
         sliderInput('radius', 'Search Radius', min=1, max=4, value=2),
         sliderInput('weight_pow', 'Weight Power', min=1, max=4, value=2),
         sliderInput('k', 'Search k', min=4, max=16, value=8, step=1),
@@ -91,37 +91,36 @@ ui = fluidPage(
         selectInput('label_white', 'White Dwarf Phase', choices=-1:10, multiple=TRUE),
         selectInput('label_WR', 'Wolf-Rayet', choices=-1:10, multiple=TRUE),
         tags$h5("Allow 30 sec to [Run Interp]"),
-        actionButton("run_interp", "Run Interp")
+        actionButton("run_interp", "Run Interp"),
+        br(), br(),
+        actionButton("interp_done", "Return Interp Grids"),
       ),
       
-      # conditionalPanel(
-      #   #condition = "input.tabs == 'Interpolate'",
-      #   condition = paste("input.tabs == 'Interpolate'", sprintf("'%s' === 'server'", ProGeny_app_mode), sep=' & '),
-      #   sliderInput('radius', 'Search Radius', min=1, max=4, value=2),
-      #   sliderInput('weight_pow', 'Weight Power', min=1, max=4, value=2),
-      #   sliderInput('k', 'Search k', min=4, max=16, value=8, step=1),
-      #   fluidRow(
-      #     column(6, checkboxInput('do_hot', 'Use Hot', value = TRUE)),
-      #     column(6, checkboxInput('prefer_hot', 'Prefer Hot', value = TRUE))
-      #   ),
-      #   fluidRow(
-      #     column(6, checkboxInput('do_AGB', 'Use AGB', value = TRUE)),
-      #     column(6, checkboxInput('prefer_AGB', 'Prefer AGB', value = TRUE))
-      #   ),
-      #   fluidRow(
-      #     column(6, checkboxInput('do_white', 'Use White Dwarf', value = TRUE)),
-      #     column(6, checkboxInput('prefer_white', 'Prefer White', value = TRUE))
-      #   ),
-      #   fluidRow(
-      #     column(6, checkboxInput('do_WR', 'Use Wolf-Rayet', value = TRUE)),
-      #     column(6, checkboxInput('prefer_WR', 'Prefer Wolf-Rayet', value = TRUE))
-      #   ),
-      #   selectInput('label_AGB', 'AGB Phase', choices=-1:10, multiple=TRUE),
-      #   selectInput('label_white', 'White Dwarf Phase', choices=-1:10, multiple=TRUE),
-      #   selectInput('label_WR', 'Wolf-Rayet', choices=-1:10, multiple=TRUE),
-      #   tags$h5("Allow 30 sec to [Run Interp]"),
-      #   actionButton("run_interp", "Run Interp")
-      # ),
+      conditionalPanel(
+        #condition = "input.tabs == 'Interpolate'",
+        condition = paste("input.tabs == 'Interpolate'", sprintf("'%s' === 'server'", ProGeny_app_mode), sep=' & '),
+        sliderInput('radius', 'Search Radius', min=1, max=4, value=2),
+        sliderInput('weight_pow', 'Weight Power', min=1, max=4, value=2),
+        sliderInput('k', 'Search k', min=4, max=16, value=8, step=1),
+        fluidRow(
+          column(6, checkboxInput('do_hot', 'Use Hot', value = TRUE)),
+          column(6, checkboxInput('prefer_hot', 'Prefer Hot', value = TRUE))
+        ),
+        fluidRow(
+          column(6, checkboxInput('do_AGB', 'Use AGB', value = TRUE)),
+          column(6, checkboxInput('prefer_AGB', 'Prefer AGB', value = TRUE))
+        ),
+        fluidRow(
+          column(6, checkboxInput('do_white', 'Use White Dwarf', value = TRUE)),
+          column(6, checkboxInput('prefer_white', 'Prefer White', value = TRUE))
+        ),
+        fluidRow(
+          column(6, checkboxInput('do_WR', 'Use Wolf-Rayet', value = TRUE)),
+          column(6, checkboxInput('prefer_WR', 'Prefer Wolf-Rayet', value = TRUE))
+        ),
+        tags$h5("Allow 30 sec to [Run Interp]"),
+        actionButton("run_interp", "Run Interp")
+      ),
 
       conditionalPanel(
         condition = "input.tabs == 'IMF'",

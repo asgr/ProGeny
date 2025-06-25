@@ -212,12 +212,12 @@ ui = fluidPage(
  </p>
 
  <p>
- The selected atmospheres should take a few tens of seconds to load, and you should see a couple of userful plots. One will overlay and colour-code the various atmosphere grids on the isochrone Temp versus logG figure to give you an idea of the evolutionary coverage of the chosen isochrone and how well sampled the properties are with your chosen stellar atmospheres. The other shows the spectral resolution as a functions of wavelength. If users do not upload their own this will simply be the default high-resolution CB19 grid.
+ The selected atmospheres should take a few tens of seconds to load, and you should see a couple of userful plots. One will overlay and colour-code the various atmosphere grids on the isochrone Temp versus logG figure to give you an idea of the evolutionary coverage of the chosen isochrone and how well sampled the properties are with your chosen stellar atmospheres. The other shows the spectral resolution as a function of wavelength. If users do not upload their own this will simply be the default high-resolution CB19 grid.
  </p>
 
  <h4>Interpolate</h4>
  <p>
- This tab controls how stellar properties are interpolated from the gridded atmospheres onto the non-gridded isochrones. The defaults are robust and were used in the reference papers, but users can experiment to explore their effects. Almost certainly the auto options regarding the labels should be left as they are, unless you really know what you are doing (and how these work).
+ This tab controls how stellar properties are interpolated from the gridded atmospheres onto the non-gridded isochrones. The defaults are robust and were used in the reference papers, but users can experiment to explore their effects. Almost certainly the auto options regarding the phase labels should be left as they are in 'user' mode, unless you really know what you are doing (and how these work). In 'server' mode the label options are not offered.
  </p>
 
  <p>
@@ -358,15 +358,16 @@ ui = fluidPage(
 
  <hr>
 
- <h4><strong>BastiIso_New</strong></h4>
- <p>From the <a href='http://basti-iac.oa-abruzzo.inaf.it/isocs.html' target='_blank'>BaSTI-IAC database</a>. Downloaded 2024-09-12. logG computed from Lum, Mass, and Teff using Stefan-Boltzmann Law (see <code>BaSTI_New_isochrone.R</code>).</p>
- <p><em>General comment:</em> Missing remnants. No UV upturn for old populations. 10 Z values from 0.0003 to 0.04 — narrowest and least sampled Z range.</p>
-
- <hr>
-
- <h4><strong>BastiIso_FSPS</strong></h4>
+ <h4><strong>BaSTI</strong></h4>
  <p>Converted BaSTI isochrones used in FSPS. logG values added manually for remnants (originally set to -99). Based on older BaSTI versions (~2010–2015).</p>
  <p><em>General comment:</em> Remnants added by hand. Provides reasonable UV upturn. 21 Z values from 0.00001 to 0.06 — middling in Z coverage and sampling.</p>
+
+ <hr>
+ 
+ <h4><strong>Padova</strong></h4>
+<p> Converted version of the Padova isochrones, basically as per used within FSPS. PadovaIso_FSPS is included here since FSPS has stellar remnants added onto the base Padova isochrone (which might be interesting for some purposes). </p>
+<p>Remnants have been added by hand to the FSPS Padova isochrones. It's not entirely clear where these come from though (I can't see any specific mention in the GitHub repo). In practice, this means PadovaIso_FSPS provides a pretty reasonable UV upturn (but not as densely sampled as MIST).</p>
+<p>This library has 22 Z values spanning 0.0002 to 0.03 (so x1.5 solar). This makes it fairly poor in terms of both Z coverage and middling in sampling density.</p>
 ")
                   ),
 

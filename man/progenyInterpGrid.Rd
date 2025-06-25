@@ -99,7 +99,7 @@ In MIST the isochrones labels are provided as: -1 = PreMS, 0 = MS, 2 = RGB, 3 = 
 
 In PARSEC the isochrones labels are provided as: 0 = PreMS, 1 = MS, 2 = SubGB, 3 = RGB, 4-6 = CHeB, 7 = eAGB, 8 = TP-AGB, 9 = PostAGB.
 
-In BaSTI the isochrones labels are provided as: -1 = PreMS, 0 = MS, 1 = RGB, 2 = CHeB, 3 = eAGB, 4-5 = AGB, 6 = PostAGB
+In BaSTI (FSPS) the isochrones labels are provided as: -1 = PreMS, 0 = MS, 1 = RGB, 2 = CHeB, 3 = eAGB, 4-5 = AGB, 6 = PostAGB
 
 In Padova the isochrones labels are provided as: 0 = MS, 5 = AGB, 6 = PostAGB, 9 = WR
 

@@ -8,7 +8,21 @@ Interactive Tool to Build SSPs
 A simple interactive tool to interactively build the various inputs needed to create a new SSP. Users get graphical feedback, making it clear what isochrone, spectral atmospheres, interpolation and IMF are being used.
 }
 \usage{
-runShinyProGeny()
+runShinyProGeny(app_mode = 'user',
+  iso_path = "~/Google Drive/My Drive/ProGeny_isochrone/",
+  atmos_path = "~/Google Drive/My Drive/ProGeny_atmos/")
+}
+
+\arguments{
+  \item{app_mode}{
+Character scalar; either 'user' or 'server'. The 'former 'user' option lets you return outputs at various stages, and lets you dynamically specify data locations for your own computer and choose the number of cores to run on. The 'server' option is more restricted to reflect how the Shiny App should run on a server.
+}
+  \item{iso_path}{
+Character scalar; path to the isochrones to be used only in 'server' \option{mode}. Defaults just happen to work on ASGR's machine, so almost certainly need to be changed.
+}
+  \item{atmos_path}{
+Character scalar; path to the atmospheres to be used only in 'server' \option{mode}. Defaults just happen to work on ASGR's machine, so almost certainly need to be changed.
+}
 }
 %- maybe also 'usage' for other objects documented here.
 \details{

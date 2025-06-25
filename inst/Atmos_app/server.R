@@ -1,5 +1,10 @@
+ProGeny_app_mode = getOption("ProGeny_app_mode", default = "user")
+ProGeny_iso_path = getOption("ProGeny_iso_path", default = "~/Google Drive/My Drive/ProGeny_isochrone/")
+ProGeny_atmos_path = getOption("ProGeny_atmos_path", default = "~/Google Drive/My Drive/ProGeny_atmos/")
+ProGeny_cores = getOption("ProGeny_cores", default = 4)
+
 server = function(input, output, session) {
-  ASGR_atmos_path = '/Volumes/Macintosh HD/Users/aaron/Google Drive/My Drive/ProGeny_atmos'
+  ASGR_atmos_path = '~/Google Drive/My Drive/ProGeny_atmos'
   if(file.exists(ASGR_atmos_path)){
     volumes = c(ASGR = ASGR_atmos_path, wd = getwd(), Home = '~/', shinyFiles::getVolumes()())
   }else{
@@ -19,24 +24,36 @@ server = function(input, output, session) {
   atmos_info_result = reactiveVal(NULL)
   interp_info_result = reactiveVal(NULL)
   #IMF_info_result = reactiveVal(NULL)
+  iso_path = reactiveVal(NULL)
+  iso_name = reactiveVal(NULL)
 
   observeEvent(input$destpath,{
-    output$selectedPath <- renderText({
-      req(input$destpath)
-      paste(
-        'Path to use: \n',
-        shinyFiles::parseDirPath(volumes, input$destpath)
-      )
-    })
+    if(ProGeny_app_mode == 'user'){
+      output$selectedPath <- renderText({
+        req(input$destpath)
+        paste(
+          'Path to use: \n',
+          shinyFiles::parseDirPath(volumes, input$destpath)
+        )
+      })
+    }
   })
 
   #output$status <- renderText("Waiting...")
 
-  observeEvent(input$iso_file, {
-    req(input$iso_file)
+  observeEvent(input$iso_load, {
+    if(ProGeny_app_mode == 'user'){
+      req(input$iso_file)
+      iso_path(input$iso_file$datapath)
+      iso_name(input$iso_file$name)
+    }else if(ProGeny_app_mode == 'server'){
+      iso_path(file.path(ProGeny_iso_path, input$iso_choice))
+      iso_name(input$iso_choice)
+    }
+    
     shinybusy::show_spinner()
     tryCatch({
-      iso_out = fst::read_fst(input$iso_file$datapath, as.data.table = TRUE)
+      iso_out = fst::read_fst(iso_path(), as.data.table = TRUE)
       iso_result(iso_out)
       output$iso_summary <- renderPrint(summary(iso_out))
       output$iso_status <- renderText("Isochrone file loaded successfully!")
@@ -47,8 +64,11 @@ server = function(input, output, session) {
       output$iso_status <- renderText(paste("Error loading isochrone file:", e$message))
     })
     shinybusy::hide_spinner()
-
-    if(grepl('Mist', input$iso_file$name)){
+  })
+  
+  observeEvent(input$iso_load, {
+    # print(iso_name())
+    if(grepl('Mist', iso_name())){
       updateSelectInput(
         session = getDefaultReactiveDomain(),
         inputId = 'label_AGB',
@@ -71,7 +91,7 @@ server = function(input, output, session) {
       )
 
       Iso_info = c(Iso_type = 'MIST')
-    }else if(grepl('Parsec', input$iso_file$name)){
+    }else if(grepl('Parsec', iso_name())){
       updateSelectInput(
         session = getDefaultReactiveDomain(),
         inputId = 'label_AGB',
@@ -85,9 +105,16 @@ server = function(input, output, session) {
         choices = -1:10,
         selected = 9
       )
+      
+      updateSelectInput(
+        session = getDefaultReactiveDomain(),
+        inputId = 'label_WR',
+        choices = -1:10,
+        selected = NULL
+      )
 
       Iso_info = c(Iso_type = 'Parsec')
-    }else if(grepl('Basti', input$iso_file$name)){
+    }else if(grepl('Basti', iso_name())){
       updateSelectInput(
         session = getDefaultReactiveDomain(),
         inputId = 'label_AGB',
@@ -101,9 +128,16 @@ server = function(input, output, session) {
         choices = -1:10,
         selected = 6
       )
+      
+      updateSelectInput(
+        session = getDefaultReactiveDomain(),
+        inputId = 'label_WR',
+        choices = -1:10,
+        selected = NULL
+      )
 
       Iso_info = c(Iso_type = 'BaSTI')
-    }else if(grepl('Padova', input$iso_file$name)){
+    }else if(grepl('Padova', iso_name())){
       updateSelectInput(
         session = getDefaultReactiveDomain(),
         inputId = 'label_AGB',
@@ -124,6 +158,7 @@ server = function(input, output, session) {
         choices = -1:10,
         selected = 9
       )
+      
       Iso_info = c(Iso_type = 'Padova')
     }
     iso_info_result(Iso_info)
@@ -162,7 +197,11 @@ server = function(input, output, session) {
       input_WR = NULL
     }
 
-    destpath = shinyFiles::parseDirPath(volumes, input$destpath)
+    if(ProGeny_app_mode == 'user'){
+      destpath = shinyFiles::parseDirPath(volumes, input$destpath)
+    }else if(ProGeny_app_mode == 'server'){
+      destpath = ProGeny_atmos_path
+    }
 
     if(!file.exists(paste0(destpath,'/',input_base,'.fits'))){
       output$atmos_status <- renderText(paste("No base atmosphere at:", paste0(destpath,'/',input_base,'.fits')))
@@ -204,6 +243,12 @@ server = function(input, output, session) {
       }
     }
 
+    if(ProGeny_app_mode == 'user'){
+      cores_atmos = input$atmos_cores
+    }else if(ProGeny_app_mode == 'server'){
+      cores_atmos = ProGeny_cores
+    }
+    
     #shinyjs::delay(100, {
     tryCatch({
       atmos_out = progenyAtmosLoad(
@@ -215,7 +260,7 @@ server = function(input, output, session) {
         white = input_white,
         WR = input_WR,
         wavegrid = wave_grid_result(),
-        cores = input$atmos_cores
+        cores = cores_atmos
       )
       atmos_result(atmos_out)
 
@@ -372,7 +417,7 @@ server = function(input, output, session) {
     can_run_SSP = Iso_exits & Atmos_exist & Interp_exist
 
     HTML(paste0('Isochrone loaded: ', color_bool(Iso_exits), '<br>',
-          'Isochrone for SSP: ', input$iso_file$name, '<br><br>',
+          'Isochrone for SSP: ', iso_name(), '<br><br>',
           'Atmospheres for SSP loaded: ', color_bool(Atmos_exist), '<br>',
           'See (Atmospheres) tab for parameter details.', '<br><br>',
           'Interpolated grid generated: ', color_bool(Interp_exist), '<br>',
@@ -612,6 +657,12 @@ server = function(input, output, session) {
 
       req(iso_data, atmos_data, interp_data, IMF_function)
 
+      if(ProGeny_app_mode == 'user'){
+        cores_SSP = input$SSP_cores
+      }else if(ProGeny_app_mode == 'server'){
+        cores_SSP = ProGeny_cores
+      }
+      
       if(input$imf == 'IMF_Chabrier'){
         SSP_out = progenyMakeSSP(
           Iso = iso_data,
@@ -624,7 +675,7 @@ server = function(input, output, session) {
           Spec_combine = atmos_data,
           Interp_combine = interp_data,
           Zsol = input$Zsol,
-          cores = input$SSP_cores
+          cores = cores_SSP
         )
 
         IMF_info = c(
@@ -649,7 +700,7 @@ server = function(input, output, session) {
           Spec_combine = atmos_data,
           Interp_combine = interp_data,
           Zsol = input$Zsol,
-          cores = input$SSP_cores
+          cores = cores_SSP
         )
 
         IMF_info = c(
@@ -672,7 +723,7 @@ server = function(input, output, session) {
           Spec_combine = atmos_data,
           Interp_combine = interp_data,
           Zsol = input$Zsol,
-          cores = input$SSP_cores
+          cores = cores_SSP
         )
 
         IMF_info = c(
@@ -702,7 +753,7 @@ server = function(input, output, session) {
           Spec_combine = atmos_data,
           Interp_combine = interp_data,
           Zsol = input$Zsol,
-          cores = input$SSP_cores
+          cores = cores_SSP
         )
 
         IMF_info = c(
@@ -737,7 +788,7 @@ server = function(input, output, session) {
           Spec_combine = atmos_data,
           Interp_combine = interp_data,
           Zsol = input$Zsol,
-          cores = input$SSP_cores
+          cores = cores_SSP
         )
 
         IMF_info = c(
@@ -772,7 +823,7 @@ server = function(input, output, session) {
           Spec_combine = atmos_data,
           Interp_combine = interp_data,
           Zsol = input$Zsol,
-          cores = input$SSP_cores
+          cores = cores_SSP
         )
 
         IMF_info = c(
@@ -807,7 +858,7 @@ server = function(input, output, session) {
           Spec_combine = atmos_data,
           Interp_combine = interp_data,
           Zsol = input$Zsol,
-          cores = input$SSP_cores
+          cores = cores_SSP
         )
 
         IMF_info = c(
@@ -1075,7 +1126,6 @@ server = function(input, output, session) {
       stopApp(SSP_result())
     }
   })
-
 
   output$download_ssp <- downloadHandler(
     filename = paste0("PG_SSP_", format(Sys.time(), "%y_%m_%d_%H_%M_%S"), ".fits"),

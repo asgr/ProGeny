@@ -1,4 +1,6 @@
-app_mode = getOption("app_mode", default = "user")
+ProGeny_app_mode = getOption("ProGeny_app_mode", default = "user")
+ProGeny_iso_path = getOption("ProGeny_iso_path", default = "~/Google Drive/My Drive/ProGeny_isochrone/")
+ProGeny_atmos_path = getOption("ProGeny_atmos_path", default = "~/Google Drive/My Drive/ProGeny_atmos/")
 
 ui = fluidPage(
   shinybusy::use_busy_spinner(spin = "fading-circle"),
@@ -13,22 +15,27 @@ ui = fluidPage(
       #The below syntax basically works to let me switch App modes from user to server. Need to user throughout (and fix some of the server code expecting particular objects to appear, like input$iso_file$name). That shouldn't be too hard though!
       conditionalPanel(
         # condition = "input.tabs == 'Isochrone'",
-        condition = paste("input.tabs == 'Isochrone'", sprintf("'%s' === 'user'", app_mode), sep=' & '),
+        condition = paste("input.tabs == 'Isochrone'", sprintf("'%s' === 'user'", ProGeny_app_mode), sep=' & '),
         tags$h5("Allow 1 sec to load Iso File"),
         fileInput("iso_file", "Choose Isochrone File [.fst]", accept = ".fst"),
+        br(),
+        actionButton("iso_load", "Load Isochrone"),
         br(),
         actionButton("iso_done", "Return Isochrone"),
       ),
 
       conditionalPanel(
         # condition = "input.tabs == 'Isochrone'",
-        condition = paste("input.tabs == 'Isochrone'", sprintf("'%s' === 'server'", app_mode), sep=' & '),
+        condition = paste("input.tabs == 'Isochrone'", sprintf("'%s' === 'server'", ProGeny_app_mode), sep=' & '),
         tags$h5("Select isochrone:"),
         selectInput("iso_choice", "Isochrone", choices = c("MIST" = "MistIso.fst", "PARSEC" = "ParsecIso.fst", "BaSTI" = "BastiIso_FSPS.fst")),
+        br(),
+        actionButton("iso_load", "Load Isochrone"),
       ),
 
       conditionalPanel(
-        condition = paste("input.tabs == 'Atmospheres'", sprintf("'%s' === 'user'", app_mode), sep=' & '),
+        # condition = "input.tabs == 'Atmospheres'",
+        condition = paste("input.tabs == 'Atmospheres'", sprintf("'%s' === 'user'", ProGeny_app_mode), sep=' & '),
         shinyFiles::shinyDirButton("destpath", "Atmos Path", "Select a folder"),
         selectInput("base", "Base", choices = c("C3K Conroy" = "combine_C3K_conroy", "PHOENIX Husser" = "combine_PHOENIX_husser", "PHOENIX Allard" = "combine_PHOENIX_Allard", "MILES Vazdekis" = "combine_MILES_vazdekis", "BaSeL-3.1 WLBC" = "combine_BASEL_wlbc")),
         selectInput("extend", "Extend", choices = c("PHOENIX Allard" = "combine_PHOENIX_Allard", "ATLAS9 Castelli" = "combine_ATLAS9_castelli", "None" = "None")),
@@ -43,9 +50,24 @@ ui = fluidPage(
         br(), br(),
         actionButton("atmos_done", "Return Atmos")
       ),
+      
+      conditionalPanel(
+        # condition = "input.tabs == 'Atmospheres'",
+        condition = paste("input.tabs == 'Atmospheres'", sprintf("'%s' === 'server'", ProGeny_app_mode), sep=' & '),
+        selectInput("base", "Base", choices = c("C3K Conroy" = "combine_C3K_conroy", "PHOENIX Husser" = "combine_PHOENIX_husser", "PHOENIX Allard" = "combine_PHOENIX_Allard", "MILES Vazdekis" = "combine_MILES_vazdekis", "BaSeL-3.1 WLBC" = "combine_BASEL_wlbc")),
+        selectInput("extend", "Extend", choices = c("PHOENIX Allard" = "combine_PHOENIX_Allard", "ATLAS9 Castelli" = "combine_ATLAS9_castelli", "None" = "None")),
+        selectInput("hot", "Hot", choices = c("PoWR" = "combine_OB_PoWR", "hot" = "combine_hot", "None" = "None")),
+        selectInput("AGB", "AGB", choices = c("AGB Lancon" = "combine_AGB_lancon", "None" = "None")),
+        selectInput("white", "White Dwarfs", choices = c("TMAP Werner" = "combine_TMAP_werner", "white" = "combine_white", "None" = "None")),
+        selectInput("WR", "Wolf-Rayet", choices = c("PoWR" = "combine_WNE_PoWR", "None" = "None")),
+        fileInput("wave_file", "User Wave (Ang) [.tab .dat .txt]", accept = c('tab', 'dat', 'txt')),
+        tags$h5("Allow 10 sec to [Load Atmos]"),
+        actionButton("load_atmos", "Load Atmos")
+      ),
 
       conditionalPanel(
         condition = "input.tabs == 'Interpolate'",
+        #condition = paste("input.tabs == 'Interpolate'", sprintf("'%s' === 'user'", ProGeny_app_mode), sep=' & '),
         sliderInput('radius', 'Search Radius', min=1, max=4, value=2),
         sliderInput('weight_pow', 'Weight Power', min=1, max=4, value=2),
         sliderInput('k', 'Search k', min=4, max=16, value=8, step=1),
@@ -69,10 +91,37 @@ ui = fluidPage(
         selectInput('label_white', 'White Dwarf Phase', choices=-1:10, multiple=TRUE),
         selectInput('label_WR', 'Wolf-Rayet', choices=-1:10, multiple=TRUE),
         tags$h5("Allow 30 sec to [Run Interp]"),
-        actionButton("run_interp", "Run Interp"),
-        br(), br(),
-        actionButton("interp_done", "Return Interp Grids"),
+        actionButton("run_interp", "Run Interp")
       ),
+      
+      # conditionalPanel(
+      #   #condition = "input.tabs == 'Interpolate'",
+      #   condition = paste("input.tabs == 'Interpolate'", sprintf("'%s' === 'server'", ProGeny_app_mode), sep=' & '),
+      #   sliderInput('radius', 'Search Radius', min=1, max=4, value=2),
+      #   sliderInput('weight_pow', 'Weight Power', min=1, max=4, value=2),
+      #   sliderInput('k', 'Search k', min=4, max=16, value=8, step=1),
+      #   fluidRow(
+      #     column(6, checkboxInput('do_hot', 'Use Hot', value = TRUE)),
+      #     column(6, checkboxInput('prefer_hot', 'Prefer Hot', value = TRUE))
+      #   ),
+      #   fluidRow(
+      #     column(6, checkboxInput('do_AGB', 'Use AGB', value = TRUE)),
+      #     column(6, checkboxInput('prefer_AGB', 'Prefer AGB', value = TRUE))
+      #   ),
+      #   fluidRow(
+      #     column(6, checkboxInput('do_white', 'Use White Dwarf', value = TRUE)),
+      #     column(6, checkboxInput('prefer_white', 'Prefer White', value = TRUE))
+      #   ),
+      #   fluidRow(
+      #     column(6, checkboxInput('do_WR', 'Use Wolf-Rayet', value = TRUE)),
+      #     column(6, checkboxInput('prefer_WR', 'Prefer Wolf-Rayet', value = TRUE))
+      #   ),
+      #   selectInput('label_AGB', 'AGB Phase', choices=-1:10, multiple=TRUE),
+      #   selectInput('label_white', 'White Dwarf Phase', choices=-1:10, multiple=TRUE),
+      #   selectInput('label_WR', 'Wolf-Rayet', choices=-1:10, multiple=TRUE),
+      #   tags$h5("Allow 30 sec to [Run Interp]"),
+      #   actionButton("run_interp", "Run Interp")
+      # ),
 
       conditionalPanel(
         condition = "input.tabs == 'IMF'",
@@ -88,7 +137,8 @@ ui = fluidPage(
       ),
 
       conditionalPanel(
-        condition = "input.tabs == 'Make SSP'",
+        # condition = "input.tabs == 'Make SSP'",
+        condition = paste("input.tabs == 'Make SSP'", sprintf("'%s' === 'user'", ProGeny_app_mode), sep=' & '),
         numericInput("Zsol", "Zsol", value = 0.02, min = 0.01, max = 0.03, step=0.001),
         numericInput("SSP_cores", "Number of Cores", value = 8, min = 1, step=1),
         tags$h5("Allow 2 min to [Make SSP]"),
@@ -97,6 +147,18 @@ ui = fluidPage(
         actionButton("check_ssp", "Check SSP"),
         br(), br(),
         actionButton("return_ssp", "Return SSP"),
+        br(), br(),
+        downloadButton("download_ssp", "Download SSP [.fits]")
+      ),
+      
+      conditionalPanel(
+        # condition = "input.tabs == 'Make SSP'",
+        condition = paste("input.tabs == 'Make SSP'", sprintf("'%s' === 'server'", ProGeny_app_mode), sep=' & '),
+        numericInput("Zsol", "Zsol", value = 0.02, min = 0.01, max = 0.03, step=0.001),
+        tags$h5("Allow 2 min to [Make SSP]"),
+        actionButton("make_ssp", "Make SSP"),
+        br(), br(),
+        actionButton("check_ssp", "Check SSP"),
         br(), br(),
         downloadButton("download_ssp", "Download SSP [.fits]")
       ),
@@ -254,8 +316,6 @@ ui = fluidPage(
                            tags$h4("[Check SSP] Status:"),
                            uiOutput("SSP_check"),
                            tags$h4("[Return SSP] Status:"),
-                           uiOutput("SSP_return"),
-                           tags$h4("[Download SSP] Status:"),
                            uiOutput("SSP_return")
                   ),
                   tabPanel("Test SSP",

@@ -10,7 +10,7 @@ A simple interactive tool to interactively build the various inputs needed to cr
 \usage{
 runShinyProGeny(app_mode = 'user',
   iso_path = "~/Google Drive/My Drive/ProGeny_isochrone/",
-  atmos_path = "~/Google Drive/My Drive/ProGeny_atmos/")
+  atmos_path = "~/Google Drive/My Drive/ProGeny_atmos/", cores_server = 4)
 }
 
 \arguments{
@@ -22,6 +22,9 @@ Character scalar; path to the isochrones to be used only in 'server' \option{mod
 }
   \item{atmos_path}{
 Character scalar; path to the atmospheres to be used only in 'server' \option{mode}. Defaults just happen to work on ASGR's machine, so almost certainly need to be changed.
+}
+  \item{cores_server}{
+Integer scalar; the number of server cores to run on.
 }
 }
 %- maybe also 'usage' for other objects documented here.

@@ -50,7 +50,7 @@ server = function(input, output, session) {
       iso_path(file.path(ProGeny_iso_path, input$iso_choice))
       iso_name(input$iso_choice)
     }
-    
+
     shinybusy::show_spinner()
     tryCatch({
       iso_out = fst::read_fst(iso_path(), as.data.table = TRUE)
@@ -65,7 +65,7 @@ server = function(input, output, session) {
     })
     shinybusy::hide_spinner()
   })
-  
+
   observeEvent(input$iso_load, {
     # print(iso_name())
     if(grepl('Mist', iso_name())){
@@ -105,7 +105,7 @@ server = function(input, output, session) {
         choices = -1:10,
         selected = 9
       )
-      
+
       updateSelectInput(
         session = getDefaultReactiveDomain(),
         inputId = 'label_WR',
@@ -128,7 +128,7 @@ server = function(input, output, session) {
         choices = -1:10,
         selected = 6
       )
-      
+
       updateSelectInput(
         session = getDefaultReactiveDomain(),
         inputId = 'label_WR',
@@ -158,7 +158,7 @@ server = function(input, output, session) {
         choices = -1:10,
         selected = 9
       )
-      
+
       Iso_info = c(Iso_type = 'Padova')
     }
     iso_info_result(Iso_info)
@@ -248,7 +248,7 @@ server = function(input, output, session) {
     }else if(ProGeny_app_mode == 'server'){
       cores_atmos = ProGeny_cores
     }
-    
+
     #shinyjs::delay(100, {
     tryCatch({
       atmos_out = progenyAtmosLoad(
@@ -662,7 +662,7 @@ server = function(input, output, session) {
       }else if(ProGeny_app_mode == 'server'){
         cores_SSP = ProGeny_cores
       }
-      
+
       if(input$imf == 'IMF_Chabrier'){
         SSP_out = progenyMakeSSP(
           Iso = iso_data,
@@ -1089,10 +1089,27 @@ server = function(input, output, session) {
     })
   })
 
+  output$dynamic_spec <- renderUI({
+    req(SSP_result())
+    logAge_range = log10(c(max(min(BC03lr$Age), min(SSP_result()$Age)) , min(max(BC03lr$Age), max(SSP_result()$Age))))
+    logAge_range[1] = ceiling(logAge_range[1]*10)/10
+    logAge_range[2] = floor(logAge_range[2]*10)/10
+
+    logZ_range = log10(c(max(min(BC03lr$Z/0.02), min(SSP_result()$Z/input$Zsol)) , min(max(BC03lr$Z/0.02), max(SSP_result()$Z/input$Zsol))))
+    logZ_range[1] = ceiling(logZ_range[1]*10)/10
+    logZ_range[2] = floor(logZ_range[2]*10)/10
+
+    tagList(
+      sliderInput("logAge", "log(Age / Yr)", value = 9, min = logAge_range[1], max = logAge_range[2], step=0.1),
+      sliderInput("logZ", "log(Z / Zsol)", value = 0, min = logZ_range[1], max = logZ_range[2], step=0.1)
+    )
+  })
+
   output$plot_spec <- renderPlot({
-    PG_SSP = SSP_result()
-    req(PG_SSP)
-    if(!is.null(PG_SSP)){
+    req(SSP_result())
+    req(input$logAge)
+    req(input$logZ)
+    if(!is.null(SSP_result())){
       magicaxis::magplot(ProSpect::speclibReGrid(BC03lr, input$logAge, input$logZ, Zsol=0.02),
               type='l', log='xy', col='grey',
               xlab = BC03lr$Labels$Wavelab,

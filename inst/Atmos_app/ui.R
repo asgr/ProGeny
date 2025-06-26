@@ -50,7 +50,7 @@ ui = fluidPage(
         br(), br(),
         actionButton("atmos_done", "Return Atmos")
       ),
-      
+
       conditionalPanel(
         # condition = "input.tabs == 'Atmospheres'",
         condition = paste("input.tabs == 'Atmospheres'", sprintf("'%s' === 'server'", ProGeny_app_mode), sep=' & '),
@@ -95,7 +95,7 @@ ui = fluidPage(
         br(), br(),
         actionButton("interp_done", "Return Interp Grids"),
       ),
-      
+
       conditionalPanel(
         #condition = "input.tabs == 'Interpolate'",
         condition = paste("input.tabs == 'Interpolate'", sprintf("'%s' === 'server'", ProGeny_app_mode), sep=' & '),
@@ -149,7 +149,7 @@ ui = fluidPage(
         br(), br(),
         downloadButton("download_ssp", "Download SSP [.fits]")
       ),
-      
+
       conditionalPanel(
         # condition = "input.tabs == 'Make SSP'",
         condition = paste("input.tabs == 'Make SSP'", sprintf("'%s' === 'server'", ProGeny_app_mode), sep=' & '),
@@ -164,8 +164,9 @@ ui = fluidPage(
 
       conditionalPanel(
         condition =  "input.tabs == 'Test SSP'",
-        sliderInput("logAge", "logAge", value = 9, min = 5, max = 10.3, step=0.1),
-        sliderInput("logZ", "logZ", value = 0, min = -2.3, max = 0.3, step=0.1),
+        #sliderInput("logAge", "log(Age / Yr)", value = 9, min = 5, max = 10.3, step=0.1),
+        #sliderInput("logZ", "log(Z / Zsol)", value = 0, min = -2.3, max = 0.3, step=0.1),
+        uiOutput("dynamic_spec")
       )
     ),
 
@@ -363,7 +364,7 @@ ui = fluidPage(
  <p><em>General comment:</em> Remnants added by hand. Provides reasonable UV upturn. 21 Z values from 0.00001 to 0.06 — middling in Z coverage and sampling.</p>
 
  <hr>
- 
+
  <h4><strong>Padova</strong></h4>
 <p> Converted version of the Padova isochrones, basically as per used within FSPS. PadovaIso_FSPS is included here since FSPS has stellar remnants added onto the base Padova isochrone (which might be interesting for some purposes). </p>
 <p>Remnants have been added by hand to the FSPS Padova isochrones. It's not entirely clear where these come from though (I can't see any specific mention in the GitHub repo). In practice, this means PadovaIso_FSPS provides a pretty reasonable UV upturn (but not as densely sampled as MIST).</p>

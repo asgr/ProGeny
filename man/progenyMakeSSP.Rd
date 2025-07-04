@@ -44,7 +44,7 @@ Numeric vector; if provided it is the log10(Z/Zsol) values that you want the out
 Numeric vector; optional. Lower and upper ranges of \option{Iso} Mini to use. This can be useful if wanting to combine mass ranges from different isochrone to make a better combined SSP (say one is better for low mass stars, and another better for high mass stars). If provided it must be length 2.
 }
   \item{Zsol}{
-Numeric scalar; value of the Sun's solar metallicity (to convert logZ to Z). Sensible values to use are 0.02 (the standard BC03 and many other SPLs) or 0.014 (Asplund). Conflicting works have measured values as low as 0.013 and as high as 0.02 even in recent years so this should be treated a bit like H0, where values relative to the assumed value of solar are what we are really measuring with any resulting SSP.
+Numeric scalar; value of the Sun's solar metallicity (to convert logZ to Z). Sensible values to use are 0.02 (the standard BC03 and many other SPLs) or 0.014 (Asplund, 2009). Conflicting works have measured values as low as 0.013 and as high as 0.02 even in recent years so this should be treated a bit like H0, where values relative to the assumed value of solar are what we are really measuring with any resulting SSP.
 }
   \item{cores}{
 Integer scalar; how many cores to run on.
@@ -69,8 +69,8 @@ A \code{ProSpect} compatible speclib (SSP) format looks like a list containing:
 \item{Zevo}{List containing the mean evolutionary tracks of the SSPs (as determined by the route isochrones). The list must correspond to the 'Z' vector metallicities. Each list item is a data.frame with columns 'SMstar' (fraction of mass in luminous stars) 'SMgas' (fraction of mass in gas) 'SMtot' (fraction of total mass, always 1 in practice) 'SFR' (star formation rate, always 0 in practice) 'SMrem' (fraction of mass in stellar remnants, e.g. black holes etc). Nrow should be equal to the number of age bins (corresponding with 'Age').}
 }
 \references{
-Robotham & Bellstedt, 2025, RASTI, Vol, Page \cr
-Bellstedt & Robotham, 2025, MNRAS, Vol, Page
+Robotham & Bellstedt, 2025, RASTI, 4, 19 \cr
+Bellstedt & Robotham, 2025, MNRAS, 540, 2703
 }
 \author{
 Aaron Robotham

@@ -58,7 +58,7 @@ server = function(input, output, session) {
       output$iso_summary <- renderPrint(summary(iso_out))
       output$iso_status <- renderText("Isochrone file loaded successfully!")
       output$plot_iso = renderPlot({
-        progenyIsoPlot(iso_result())
+        progenyIsoPlot(iso_result(), draw_regions = TRUE)
       })
     }, error = function(e) {
       output$iso_status <- renderText(paste("Error loading isochrone file:", e$message))
@@ -1110,17 +1110,17 @@ server = function(input, output, session) {
     req(input$logAge)
     req(input$logZ)
     if(!is.null(SSP_result())){
-      magicaxis::magplot(ProSpect::speclibReGrid(BC03lr, input$logAge, input$logZ, Zsol=0.02),
+      BC03_rebin = ProSpect::speclibReGrid(BC03lr, input$logAge, input$logZ, Zsol=0.02)
+      magicaxis::magplot(BC03_rebin,
               type='l', log='xy', col='grey',
               xlab = BC03lr$Labels$Wavelab,
               ylab = BC03lr$Labels$Lumlab,
-              xlim = c(1e2, 1e5),
-              ylim = c(1e-10, 10)
-
+              xlim=c(1e2, 1e5),
+              ylim=c(max(1e-8, min(BC03_rebin$lum)), max(BC03_rebin$lum)*1.2)
               )
       lines(ProSpect::speclibReGrid(SSP_result(), input$logAge, input$logZ, Zsol=input$Zsol))
       legend('topright', legend = c('ProGeny', 'BC03'), col=c('black', 'grey'), lty=1, lwd=2, bty='n')
-      legend('topleft', legend = c(paste('logAge:', input$logAge), paste('logZ:', input$logZ)))
+      legend('bottomleft', legend = c(paste('logAge:', input$logAge), paste('logZ:', input$logZ)))
     }
   })
 

@@ -227,12 +227,16 @@ ui = fluidPage(
 
  <h4>IMF</h4>
  <p>
- The initial mass function (IMF) determines the distribution of stellar masses. ProGeny uniquely supports evolving IMFs. The default is a Chabrier IMF, but this may not suit all science cases (e.g., high redshift). This is a critical tab—users should carefully consider their choice here. Note how the available options vary depending on the IMF selected? That is partly me pointing it out because I think it is very neat, but it is also relevant because some of the parameters have different effects depending on the IMF. Check out the auto-generated plot to better understand the impact of your options on the resulting IMF.
+ The initial mass function (IMF) determines the distribution of stellar masses. ProGeny uniquely supports evolving IMFs. The default is a Chabrier IMF, but this may not suit all science cases (e.g., high redshift). This is a critical tab—users should carefully consider their choice here. Note how the available options vary depending on the IMF selected! That is partly me pointing it out because I think it is very neat, but it is also relevant because some of the parameters have different effects depending on the IMF. Check out the auto-generated plot to better understand the impact of your options on the resulting IMF.
  </p>
 
  <h4>Make SSP</h4>
  <p>
  This tab runs the SSP generation, combining outputs from the other tabs. Users should make sure all the previous tabs have been run, and the assoicated text on this tab is TRUE (helpfully also coloured green). It may take a minute or two to complete the main SSP building even on 8 cores (so please be patient).
+ </p>
+ 
+ <p>
+ At this stage the only user option is 'Zsol', which just specifies the fidcuial value to use for solar metallicity. Sensible values to use are 0.02 (the standard BC03 and many other SPLs) or 0.014 (Asplund, 2009). Conflicting works have measured values as low as 0.013 and as high as 0.02 even in recent years so this should be treated a bit like H0, where values relative to the assumed value of solar are what we are really measuring with any resulting SSP.
  </p>
 
  <p>
@@ -240,7 +244,11 @@ ui = fluidPage(
  </p>
 
  <p>
- Once you have run your checks, the SSP is ready to be downloaded with the 'Download SSP' button. The output will be FITS files in the standard ProSpect SSP format, except with an additional PG_info table at the end containing all the user parameters selected to generate the SSP (this same table is printed in the ProGeny Generator UI). The basic SSP format is detailed fully in the ProSpect package, but in brief see below for the included BC03lr data. Within R you can load a generated ProGeny SSP with the ProSpect convenience function speclib_FITSload, but in general the file is a pretty simple multi-extension FITS that can be loaded directly into any software that supports that format (including, of course, AstroPy etc).
+ Once you have run your checks, the SSP is ready to be downloaded with the 'Download SSP' button. The output will be FITS files in the standard ProSpect SSP format, except with an additional PG_info table at the end containing all the user parameters selected to generate the SSP (this same table is printed in the ProGeny Generator UI). The outputs will vary in size between a few tens and a couple fundred MB, so you might need to be patient when downloading.
+ </p>
+ 
+ <p>
+ The basic SSP format is detailed fully in the ProSpect package, but in brief see below for the included BC03lr data. Within R you can load a generated ProGeny SSP with the ProSpect convenience function speclib_FITSload, but in general the file is a pretty simple multi-extension FITS that can be loaded directly into any software that supports that format (including, of course, AstroPy etc).
  </P>
 
 <h5>Overview: Low Resolution BC03lr Format</h5>

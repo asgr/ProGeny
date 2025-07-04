@@ -1113,7 +1113,10 @@ server = function(input, output, session) {
       magicaxis::magplot(ProSpect::speclibReGrid(BC03lr, input$logAge, input$logZ, Zsol=0.02),
               type='l', log='xy', col='grey',
               xlab = BC03lr$Labels$Wavelab,
-              ylab = BC03lr$Labels$Lumlab
+              ylab = BC03lr$Labels$Lumlab,
+              xlim = c(1e2, 1e5),
+              ylim = c(1e-10, 10)
+
               )
       lines(ProSpect::speclibReGrid(SSP_result(), input$logAge, input$logZ, Zsol=input$Zsol))
       legend('topright', legend = c('ProGeny', 'BC03'), col=c('black', 'grey'), lty=1, lwd=2, bty='n')

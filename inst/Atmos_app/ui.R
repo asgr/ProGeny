@@ -38,7 +38,7 @@ ui = fluidPage(
         condition = paste("input.tabs == 'Atmospheres'", sprintf("'%s' === 'user'", ProGeny_app_mode), sep=' & '),
         shinyFiles::shinyDirButton("destpath", "Atmos Path", "Select a folder"),
         selectInput("base", "Base", choices = c("C3K Conroy" = "combine_C3K_conroy", "PHOENIX Husser" = "combine_PHOENIX_husser", "PHOENIX Allard" = "combine_PHOENIX_Allard", "MILES Vazdekis" = "combine_MILES_vazdekis", "BaSeL-3.1 WLBC" = "combine_BASEL_wlbc")),
-        selectInput("extend", "Extend", choices = c("PHOENIX Allard" = "combine_PHOENIX_Allard", "ATLAS9 Castelli" = "combine_ATLAS9_castelli", "None" = "None")),
+        selectInput("extend", "Extend", choices = c("PHOENIX Allard" = "combine_PHOENIX_allard", "ATLAS9 Castelli" = "combine_ATLAS9_castelli", "None" = "None")),
         selectInput("hot", "Hot", choices = c("PoWR" = "combine_OB_PoWR", "hot" = "combine_hot", "None" = "None")),
         selectInput("AGB", "AGB", choices = c("AGB Lancon" = "combine_AGB_lancon", "None" = "None")),
         selectInput("white", "White Dwarfs", choices = c("TMAP Werner" = "combine_TMAP_werner", "white" = "combine_white", "None" = "None")),

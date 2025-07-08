@@ -115,7 +115,7 @@ server = function(input, output, session) {
         selected = NULL
       )
 
-      Iso_info = c(Iso_type = 'Parsec')
+      Iso_info = c(Iso_type = 'PARSEC')
     }else if(grepl('Basti', iso_name())){
       updateSelectInput(
         session = getDefaultReactiveDomain(),

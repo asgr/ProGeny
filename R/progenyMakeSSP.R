@@ -134,6 +134,8 @@ progenyMakeSSP = function(Iso, IMFfunc = IMF_Chabrier, ..., rem_frac = 'get', Sp
   Iso_temp[Lum > 1e-6, IMFint := progenyUpdateIMF(Iso_temp[Lum > 1e-6,], IMFfunc, ...)$IMFint]
 
   cores = min(cores, length(logZ_steps), detectCores())
+  message('ProGeny can see ',cores,' cores!')
+  print(paste('ProGeny can see ',cores,' cores!'))
   registerDoParallel(cores=cores)
   #
   logAge_step = NULL

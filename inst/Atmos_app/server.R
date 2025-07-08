@@ -56,6 +56,8 @@ server = function(input, output, session) {
       iso_out = fst::read_fst(iso_path(), as.data.table = TRUE)
       iso_result(iso_out)
       output$iso_summary <- renderPrint(summary(iso_out))
+      Zval = sort(unique(iso_out$logZ))
+      output$iso_Zval <- renderPrint(paste0(c(paste0('[',length(Zval),'] '), Zval), collapse = ' '))
       output$iso_status <- renderText("Isochrone file loaded successfully!")
       output$plot_iso = renderPlot({
         progenyIsoPlot(iso_result(), draw_regions = TRUE)
@@ -876,6 +878,8 @@ server = function(input, output, session) {
 
       SSP_out$PG_info = data.frame(
         name = c(
+          'ProGeny_version',
+          'ProSpect_version',
           names(iso_info_result()),
           names(atmos_info_result()),
           names(interp_info_result()),
@@ -883,6 +887,8 @@ server = function(input, output, session) {
           'SSP_Zsol'
         ),
         value = as.character(c(
+          packageVersion('ProGeny'),
+          packageVersion('ProSpect'),
           iso_info_result(),
           atmos_info_result(),
           interp_info_result(),

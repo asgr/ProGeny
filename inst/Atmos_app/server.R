@@ -115,7 +115,7 @@ server = function(input, output, session) {
         selected = NULL
       )
 
-      Iso_info = c(Iso_type = 'Parsec')
+      Iso_info = c(Iso_type = 'PARSEC')
     }else if(grepl('Basti', iso_name())){
       updateSelectInput(
         session = getDefaultReactiveDomain(),
@@ -887,8 +887,8 @@ server = function(input, output, session) {
           'SSP_Zsol'
         ),
         value = as.character(c(
-          packageVersion('ProGeny'),
-          packageVersion('ProSpect'),
+          as.character(packageVersion('ProGeny')),
+          as.character(packageVersion('ProSpect')),
           iso_info_result(),
           atmos_info_result(),
           interp_info_result(),

@@ -57,7 +57,7 @@ server = function(input, output, session) {
       iso_result(iso_out)
       output$iso_summary <- renderPrint(summary(iso_out))
       Zval = sort(unique(iso_out$logZ))
-      output$iso_Zval <- renderPrint(paste0(c(paste0('[',length(Zval),'] '), Zval), collapse = ' '))
+      output$iso_Zval <- renderText(paste0(c(paste0('[',length(Zval),'] '), Zval), collapse = ' '))
       output$iso_status <- renderText("Isochrone file loaded successfully!")
       output$plot_iso = renderPlot({
         progenyIsoPlot(iso_result(), draw_regions = TRUE)

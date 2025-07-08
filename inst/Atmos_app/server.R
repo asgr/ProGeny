@@ -876,6 +876,8 @@ server = function(input, output, session) {
         )
       }
 
+      browser()
+
       SSP_out$PG_info = data.frame(
         name = c(
           'ProGeny_version',

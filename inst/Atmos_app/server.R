@@ -889,8 +889,8 @@ server = function(input, output, session) {
           'SSP_Zsol'
         ),
         value = as.character(c(
-          packageVersion('ProGeny'),
-          packageVersion('ProSpect'),
+          as.character(packageVersion('ProGeny')),
+          as.character(packageVersion('ProSpect')),
           iso_info_result(),
           atmos_info_result(),
           interp_info_result(),

@@ -1,7 +1,7 @@
 ProGeny_app_mode = getOption("ProGeny_app_mode", default = "user")
 ProGeny_iso_path = getOption("ProGeny_iso_path", default = "~/Google Drive/My Drive/ProGeny_isochrone/")
 ProGeny_atmos_path = getOption("ProGeny_atmos_path", default = "~/Google Drive/My Drive/ProGeny_atmos/")
-ProGeny_cores = getOption("ProGeny_cores", default = 4)
+ProGeny_cores = getOption("ProGeny_cores", default = 15L)
 
 server = function(input, output, session) {
   ASGR_atmos_path = '~/Google Drive/My Drive/ProGeny_atmos'

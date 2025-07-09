@@ -14,8 +14,8 @@ ui = fluidPage(
 
       #The below syntax basically works to let me switch App modes from user to server. Need to user throughout (and fix some of the server code expecting particular objects to appear, like input$iso_file$name). That shouldn't be too hard though!
       conditionalPanel(
-        # condition = "input.tabs == 'Isochrone'",
-        condition = paste("input.tabs == 'Isochrone'", sprintf("'%s' === 'user'", ProGeny_app_mode), sep=' & '),
+        # condition = "input.tabs == 'Isochrone [1]'",
+        condition = paste("input.tabs == 'Isochrone [1]'", sprintf("'%s' === 'user'", ProGeny_app_mode), sep=' & '),
         tags$h5("Allow 1 sec to load Iso File"),
         fileInput("iso_file", "Choose Isochrone File [.fst]", accept = ".fst"),
         br(),
@@ -25,8 +25,8 @@ ui = fluidPage(
       ),
 
       conditionalPanel(
-        # condition = "input.tabs == 'Isochrone'",
-        condition = paste("input.tabs == 'Isochrone'", sprintf("'%s' === 'server'", ProGeny_app_mode), sep=' & '),
+        # condition = "input.tabs == 'Isochrone [1]'",
+        condition = paste("input.tabs == 'Isochrone [1]'", sprintf("'%s' === 'server'", ProGeny_app_mode), sep=' & '),
         tags$h5("Select isochrone:"),
         selectInput("iso_choice", "Isochrone", choices = c("MIST" = "MistIso.fst", "PARSEC" = "ParsecIso.fst", "BaSTI" = "BastiIso_FSPS.fst", "Padova" = "PadovaIso_FSPS.fst")),
         br(),
@@ -34,8 +34,8 @@ ui = fluidPage(
       ),
 
       conditionalPanel(
-        # condition = "input.tabs == 'Atmospheres'",
-        condition = paste("input.tabs == 'Atmospheres'", sprintf("'%s' === 'user'", ProGeny_app_mode), sep=' & '),
+        # condition = "input.tabs == 'Atmospheres [2]'",
+        condition = paste("input.tabs == 'Atmospheres [2]'", sprintf("'%s' === 'user'", ProGeny_app_mode), sep=' & '),
         shinyFiles::shinyDirButton("destpath", "Atmos Path", "Select a folder"),
         selectInput("base", "Base", choices = c("C3K Conroy" = "combine_C3K_conroy", "PHOENIX Husser" = "combine_PHOENIX_husser", "PHOENIX Allard" = "combine_PHOENIX_allard", "MILES Vazdekis" = "combine_MILES_vazdekis", "BaSeL-3.1 WLBC" = "combine_BASEL_wlbc")),
         selectInput("extend", "Extend", choices = c("PHOENIX Allard" = "combine_PHOENIX_allard", "ATLAS9 Castelli" = "combine_ATLAS9_castelli", "None" = "None")),
@@ -52,8 +52,8 @@ ui = fluidPage(
       ),
 
       conditionalPanel(
-        # condition = "input.tabs == 'Atmospheres'",
-        condition = paste("input.tabs == 'Atmospheres'", sprintf("'%s' === 'server'", ProGeny_app_mode), sep=' & '),
+        # condition = "input.tabs == 'Atmospheres [2]'",
+        condition = paste("input.tabs == 'Atmospheres [2]'", sprintf("'%s' === 'server'", ProGeny_app_mode), sep=' & '),
         selectInput("base", "Base", choices = c("C3K Conroy" = "combine_C3K_conroy", "PHOENIX Husser" = "combine_PHOENIX_husser", "PHOENIX Allard" = "combine_PHOENIX_allard", "MILES Vazdekis" = "combine_MILES_vazdekis", "BaSeL-3.1 WLBC" = "combine_BASEL_wlbc")),
         selectInput("extend", "Extend", choices = c("PHOENIX Allard" = "combine_PHOENIX_allard", "ATLAS9 Castelli" = "combine_ATLAS9_castelli", "None" = "None")),
         selectInput("hot", "Hot", choices = c("PoWR" = "combine_OB_PoWR", "hot" = "combine_hot", "None" = "None")),
@@ -66,8 +66,8 @@ ui = fluidPage(
       ),
 
       conditionalPanel(
-        #condition = "input.tabs == 'Interpolate'",
-        condition = paste("input.tabs == 'Interpolate'", sprintf("'%s' === 'user'", ProGeny_app_mode), sep=' & '),
+        #condition = "input.tabs == 'Interpolate [3]'",
+        condition = paste("input.tabs == 'Interpolate [3]'", sprintf("'%s' === 'user'", ProGeny_app_mode), sep=' & '),
         sliderInput('radius', 'Search Radius', min=1, max=4, value=2),
         sliderInput('weight_pow', 'Weight Power', min=1, max=4, value=2),
         sliderInput('k', 'Search k', min=4, max=16, value=8, step=1),
@@ -97,8 +97,8 @@ ui = fluidPage(
       ),
 
       conditionalPanel(
-        #condition = "input.tabs == 'Interpolate'",
-        condition = paste("input.tabs == 'Interpolate'", sprintf("'%s' === 'server'", ProGeny_app_mode), sep=' & '),
+        #condition = "input.tabs == 'Interpolate [3]'",
+        condition = paste("input.tabs == 'Interpolate [3]'", sprintf("'%s' === 'server'", ProGeny_app_mode), sep=' & '),
         sliderInput('radius', 'Search Radius', min=1, max=4, value=2),
         sliderInput('weight_pow', 'Weight Power', min=1, max=4, value=2),
         sliderInput('k', 'Search k', min=4, max=16, value=8, step=1),
@@ -123,7 +123,7 @@ ui = fluidPage(
       ),
 
       conditionalPanel(
-        condition = "input.tabs == 'IMF'",
+        condition = "input.tabs == 'IMF [4]'",
         selectInput("imf", "IMF", choices = c("Chabrier" = "IMF_Chabrier",
                                               "Kroupa" = "IMF_Kroupa",
                                               "Salpeter" = "IMF_Salpeter",
@@ -136,8 +136,8 @@ ui = fluidPage(
       ),
 
       conditionalPanel(
-        # condition = "input.tabs == 'Make SSP'",
-        condition = paste("input.tabs == 'Make SSP'", sprintf("'%s' === 'user'", ProGeny_app_mode), sep=' & '),
+        # condition = "input.tabs == 'Make SSP [5]'",
+        condition = paste("input.tabs == 'Make SSP [5]'", sprintf("'%s' === 'user'", ProGeny_app_mode), sep=' & '),
         numericInput("Zsol", "Zsol", value = 0.02, min = 0.01, max = 0.03, step=0.001),
         numericInput("SSP_cores", "Number of Cores", value = 8, min = 1, step=1),
         tags$h5("Allow 2 min to [Make SSP]"),
@@ -151,8 +151,8 @@ ui = fluidPage(
       ),
 
       conditionalPanel(
-        # condition = "input.tabs == 'Make SSP'",
-        condition = paste("input.tabs == 'Make SSP'", sprintf("'%s' === 'server'", ProGeny_app_mode), sep=' & '),
+        # condition = "input.tabs == 'Make SSP [5]'",
+        condition = paste("input.tabs == 'Make SSP [5]'", sprintf("'%s' === 'server'", ProGeny_app_mode), sep=' & '),
         numericInput("Zsol", "Zsol", value = 0.02, min = 0.01, max = 0.03, step=0.001),
         tags$h5("Allow 2 min to [Make SSP]"),
         actionButton("make_ssp", "Make SSP"),
@@ -163,7 +163,7 @@ ui = fluidPage(
       ),
 
       conditionalPanel(
-        condition =  "input.tabs == 'Test SSP'",
+        condition =  "input.tabs == 'Test SSP [6]'",
         #sliderInput("logAge", "log(Age / Yr)", value = 9, min = 5, max = 10.3, step=0.1),
         #sliderInput("logZ", "log(Z / Zsol)", value = 0, min = -2.3, max = 0.3, step=0.1),
         uiOutput("dynamic_spec")
@@ -183,14 +183,29 @@ ui = fluidPage(
  </p>
 
  <p>
- The sub sections below provide basic information on the related tabs, and in general users should progress their ProGeny journey from left to right (so Isochrone -> Atmospheres -> Interpolate -> Make SSP). The additional tabs beyond that provide a bit more information about the data underlying the Isochrone and Atmospheres tabs. There is much more information available through the ProGeny papers and R package itself, so if you need much more information that this you should look there (before getting in touch with questions those cover).
+ The sub sections below provide basic information on the related tabs, and in general users should progress their ProGeny journey from left to right, so:
+ </p>
+ 
+ <p>
+<div style='text-align:center; font-size:14px; line-height:1.5em;'>
+      Isochrone [1] <br> ↓ <br>
+      Atmospheres [2] <br> ↓ <br>
+      Interpolate [3] <br> ↓ <br>
+      IMF [4] <br> ↓ <br>
+      Make SSP [5] <br> ↓ <br>
+      Test SSP [6]
+</div>
+ </p
+ 
+ <p>
+The additional tabs beyond that provide a bit more information about the data underlying the Isochrone and Atmospheres tabs. There is much more information available through the ProGeny papers and R package itself, so if you need much more information that this you should look there (before getting in touch with questions those cover).
 </p>
 
 <p>
  If you have specific questions about ProGeny that is not well covered in the papers and the R package documentation please get in touch at <a href='mailto:aaron.robotham@uwa.edu.au'>aaron.robotham@uwa.edu.au</a>.
  </p>
 
- <h4>Isochrone</h4>
+ <h4>Isochrone [1]</h4>
  <p>
  Isochrones encode how stars evolve over cosmic time. Users should select one from the dropdown list. The <em>Iso Info</em> tab provides more details. We recommend starting here. Our preference is the MIST isochrones due to their broad coverage, but experimentation is encouraged.
  </p>
@@ -199,7 +214,7 @@ ui = fluidPage(
  The selected isochrone should load pretty quickly (a few seconds at worst), and you should see a useful Temp versus logG figure to give you an idea of the evolutionary coverage of the chosen isochrone.
  </p>
 
- <h4>Atmospheres</h4>
+ <h4>Atmospheres [2]</h4>
  <p>
  Stellar spectral atmospheres provide the spectral data for stars across different physical properties. The <em>Atmos Info</em> tab offers more detail. Atmosphere types include:
  <ul>
@@ -216,7 +231,7 @@ ui = fluidPage(
  The selected atmospheres should take a few tens of seconds to load, and you should see a couple of userful plots. One will overlay and colour-code the various atmosphere grids on the isochrone Temp versus logG figure to give you an idea of the evolutionary coverage of the chosen isochrone and how well sampled the properties are with your chosen stellar atmospheres. The other shows the spectral resolution as a function of wavelength. If users do not upload their own this will simply be the default high-resolution CB19 grid.
  </p>
 
- <h4>Interpolate</h4>
+ <h4>Interpolate [3]</h4>
  <p>
  This tab controls how stellar properties are interpolated from the gridded atmospheres onto the non-gridded isochrones. The defaults are robust and were used in the reference papers, but users can experiment to explore their effects. Almost certainly the auto options regarding the phase labels should be left as they are in 'user' mode, unless you really know what you are doing (and how these work). In 'server' mode the label options are not offered.
  </p>
@@ -225,12 +240,12 @@ ui = fluidPage(
  The interpolation should take a few tens of seconds to run. Various summary plots and statistics are generated on the main panel to help you decide if the atmospheric coverage is good enough.
  </p>
 
- <h4>IMF</h4>
+ <h4>IMF [4]</h4>
  <p>
  The initial mass function (IMF) determines the distribution of stellar masses. ProGeny uniquely supports evolving IMFs. The default is a Chabrier IMF, but this may not suit all science cases (e.g., high redshift). This is a critical tab—users should carefully consider their choice here. Note how the available options vary depending on the IMF selected! That is partly me pointing it out because I think it is very neat, but it is also relevant because some of the parameters have different effects depending on the IMF. Check out the auto-generated plot to better understand the impact of your options on the resulting IMF.
  </p>
 
- <h4>Make SSP</h4>
+ <h4>Make SSP [5]</h4>
  <p>
  This tab runs the SSP generation, combining outputs from the other tabs. Users should make sure all the previous tabs have been run, and the assoicated text on this tab is TRUE (helpfully also coloured green). It may take a minute or two to complete the main SSP building even on 8 cores (so please be patient).
  </p>
@@ -244,7 +259,7 @@ ui = fluidPage(
  </p>
 
  <p>
- Once you have run your checks, the SSP is ready to be downloaded with the 'Download SSP' button. The output will be FITS files in the standard ProSpect SSP format, except with an additional PG_info table at the end containing all the user parameters selected to generate the SSP (this same table is printed in the ProGeny Generator UI). The outputs will vary in size between a few tens and a couple fundred MB, so you might need to be patient when downloading.
+ Once you have run your checks, the SSP is ready to be downloaded with the 'Download SSP' button. The output will be FITS files in the standard ProSpect SSP format, except with an additional PG_info table at the end containing all the user parameters selected to generate the SSP (this same table is printed in the ProGeny Generator UI). The outputs will vary in size between a few tens and a couple hundred MB, so you might need to be patient when downloading.
  </p>
 
  <p>
@@ -272,7 +287,7 @@ ui = fluidPage(
  </li>
  </ul>
 
- <h4>Test SSP</h4>
+ <h4>Test SSP [6]</h4>
  <p>
  Basic interacgive spectral viewing tool. This will interpolate the currently generated SSP to the values shown on the sliders, doing the same for our reference BC03 SSP. Seeing for what values of logAge and logZ the SSP looks similar too (or different to) BC03 can be useful for understanding SED fitting biases.
  </p>
@@ -288,14 +303,14 @@ ui = fluidPage(
  </p>
  ")
                   ),
-                  tabPanel("Isochrone",
+                  tabPanel("Isochrone [1]",
                            verbatimTextOutput("iso_status"),
                            plotOutput("plot_iso", height = "600px"),
                            verbatimTextOutput("iso_summary"),
                            tags$h4("Unique log10(Z/Zsol) values in isochrone:"),
                            verbatimTextOutput("iso_Zval")
                   ),
-                  tabPanel("Atmospheres",
+                  tabPanel("Atmospheres [2]",
                            verbatimTextOutput("selectedPath"),
                            verbatimTextOutput("atmos_status"),
                            plotOutput("plot_atmos", height = "600px"),
@@ -304,7 +319,7 @@ ui = fluidPage(
                            verbatimTextOutput("summary_wave_samp"),
                            plotOutput("plot_wave_samp", height = "400px"),
                   ),
-                  tabPanel("Interpolate",
+                  tabPanel("Interpolate [3]",
                            verbatimTextOutput("interp_status"),
                            plotOutput("plot_iso_best_logZ", height = "400px"),
                            plotOutput("plot_iso_best_logG", height = "400px"),
@@ -314,10 +329,10 @@ ui = fluidPage(
                            plotOutput("plot_atmos_error_logG", height = "400px"),
                            plotOutput("plot_atmos_error_logT", height = "400px")
                   ),
-                  tabPanel("IMF",
+                  tabPanel("IMF [4]",
                            plotOutput("plot_imf", height = "600px")
                   ),
-                  tabPanel("Make SSP",
+                  tabPanel("Make SSP [5]",
                            tags$h4("Pre-requisite Inputs Status:"),
                            uiOutput("used_imf"),
                            tags$h4("[Make SSP] Status:"),
@@ -328,7 +343,7 @@ ui = fluidPage(
                            tags$h4("[Return SSP] Status:"),
                            uiOutput("SSP_return")
                   ),
-                  tabPanel("Test SSP",
+                  tabPanel("Test SSP [6]",
                            plotOutput("plot_spec", height = "600px")
                   ),
                   tabPanel("Iso Info",

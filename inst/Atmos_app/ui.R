@@ -185,7 +185,7 @@ ui = fluidPage(
  <p>
  The sub sections below provide basic information on the related tabs, and in general users should progress their ProGeny journey from left to right, so:
  </p>
- 
+
  <p>
 <div style='text-align:center; font-size:14px; line-height:1.5em;'>
       Isochrone [1] <br> ↓ <br>
@@ -196,7 +196,7 @@ ui = fluidPage(
       Test SSP [6]
 </div>
  </p
- 
+
  <p>
 The additional tabs beyond that provide a bit more information about the data underlying the Isochrone and Atmospheres tabs. There is much more information available through the ProGeny papers and R package itself, so if you need much more information that this you should look there (before getting in touch with questions those cover).
 </p>
@@ -306,8 +306,8 @@ The additional tabs beyond that provide a bit more information about the data un
  <p>
  <li>Aaron Robotham (creator ProGeny, ICRAR-UWA)</li>
  <li>Sabine Bellstedt (contributor ProGeny, ICRAR-UWA)</li>
- <li>Arianna Ranabhat (ProGeny App assistance, Data Central - Macquarie University)</li>
- <li>Dior Etherton (ProGeny App assistance, Data Central & ICRAR - UWA)</li>
+ <li>Arianna Ranabhat (ProGeny web app assistance, Data Central - Macquarie University)</li>
+ <li>Dior Etherton (ProGeny web app assistance, Data Central & ICRAR - UWA)</li>
  </p>
  ")
                   ),

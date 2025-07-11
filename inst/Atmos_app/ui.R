@@ -301,6 +301,14 @@ The additional tabs beyond that provide a bit more information about the data un
  <p>
  Basic info about the available spectral atmospheres (more information is available in the ProGeny package itself).
  </p>
+
+ <h3>Credit</h3>
+ <p>
+ <li>Aaron Robotham (creator ProGeny, ICRAR-UWA)</li>
+ <li>Sabine Bellstedt (contributor ProGeny, ICRAR-UWA)</li>
+ <li>Arianna Ranabhat (ProGeny App assistance, Data Central - Macquarie University)</li>
+ <li>Dior Etherton (ProGeny App assistance, Data Central & ICRAR - UWA)</li>
+ </p>
  ")
                   ),
                   tabPanel("Isochrone [1]",

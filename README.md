@@ -1,6 +1,8 @@
 # ProGeny: Stellar Population Library
 
-**ProGeny** is a stellar population library (SPL) that generates highly flexible simple/single stellar populations (SSPs) that can be directly loaded into the spectral energy distribution (SED) generating and fitting code **ProSpect**. The software is released under a permissive LGPL-3 license.
+**ProGeny** is a stellar population library (SPL) and software package that generates highly flexible simple/single stellar populations (SSPs) that can be directly loaded into the spectral energy distribution (SED) generating and fitting code **ProSpect**. The software is written in **R** and is released under a permissive LGPL-3 license.
+
+If you just want to create SSPs with ProGeny using a simple UI over the web, then please try [progeny.datacentral.org.au](https://progeny.datacentral.org.au). This contains a good fraction of the core functionality, but lacks the ultra high resolution spectral atmospheres, so less well suited to higher resolution (over R~5000 in optical) work.
 
 **ProGeny** is described in detail in the core software paper (ProGeny I: Robotham & Bellstedt, RASTI, 4, 19) and the associated application paper (ProGeny II: Bellstedt & Robotham, MNRAS, 540, 2703), and these papers should both be cited in any work making use of the package, interactive tool (either locally or through the web interface), or its outputs (the static FITS SSPs). 
 

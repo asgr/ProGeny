@@ -304,10 +304,10 @@ The additional tabs beyond that provide a bit more information about the data un
 
  <h3>Credit</h3>
  <p>
- <li>Aaron Robotham (creator ProGeny, ICRAR-UWA)</li>
- <li>Sabine Bellstedt (contributor ProGeny, ICRAR-UWA)</li>
- <li>Arianna Ranabhat (ProGeny web app assistance, Data Central - Macquarie University)</li>
- <li>Dior Etherton (ProGeny web app assistance, Data Central & ICRAR - UWA)</li>
+ <li>Aaron Robotham (creator ProGeny R package and web app, ICRAR-UWA)</li>
+ <li>Sabine Bellstedt (contributor ProGeny development, ICRAR-UWA)</li>
+ <li>Arianna Ranabhat (web app deployment, Data Central - Macquarie University)</li>
+ <li>Dior Etherton (web app deployment, Data Central & ICRAR - UWA)</li>
  </p>
  ")
                   ),

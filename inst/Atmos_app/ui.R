@@ -3,6 +3,7 @@ ProGeny_iso_path = getOption("ProGeny_iso_path", default = "~/Google Drive/My Dr
 ProGeny_atmos_path = getOption("ProGeny_atmos_path", default = "~/Google Drive/My Drive/ProGeny_atmos/")
 
 ui = fluidPage(
+  includeHTML("google-analytics.html"),
   shinybusy::use_busy_spinner(spin = "fading-circle"),
   titlePanel("ProGeny SSP Generator"),
   sidebarLayout(

@@ -177,7 +177,7 @@ ui = fluidPage(
                            HTML("
  <h3>Welcome to ProGeny SSP Generator!</h3>
  <p>
- The <strong>ProGeny simple stellar population (SSP) generator</strong> can be used to create highly flexible SSPs by incorporating the user's choice of isochrones, stellar spectral atmospheres, and IMFs. The various tabs reflect the underlying stages of SSP generation and give users access to nearly 100% of ProGeny's functionality—without needing to learn specific R syntax.
+ The <strong>ProGeny simple stellar population (SSP) generator</strong> can be used to create highly flexible SSPs by incorporating the user's choice of isochrones, stellar spectral atmospheres, and IMFs. The various tabs reflect the underlying stages of SSP generation and give users access to nearly 100% of the ProGeny R package's functionality—without needing to learn specific R syntax. For the fully featured R package please see <a href=https://github.com/asgr/ProGeny>github.com/asgr/ProGeny</a>.
  </p>
  <p>
  The goal is to allow users to generate SSPs and use them directly in ProSpect (as FITS files), or process them for your SED code of choice. For deeper understanding, please refer to the associated papers: <b>Robotham & Bellstedt (2025, RASTI, 4, 19)</b> and <b>Bellstedt & Robotham (2025, MNRAS, 540, 2703)</b>. Any works making use of ProGeny outputs (including this interactive tool) should cite both of those papers.

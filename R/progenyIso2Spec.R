@@ -80,7 +80,8 @@ progenyIso2Spec = function(logAge=8.4, logZ=0, Iso, IMFint, Spec_combine, Interp
     }
     if(!is.null(temp_stack)){
       temp_stack = temp_stack[,list(wt_sum=sum(wt_sum)),by=ID]
-      #spec_stack = spec_stack + as.numeric(t(temp_stack$V1) %*% Spec_combine[[i]]$spec[temp_stack$ID,])*interp_wt
+      #This version didn't seem to help, so removed to reduce complication installing ProGeny
+      #.vec_add_cpp(spec_stack, crossprod(temp_stack$wt_sum, Spec_combine[[i]]$spec[temp_stack$ID,]))
       spec_stack = spec_stack + as.numeric(crossprod(temp_stack$wt_sum, Spec_combine[[i]]$spec[temp_stack$ID,]))
     }
   }
@@ -89,6 +90,8 @@ progenyIso2Spec = function(logAge=8.4, logZ=0, Iso, IMFint, Spec_combine, Interp
 
   if(length(subset > 0)){
     for(sel in subset){
+      #This version didn't seem to help, so removed to reduce complication installing ProGeny
+      #.vec_add_cpp(spec_stack, .blackbody_simp(wave=wave_grid, Temp=Iso[sel,Teff], norm=Iso[sel,Lum]*IMFint[sel])*interp_wt)
       spec_stack = spec_stack + .blackbody_simp(wave=wave_grid, Temp=Iso[sel,Teff], norm=Iso[sel,Lum]*IMFint[sel])*interp_wt
     }
   }

@@ -255,7 +255,7 @@ progenyFindMass = function(tracklist, logAge_lim = c(5,10.3), logAge_bin=0.05, l
 
   temp = temp[!is.na(logAge)]
 
-  #to compute the interplated bicubic fit onto a regular isochrone grid
+  #to compute the interpolated bicubic fit onto a regular isochrone grid
 
   akima.si = akima::interp(temp$logAge, temp$i, log10(temp$Mini),
                            xo=logAge_vec, yo=min(temp$i):max(temp$i),

@@ -18,9 +18,9 @@ progenyIso2Spec = function(logAge=8.4, logZ=0, logA=NULL, Iso, IMFint, Spec_comb
       stop('No logA column in Iso!')
     }
 
-    if(!'logA' %in% colnames(Spec_combine[[1]]$info)){
-      stop('No logA column in base Spec_combine!')
-    }
+    # if(!'logA' %in% colnames(Spec_combine[[1]]$info)){
+    #   stop('No logA column in base Spec_combine!')
+    # }
     IsoA = sort(unique(Iso$logA))
   }
 
@@ -114,7 +114,7 @@ progenyIso2Spec = function(logAge=8.4, logZ=0, logA=NULL, Iso, IMFint, Spec_comb
             temp_stack = rbind(temp_stack, pre_stack)
           }
         }else{
-          if('logA' %in% colnames(Spec_combine[[i]]$info)){
+#          if('logA' %in% colnames(Spec_combine[[i]]$info)){
             for(logA_m in seq_along(logA_steps)){
               logA_step = logA_steps[logA_m]
               interp_wt = logAge_wt[logAge_j]*logZ_wt[logZ_k]*logA_wt[logA_m]
@@ -130,7 +130,7 @@ progenyIso2Spec = function(logAge=8.4, logZ=0, logA=NULL, Iso, IMFint, Spec_comb
                 temp_stack = rbind(temp_stack, pre_stack)
               }
             }
-          }
+#          }
         }
       }
     }

@@ -146,7 +146,8 @@ progenyMakeSSP = function(Iso, IMFfunc = IMF_Chabrier, ..., rem_frac = 'get', Sp
     message('  ',logZ_step)
     output = foreach(logAge_step = logAge_steps)%do%{
       #message('    ',logAge_step)
-      progenyIso2Spec(logAge_step, logZ_step, Iso=Iso_temp, IMFint=Iso_temp$IMFint, Spec_combine, Interp_combine, interp=interp)
+      progenyIso2Spec(logAge=logAge_step, logZ=logZ_step, logA=NULL, Iso=Iso_temp, IMFint=Iso_temp$IMFint,
+                      Spec_combine=Spec_combine, Interp_combine=Interp_combine, interp=interp)
     }
     return(do.call(rbind, output))
   }

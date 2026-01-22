@@ -4,21 +4,21 @@ progenyInterpGrid = function(loc, info, rescale, radius=2, weight_pow=2, k=8){
 
   col_keep = Teff = logG = logZ = NULL
 
-  if(rescale$Teff != -999){
+  if(rescale$Teff != -999 & 'Teff' %in% colnames(loc)){
     has_Teff = TRUE
     col_keep = c(col_keep, 'Teff')
   }else{
     has_Teff = FALSE
   }
 
-  if(rescale$logG != -999){
+  if(rescale$logG != -999 & 'logG' %in% colnames(loc)){
     has_logG = TRUE
     col_keep = c(col_keep, 'logG')
   }else{
     has_logG = FALSE
   }
 
-  if(rescale$logZ != -999){
+  if(rescale$logZ != -999 & 'logZ' %in% colnames(loc)){
     has_logZ = TRUE
     col_keep = c(col_keep, 'logZ')
   }else{
@@ -26,7 +26,7 @@ progenyInterpGrid = function(loc, info, rescale, radius=2, weight_pow=2, k=8){
   }
 
   if(!is.null(rescale$logA)){
-    if(rescale$logA != -999){
+    if(rescale$logA != -999 & 'logA' %in% colnames(loc)){
       has_logA = TRUE
       col_keep = c(col_keep, 'logA')
     }else{

@@ -279,6 +279,37 @@ progenyFindMass = function(tracklist, logAge_lim = c(5,10.3), logAge_bin=0.05, l
   return(rbindlist(output))
 }
 
+progenyExtendIso = function(Iso_base, Iso_extend, label=NA){
+  label_use = label
+  setDT(Iso_base)
+  setDT(Iso_extend)
+
+  Mini_end = Iso_base[,max(Mini),by=list(logZ, logAge)]
+
+  if(identical(label_use, 'base_get')){
+    label_use = Iso_base[,max(label_use)] + 1
+  }
+
+  output = foreach(i = 1:dim(Mini_end)[1])%do%{
+    best_logZ = Iso_extend[which.min(abs(logZ - Mini_end[i,logZ])), logZ]
+    best_logAge = Iso_extend[logZ == best_logZ & Mini >= Mini_end[i,V1], max(logAge)]
+    temp = Iso_extend[logZ == best_logZ & logAge == best_logAge & Mini >= Mini_end[i,V1],]
+    temp[,logZ:=best_logZ]
+    temp[,logAge:=logAge]
+
+    if(!identical(label_use, 'extend_get')){
+      temp[,label:=label_use]
+    }
+
+    return(temp)
+  }
+
+  output = rbindlist(output)
+  output = rbind(Iso_base, output, fill=TRUE)
+  setkey(output, logZ, logAge, Mini)
+  return(output)
+}
+
 # .progenyTagFeatures = function(tracklist, deriv=1, n=1e4, expand=-1:1){
 #   tracklist_temp = copy(tracklist)
 #

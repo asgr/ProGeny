@@ -2,6 +2,7 @@
 \alias{progenyIsochrone}
 \alias{progenyTrackInterp}
 \alias{progenyFindMass}
+\alias{progenyExtendIso}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Isochrone Creation Tools
@@ -14,6 +15,8 @@ progenyTrackInterp(tracklist, target, make_iso = TRUE, logAge_lim = c(5, 10.3),
   logAge_bin = 0.05, iso_type = "approx", cores = 8, logZ_use = 0, ...)
 
 progenyFindMass(tracklist, logAge_lim = c(5,10.3), logAge_bin = 0.05, logZ_use = 0)
+
+progenyExtendIso(Iso_base, Iso_extend, label = NA)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -41,6 +44,15 @@ Integer scalar; the number of cores to run on.
   \item{logZ_use}{
 Numeric scalar; the value of \option{logZ} to use. Isochrones can only be computed meaningfully for a specific metallicity, i.e. these functions need to be run for one value of metallicity at a time.
 }
+  \item{Iso_base}{
+Data.table; isochrone that you want to be extended. This should be missing post-AGB stellar evolution (i.e. remnants) since they are what will be added via \option{Iso_extend}.
+}
+  \item{Iso_extend}{
+Data.table; isochrone that you want to extend with. This should be possessing post-AGB stellar evolution (i.e. remnants) since they are what will be added to \option{Iso_base}.
+}
+  \item{label}{
+Scalar; label to use for the extended isochrones. Options are a value (relevant for \option{Iso_base}); 'base_get', which will find the current largest \option{label} value in \option{Iso_base} and add 1 to it; 'extend_get', which will use whatever is currently in \option{Iso_extend}. Default is NA, which will just set the extended isochrone \option{label} to NA in the output, which is useful for identifying what entries have been added.
+}
   \item{\dots}{
 Other arguments to pass to \code{\link{approxfun}} and \code{specReBin} depending on the setting of \option{iso_type}.
 }
@@ -49,11 +61,15 @@ Other arguments to pass to \code{\link{approxfun}} and \code{specReBin} dependin
 Generally once you have loaded all your track EEP files into the required \option{tracklist} data.table format, you would pass this into \code{progenyFindMass} for you target isochrone grid, and then pass the output of this into the \option{target} argument of \code{progenyTrackInterp} with the isochrone arguments matching. The output of this should then be an isochrone ready to use with other \code{ProGeny} functions for a single metallicity (i.e. you will need to loop through all the \option{logZ} values you want for the final isochrone).
 
 Note there is currently no option of interpolating between metallicity values. Aaron Dotter's Iso also only interpolates within a specific metallicity. A path to doing this manually (for now) would be to run \code{progenyFindMass} for the logZ values either side of the one you want to create; combine them (\code{\link{rbind}}) and compute the unique rows with \code{\link{unique}}; create two target isochrones using the same combined input \option{target} argument (so we know the resulting rows will match 1-1); combine the two output isochrones with linear logZ weights (i.e. if you have logZ 0 and 1 and want 0.5 the weights would be 0.5:0.5 respectively, but if you want 0.2 the weights would be 0.8,0.2 respectively).
+
+\code{progenyExtendIso} will extended \option{Iso_base} using \option{Iso_extend}. The assumption is the provided \option{Iso_base} is missing evolved post-AGN stars and the current end points of stellar evolution will be found; then using \option{Iso_extend} an effort is made to extend these where possible. \option{Iso_extend} must therefore contain post-AGB stars (e.g. MIST or PARSEC). The best matching \option{logZ} is used (with no interpolation), so there may be issues if \option{Iso_base} has a very different \option{logZ} coverage than \option{Iso_base}. The problem is most serious if it extends outside the range (lower or higher).
 }
 \value{
-\code{progenyTrackInterp} outputs an isochrone ready to use in the rest of \code{ProGeny} (usually the \option{Iso} argument). \cr
+\code{progenyTrackInterp} outputs an isochrone data.table ready to use in the rest of \code{ProGeny} (usually the \option{Iso} argument). \cr
 
-\code{progenyFindMass} creates the \option{target} input ready to use in \code{progenyTrackInterp} for a target isochrone.
+\code{progenyFindMass} creates the \option{target} input ready to use in \code{progenyTrackInterp} for a target isochrone. \cr
+
+\code{progenyExtendIso} outputs an isochrone data.table ready to use in the rest of \code{ProGeny} (usually the \option{Iso} argument).
 }
 \references{
 Aaron Dotter, 2016, ApJS, 222, 8D

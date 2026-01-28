@@ -3,6 +3,25 @@ progenyParamWarp = function(x_src, y_src, x_tar, y_tar, check_order = FALSE, ...
   if(!requireNamespace("dtw", quietly = TRUE)){
     stop('The dtw package is needed for this function to work. Please install it from CRAN.', call. = FALSE)
   }
+  
+  if (is.matrix(x_src) || is.data.frame(x_src)) {
+    if (ncol(x_src) == 1) {
+      x_src = unlist(x_src[, 1])
+    }else if (ncol(x_src) == 2) {
+      y_src = unlist(x_src[, 2])
+      x_src = unlist(x_src[, 1])
+    }
+  }
+  
+  if (is.matrix(x_tar) || is.data.frame(x_tar)) {
+    if (ncol(x_tar) == 1) {
+      x_tar = unlist(x_tar[, 1])
+    }else if (ncol(x_tar) == 2) {
+      y_tar = unlist(x_tar[, 2])
+      x_tar = unlist(x_tar[, 1])
+    }
+  }
+  
   stopifnot(length(x_src) == length(y_src),
             length(x_tar) == length(y_tar))
 
@@ -33,24 +52,57 @@ progenyParamWarp = function(x_src, y_src, x_tar, y_tar, check_order = FALSE, ...
 
   suppressWarnings({
     # Build a continuous warp function: x_tar -> x_src
-    warp_tar2src = approxfun(
-      x = x_eval[idx_tar],
-      y = x_eval[idx_src],
-      rule = 1   # set to NA at boundaries
-    )
+    warp_tar2src = function(x, wt=0){
+      suppressWarnings({
+        temp = approxfun(x = x_eval[idx_tar], y = x_eval[idx_src], rule = 1)
+      })
+      temp(x)*(1 - wt) + x*wt
+    }
 
     # Build a continuous warp function: x_src x  -> x_tar
-    warp_src2tar = approxfun(
-      x = x_eval[idx_src],
-      y = x_eval[idx_tar],
-      rule = 1   # set to NA at boundaries
-    )
+    warp_src2tar = function(x, wt=0){
+      suppressWarnings({
+        temp = approxfun(x = x_eval[idx_src], y = x_eval[idx_tar], rule = 1)
+      })
+      temp(x)*(1 - wt) + x*wt
+    }
 
   })
 
   list(
+    src = data.frame(x = x_src, y = y_src),
+    tar = data.frame(x = x_tar, y = y_tar),
     warp_src2tar    = warp_src2tar,        # function: x_src -> x_tar
     warp_tar2src    = warp_tar2src,        # function: x_tar -> x_src
     dtw_alignment   = dtw_alignment
   )
+}
+
+progenyWarpInterp = function(x_src, y_src, x_tar, y_tar,
+                             warp_src2tar, warp_tar2src, wt=0){
+  if (is.matrix(x_src) || is.data.frame(x_src)) {
+    if (ncol(x_src) == 1) {
+      x_src = unlist(x_src[, 1])
+    }else if (ncol(x_src) == 2) {
+      y_src = unlist(x_src[, 2])
+      x_src = unlist(x_src[, 1])
+    }
+  }
+  
+  if (is.matrix(x_tar) || is.data.frame(x_tar)) {
+    if (ncol(x_tar) == 1) {
+      x_tar = unlist(x_tar[, 1])
+    }else if (ncol(x_tar) == 2) {
+      y_tar = unlist(x_tar[, 2])
+      x_tar = unlist(x_tar[, 1])
+    }
+  }
+  
+  suppressWarnings({
+    output = list(
+      x = warp_tar2src(x_tar, wt = wt),
+      y = y_tar*wt + approx(warp_src2tar(x_src, wt=0), y_src, x_tar)$y*(1 - wt)
+    )
+  })
+  return(output)
 }

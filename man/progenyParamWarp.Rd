@@ -62,7 +62,7 @@ x_tar_warped = 10 * ( (x_tar / 10)^1.3 )  # monotone distortion
 ysp_src = smooth.spline(x_src, y_src, spar = 0.6)
 y_tar   = predict(ysp_src, x_tar_warped)$y + rnorm(length(x_tar), sd = 0.05)
 
-fit <- warp_by_curvature_dtw(x_src, y_src, x_tar, y_tar)
+fit = progenyParamWarp(x_src, y_src, x_tar, y_tar)
 
 # Original curves
 magplot(x_src, y_src, type = "l", col = "blue", lwd = 2,

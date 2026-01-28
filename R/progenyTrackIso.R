@@ -294,8 +294,8 @@ progenyExtendIso = function(Iso_base, Iso_extend, label=NA){
     best_logZ = Iso_extend[which.min(abs(logZ - Mini_end[i,logZ])), logZ]
     best_logAge = Iso_extend[logZ == best_logZ & Mini >= Mini_end[i,V1], max(logAge)]
     temp = Iso_extend[logZ == best_logZ & logAge == best_logAge & Mini >= Mini_end[i,V1],]
-    temp[,logZ:=best_logZ]
-    temp[,logAge:=logAge]
+    temp[,logZ:= Mini_end[i,logZ]]
+    temp[,logAge:= Mini_end[i,logAge]]
 
     if(!identical(label_use, 'extend_get')){
       temp[,label:=label_use]

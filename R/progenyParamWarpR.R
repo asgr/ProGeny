@@ -3,7 +3,7 @@ progenyParamWarp = function(x_src, y_src, x_tar, y_tar, check_order = FALSE, ...
   if(!requireNamespace("dtw", quietly = TRUE)){
     stop('The dtw package is needed for this function to work. Please install it from CRAN.', call. = FALSE)
   }
-  
+
   if (is.matrix(x_src) || is.data.frame(x_src)) {
     if (ncol(x_src) == 1) {
       x_src = unlist(x_src[, 1])
@@ -12,7 +12,7 @@ progenyParamWarp = function(x_src, y_src, x_tar, y_tar, check_order = FALSE, ...
       x_src = unlist(x_src[, 1])
     }
   }
-  
+
   if (is.matrix(x_tar) || is.data.frame(x_tar)) {
     if (ncol(x_tar) == 1) {
       x_tar = unlist(x_tar[, 1])
@@ -21,7 +21,7 @@ progenyParamWarp = function(x_src, y_src, x_tar, y_tar, check_order = FALSE, ...
       x_tar = unlist(x_tar[, 1])
     }
   }
-  
+
   stopifnot(length(x_src) == length(y_src),
             length(x_tar) == length(y_tar))
 
@@ -44,6 +44,17 @@ progenyParamWarp = function(x_src, y_src, x_tar, y_tar, check_order = FALSE, ...
   k_tar_obj = smooth.spline(x_tar, y_tar)
   k_tar = predict(k_tar_obj, x_eval)$y
 
+  #to help pin the final value better
+  k_src_N = length(k_src)
+  k_tar_N = length(k_tar)
+  k_src_end = k_src[k_src_N]
+  k_tar_end = k_tar[k_tar_N]
+  if(k_src_end < k_tar_end){
+    k_src = c(k_src, k_tar[max(which(k_tar < k_src_end)):k_tar_N])
+  }else{
+    k_src = c(k_src, k_tar[max(which(k_tar > k_src_end)):k_tar_N])
+  }
+
   # DTW alignment of curvature sequences
   dtw_alignment = dtw::dtw(k_src, k_tar, ...)
 
@@ -52,19 +63,19 @@ progenyParamWarp = function(x_src, y_src, x_tar, y_tar, check_order = FALSE, ...
 
   suppressWarnings({
     # Build a continuous warp function: x_tar -> x_src
-    warp_tar2src = function(x, wt=0){
+    warp_tar2src = function(x, wt=1){
       suppressWarnings({
         temp = approxfun(x = x_eval[idx_tar], y = x_eval[idx_src], rule = 1)
       })
-      temp(x)*(1 - wt) + x*wt
+      temp(x)*wt + x*(1 - wt)
     }
 
     # Build a continuous warp function: x_src x  -> x_tar
-    warp_src2tar = function(x, wt=0){
+    warp_src2tar = function(x, wt=1){
       suppressWarnings({
         temp = approxfun(x = x_eval[idx_src], y = x_eval[idx_tar], rule = 1)
       })
-      temp(x)*(1 - wt) + x*wt
+      temp(x)*wt + x*(1 - wt)
     }
 
   })
@@ -78,8 +89,16 @@ progenyParamWarp = function(x_src, y_src, x_tar, y_tar, check_order = FALSE, ...
   )
 }
 
-progenyWarpInterp = function(x_src, y_src, x_tar, y_tar,
-                             warp_src2tar, warp_tar2src, wt=0){
+progenyWarpInterp = function(x_src, y_src, x_tar, y_tar, ParamWarp_out, wt=0){
+
+  if(missing(x_src)){
+    x_src = ParamWarp_out$src
+  }
+
+  if(missing(x_tar)){
+    x_tar = ParamWarp_out$tar
+  }
+
   if (is.matrix(x_src) || is.data.frame(x_src)) {
     if (ncol(x_src) == 1) {
       x_src = unlist(x_src[, 1])
@@ -88,7 +107,7 @@ progenyWarpInterp = function(x_src, y_src, x_tar, y_tar,
       x_src = unlist(x_src[, 1])
     }
   }
-  
+
   if (is.matrix(x_tar) || is.data.frame(x_tar)) {
     if (ncol(x_tar) == 1) {
       x_tar = unlist(x_tar[, 1])
@@ -97,11 +116,11 @@ progenyWarpInterp = function(x_src, y_src, x_tar, y_tar,
       x_tar = unlist(x_tar[, 1])
     }
   }
-  
+
   suppressWarnings({
-    output = list(
-      x = warp_tar2src(x_tar, wt = wt),
-      y = y_tar*wt + approx(warp_src2tar(x_src, wt=0), y_src, x_tar)$y*(1 - wt)
+    output = data.frame(
+      x = ParamWarp_out$warp_tar2src(x_tar, wt = 1 - wt),
+      y = y_tar*wt + approx(ParamWarp_out$warp_src2tar(x_src, wt=1), y_src, x_tar)$y*(1 - wt)
     )
   })
   return(output)

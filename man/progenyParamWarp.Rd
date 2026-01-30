@@ -100,6 +100,94 @@ legend("bottomleft", legend = c("Source", "Target", "Source Warp"),
 
 magplot(fit$warp_src2tar, xlim=c(0,10), xlab='x_src', ylab='x_tar')
 abline(0,1,lty=2)
+
+\dontrun{
+#this is an example with the pre-made ProGeny MIST isochrone, were we want to interpolate between ages:
+library(fst)
+library(foreach)
+library(data.table)
+
+Iso_Mist = read.fst('/path/to/ProGeny_isochrone/MistIso.fst', as.data.table = TRUE)
+
+# Imagine we have logAge = 9 and 9.2 available:
+src = Iso_MIST[abs(logAge - 9) < 1e-4 & logZ==0, list(Mini, logL=log10(Lum), logT=log10(Teff), logG)]
+tar = Iso_MIST[abs(logAge - 9.2) < 1e-4 & logZ==0, list(Mini, logL=log10(Lum), logT=log10(Teff), logG)]
+# And we wish to create logAge = 9.1:
+cmp = Iso_MIST[abs(logAge - 9.1) < 1e-4 & logZ==0, list(Mini, logL=log10(Lum), logT=log10(Teff), logG)]
+
+#Fit it:
+fit = progenyParamWarp(x_src=src, x_tar=tar, smooth=FALSE)
+
+#Plot some results:
+par(mfrow = c(3, 1))
+par(mar=c(3.1,3.1,1.1,1.1))
+magplot(src$Mini, src$logL, type = "l", col = "blue", xlab = "Mini / Msol", ylab = "Lum / Lsol", unlog='y')
+lines(tar$Mini, tar$logL, col = "red")
+lines(fit$warp_src2tar(src$Mini), src$logL, col='blue', lty=2)
+legend("topleft", legend = c("Source", "Target", "Source Warp"), col = c("blue", "red", "blue"), lty = c(1,1,2), bty = "n")
+
+par(mar=c(3.1,3.1,1.1,1.1))
+magplot(src$Mini, src$logT, type = "l", col = "blue", xlab = "Mini / Msol", ylab = "Teff / K", unlog='y')
+lines(tar$Mini, tar$logT, col = "red")
+lines(fit$warp_src2tar(src$Mini), src$logT, col='blue', lty=2)
+legend("topleft", legend = c("Source", "Target", "Source Warp"), col = c("blue", "red", "blue"), lty = c(1,1,2), bty = "n")
+
+par(mar=c(3.1,3.1,1.1,1.1))
+magplot(src$Mini, src$logG, type = "l", col = "blue", xlab = "Mini / Msol", ylab = "logG")
+lines(tar$Mini, tar$logG, col = "red")
+lines(fit$warp_src2tar(src$Mini), src$logG, col='blue', lty=2)
+legend("topleft", legend = c("Source", "Target", "Source Warp"), col = c("blue", "red", "blue"), lty = c(1,1,2), bty = "n")
+
+#Now interpolate to our target age:
+wt = 0.5 # 0.5 since we are comparing to an isochrone halfway in logAge space
+temp_warp = progenyWarpInterp(x_src = src, x_tar = tar, ParamWarp_out = fit, wt=wt)
+
+par(mfrow = c(4, 1))
+par(mar=c(3.1,3.1,1.1,1.1))
+magplot(src$Mini, src$logL, type = "l", col = "blue", xlab = "Mini / Msol", ylab = "Lum / Lsol", unlog='y')
+lines(tar$Mini, tar$logL, col = "red")
+lines(cmp$Mini, cmp$logL, col = "darkgreen")
+lines(temp_warp$Mini, temp_warp$logL, col='blue', lty=2)
+legend("topleft", legend = c("Source", "Target", "Compare", "Source Warp"), col = c("blue", "red", 'darkgreen', "blue"), lty = c(1,1,1,2), bty = "n")
+
+par(mar=c(3.1,3.1,1.1,1.1))
+magplot(src$Mini, src$logT, type = "l", col = "blue", xlab = "Mini / Msol", ylab = "Teff / K", unlog='y')
+lines(tar$Mini, tar$logT, col = "red")
+lines(cmp$Mini, cmp$logT, col = "darkgreen")
+lines(temp_warp$Mini, temp_warp$logT, col='blue', lty=2)
+legend("topleft", legend = c("Source", "Target", "Compare", "Source Warp"), col = c("blue", "red", 'darkgreen', "blue"), lty = c(1,1,1,2), bty = "n")
+
+par(mar=c(3.1,3.1,1.1,1.1))
+magplot(src$Mini, src$logG, type = "l", col = "blue", xlab = "Mini / Msol", ylab = "logG")
+lines(tar$Mini, tar$logG, col = "red")
+lines(cmp$Mini, cmp$logG, col = "darkgreen")
+lines(temp_warp$Mini, temp_warp$logG, col='blue', lty=2)
+legend("topleft", legend = c("Source", "Target", "Compare", "Source Warp"), col = c("blue", "red", 'darkgreen', "blue"), lty = c(1,1,1,2), bty = "n")
+
+# Mass mapping is a special case, because in general we just need to scale it:
+mass_scale = max(temp_warp$Mini)/max(src$Mini)
+par(mar=c(3.1,3.1,1.1,1.1))
+magplot(src$Mini, Iso_MIST[abs(logAge - 9) < 1e-4 & logZ==0,Mass], type = "l", col = "blue", xlab = "Mini / Msol", ylab = "Mass / Msol")
+lines(tar$Mini, Iso_MIST[abs(logAge - 9.2) < 1e-4 & logZ==0,Mass], col = "red")
+lines(cmp$Mini, Iso_MIST[abs(logAge - 9.1) < 1e-4 & logZ==0,Mass], col = "darkgreen")
+lines(src$Mini*mass_scale, Iso_MIST[abs(logAge - 9) < 1e-4 & logZ==0,Mass]*mass_scale, col='blue', lty=2)
+legend("topleft", legend = c("Source", "Target", "Compare", "Source Warp"), col = c("blue", "red", 'darkgreen', "blue"), lty = c(1,1,1,2), bty = "n")
+
+# Look at the classic Teff versus logG space:
+par(mfrow = c(2, 1))
+magplot(src$logT, src$logG, type = "l", col = "blue", xlab = "Teff / K", ylab = "logG", unlog='x')
+lines(tar$logT, tar$logG, col = "red")
+lines(cmp$logT, cmp$logG, col = "darkgreen")
+lines(temp_warp$logT, temp_warp$logG, col='blue', lty=2)
+legend("bottomright", legend = c("Source", "Target", "Compare", "Source Warp"), col = c("blue", "red", 'darkgreen', "blue"), lty = c(1,1,1,2), bty = "n")
+
+# Definitely not perfect, but not too bad:
+magplot(src$logT, src$logG, type = "l", col = "blue", xlab = "Teff / K", ylab = "logG", unlog='x', xlim=c(3.5,4), ylim=c(3,4))
+lines(tar$logT, tar$logG, col = "red")
+lines(cmp$logT, cmp$logG, col = "darkgreen")
+lines(temp_warp$logT, temp_warp$logG, col='blue', lty=2)
+legend("bottomright", legend = c("Source", "Target", "Compare", "Source Warp"), col = c("blue", "red", 'darkgreen', "blue"), lty = c(1,1,1,2), bty = "n")
+}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory (show via RShowDoc("KEYWORDS")):

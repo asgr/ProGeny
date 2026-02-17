@@ -16,7 +16,7 @@ progenyTrackInterp(tracklist, target, make_iso = TRUE, logAge_lim = c(5, 10.3),
 
 progenyFindMass(tracklist, logAge_lim = c(5,10.3), logAge_bin = 0.05, logZ_use = 0)
 
-progenyExtendIso(Iso_base, Iso_extend, label = NA)
+progenyExtendIso(Iso_base, Iso_extend, label = NA, logA = NA)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -52,6 +52,9 @@ Data.table; isochrone that you want to extend with. This should be possessing po
 }
   \item{label}{
 Scalar; label to use for the extended isochrones. Options are a value (relevant for \option{Iso_base}); 'base_get', which will find the current largest \option{label} value in \option{Iso_base} and add 1 to it; 'extend_get', which will use whatever is currently in \option{Iso_extend}. Default is NA, which will just set the extended isochrone \option{label} to NA in the output, which is useful for identifying what entries have been added.
+}
+  \item{logA}{
+Scalar; logA to use for the extended isochrones. Options are a value (relevant for \option{Iso_base}); 'base_get', which will find the current largest \option{logA} value in \option{Iso_base} and use that; 'extend_get', which will use whatever is currently in \option{Iso_extend}. Default is NA, which will just set the extended isochrone \option{label} to NA in the output, which is useful for identifying what entries have been added. Note this is only relevant if one or both of \option{Iso_base} and/or \option{Iso_extend} contain a \option{logA} column.
 }
   \item{\dots}{
 Other arguments to pass to \code{\link{approxfun}} and \code{specReBin} depending on the setting of \option{iso_type}.

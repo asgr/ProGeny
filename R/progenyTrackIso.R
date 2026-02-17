@@ -279,15 +279,21 @@ progenyFindMass = function(tracklist, logAge_lim = c(5,10.3), logAge_bin=0.05, l
   return(rbindlist(output))
 }
 
-progenyExtendIso = function(Iso_base, Iso_extend, label=NA){
+progenyExtendIso = function(Iso_base, Iso_extend, label=NA, logA=NA){
   label_use = label
+  logA_use = logA
+
   setDT(Iso_base)
   setDT(Iso_extend)
 
   Mini_end = Iso_base[,max(Mini),by=list(logZ, logAge)]
 
   if(identical(label_use, 'base_get')){
-    label_use = Iso_base[,max(label_use)] + 1
+    label_use = Iso_base[,max(label, na.rm=TRUE)] + 1
+  }
+
+  if(identical(logA_use, 'base_get')){
+    logA_use = Iso_base[,max(logA, na.rm=TRUE)] + 1
   }
 
   output = foreach(i = 1:dim(Mini_end)[1])%do%{
@@ -297,8 +303,10 @@ progenyExtendIso = function(Iso_base, Iso_extend, label=NA){
     temp[,logZ:= Mini_end[i,logZ]]
     temp[,logAge:= Mini_end[i,logAge]]
 
-    if(!identical(label_use, 'extend_get')){
-      temp[,label:=label_use]
+    if(!is.na(label_use)){
+      if(!identical(label_use, 'extend_get')){
+        temp[,label:=label_use]
+      }
     }
 
     return(temp)
@@ -306,6 +314,13 @@ progenyExtendIso = function(Iso_base, Iso_extend, label=NA){
 
   output = rbindlist(output)
   output = rbind(Iso_base, output, fill=TRUE)
+
+  if('logA' %in% colnames(output) & !is.na(logA_use)){
+    if(!identical(logA_use, 'extend_get')){
+      output[is.na(logA), logA:=logA_use]
+    }
+  }
+
   setkey(output, logZ, logAge, Mini)
   return(output)
 }

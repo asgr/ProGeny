@@ -37,7 +37,7 @@ Data.frame / data.table; the input table of Isochrones. This must have a particu
 List; the required spectral atmspheres. This must be loaded via \code{\link{progenyAtmosLoad}}, where the inputs for that come via \code{\link{progenyAtmosDownload}}.
 }
   \item{add}{
-Logical; should information be added to the current plot device (TRUE) or should a fresh plot be made (FALSE).
+Logical; should information be added to the current plot device (TRUE) or should a fresh plot be made (FALSE). This is useful for overlaying \code{progenyIsoPlot} on \code{progenyAtmosPlot}.
 }
   \item{Nsamp}{
 Numeric/character scalar; the sparse sampling of the \option{Iso} being plotted. Since these are large you generally do not want to plot all points. Setting to 'all' will plot all points.
@@ -49,7 +49,7 @@ Integer scalar; random seed to use when sparse sampling with \option{Nsamp}.
 Character scalar; the column to use for x axis in \code{\link{magrun}}.
 }
   \item{zsel}{
-Character scalar; the column to use for z axis colouring.
+Character scalar; the column to use for z axis colouring. Any column present in \option{Iso} can be used.
 }
   \item{zunit}{
 Character scalar; the units for \option{zsel} (used for plot labelling).
@@ -107,7 +107,13 @@ Additional arguments to pass to the \code{\link{points}} plotting function.
 }
 }
 \details{
-TBD
+\code{progenyIsoPlot} produces a plot if Teff versus logG coverage. Generally added on top of \code{progenyAtmosPlot} by setting \option{add} = TRUE. \cr
+
+\code{progenyAtmosPlot} produces a plot if Teff versus logG coverage. \cr
+
+\code{progenyIsoBestPlot} shows which atmosphere spectral library is being used as a function of different isochrone properties (so useful to check for good/poor coverage). \cr
+
+\code{progenyAtmosErrorPlot} reveals if there are large parameter mismatches when interpolating the atmospheris spectra onto the isochrones.
 }
 \value{
 Nothing, run for the side effect of generating plot (or plot points).

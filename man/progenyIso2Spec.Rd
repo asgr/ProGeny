@@ -8,8 +8,8 @@ Convert a Specific Age and Z Isochrone and IMF to a Stacked Spectrum
 Given a full Isochrone table and IMF, this will subset by a target Age and Z and stacked all the best matching spectral atmospheres to make a single galaxy spectrum. Running this with all Age and Z combinations is basically how we construct a full SSP (with \code{\link{progenyMakeSSP}}).
 }
 \usage{
-progenyIso2Spec(logAge = 8.4, logZ = 0, Iso, IMFint, Spec_combine, Interp_combine,
-  interp = FALSE)
+progenyIso2Spec(logAge = 8.4, logZ = 0, logA = NULL, Iso, IMFint, Spec_combine,
+  Interp_combine, interp = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -18,6 +18,9 @@ Numeric scalar; target log10 Age in Gyrs.
 }
   \item{logZ}{
 Numeric scalar; target log10 Z (relative to solar, where \option{logZ} = 0 means solar).
+}
+  \item{logA}{
+Numeric scalar; target log10 Alpha abundance (relative to solar, where \option{logA} = 0 means solar abundance). If NULL it is ignored. This is only relevant when \option{Iso} contains a logA column (otherwise it is ignored). Note isochrone to spectral matching will have already been carried out when making \option{Interp_combine} (which can also use and interpolate \option{logA}), so the interpolation we are talking about here is just between isochrone \option{logA}. In practice all current isochrones have fixed abundance, but you could combine together the varying abundance BaSTI ischrones (-0.2, 0 and +0.4 dex options) to allow interpolation between values (+0.2 dex, say).
 }
   \item{Iso}{
 Data.frame / data.table; the input table of Isochrones. This must have a particular format (see ParsecIso in \code{\link{progenyIsoDownload}}).

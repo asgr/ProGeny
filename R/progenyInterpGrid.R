@@ -4,25 +4,36 @@ progenyInterpGrid = function(loc, info, rescale, radius=2, weight_pow=2, k=8){
 
   col_keep = Teff = logG = logZ = NULL
 
-  if(rescale$Teff != -999){
+  if(rescale$Teff != -999 & 'Teff' %in% colnames(loc)){
     has_Teff = TRUE
     col_keep = c(col_keep, 'Teff')
   }else{
     has_Teff = FALSE
   }
 
-  if(rescale$logG != -999){
+  if(rescale$logG != -999 & 'logG' %in% colnames(loc)){
     has_logG = TRUE
     col_keep = c(col_keep, 'logG')
   }else{
     has_logG = FALSE
   }
 
-  if(rescale$logZ != -999){
+  if(rescale$logZ != -999 & 'logZ' %in% colnames(loc)){
     has_logZ = TRUE
     col_keep = c(col_keep, 'logZ')
   }else{
     has_logZ = FALSE
+  }
+
+  if(!is.null(rescale$logA)){
+    if(rescale$logA != -999 & 'logA' %in% colnames(loc)){
+      has_logA = TRUE
+      col_keep = c(col_keep, 'logA')
+    }else{
+      has_logA = FALSE
+    }
+  }else{
+    has_logA = FALSE
   }
 
   loc_local = copy(loc[,..col_keep])
@@ -41,6 +52,11 @@ progenyInterpGrid = function(loc, info, rescale, radius=2, weight_pow=2, k=8){
   if(has_logZ){
     loc_local[,logZ:=logZ/rescale$logZ]
     info_local[,logZ:=logZ/rescale$logZ]
+  }
+
+  if(has_logA){
+    loc_local[,logA:=logA/rescale$logA]
+    info_local[,logA:=logA/rescale$logA]
   }
 
   temp = nn2(info_local, loc_local, k=k, radius=radius, searchtype = 'radius')
@@ -293,23 +309,23 @@ progenyInterpStat = function(Iso, Spec_combine, Interp_combine){
   }
 
   stats = matrix(NA, Iso_len, 3)
-  
+
   if(do1){
     # ID1 = as.integer(Interp_combine[[1]]$nn.idx)
     # ID1[ID1 == 0L] = NA
-    # 
+    #
     # if(doT1){
     #   logT1 = Spec_combine[[1]]$info[ID1,log10(Teff)] - log10(Iso_use$Teff)
     # }else{
     #   logT1 = rep(NA, Iso_len)
     # }
-    # 
+    #
     # if(doG1){
     #   logG1 = Spec_combine[[1]]$info[ID1,logG] - Iso_use$logG
     # }else{
     #   logG1 = rep(NA, Iso_len)
     # }
-    # 
+    #
     # if(doZ1){
     #   logZ1 = Spec_combine[[1]]$info[ID1,logZ] - Iso_use$logZ
     # }else{
@@ -317,15 +333,15 @@ progenyInterpStat = function(Iso, Spec_combine, Interp_combine){
     # }
     sel1 = Iso_use[best == 1L,, which = TRUE]
     SpecID1 = as.integer(Interp_combine[[1]]$nn.idx[sel1,1])
-    
+
     if(doT1){
       stats[sel1,1] = Spec_combine[[1]]$info[SpecID1,log10(Teff)] - log10(Iso_use[sel1,Teff])
     }
-    
+
     if(doG1){
       stats[sel1,2] = Spec_combine[[1]]$info[SpecID1,logG] - Iso_use[sel1,logG]
     }
-    
+
     if(doZ1){
       stats[sel1,3] = Spec_combine[[1]]$info[SpecID1,logZ] - Iso_use[sel1,logZ]
     }
@@ -334,15 +350,15 @@ progenyInterpStat = function(Iso, Spec_combine, Interp_combine){
   if(do2){
     sel2 = Iso_use[best == 2L,, which = TRUE]
     SpecID2 = as.integer(Interp_combine[[2]]$nn.idx[sel2,1])
-    
+
     if(doT2){
       stats[sel2,1] = Spec_combine[[2]]$info[SpecID2,log10(Teff)] - log10(Iso_use[sel2,Teff])
     }
-    
+
     if(doG2){
       stats[sel2,2] = Spec_combine[[2]]$info[SpecID2,logG] - Iso_use[sel2,logG]
     }
-    
+
     if(doZ2){
       stats[sel2,3] = Spec_combine[[2]]$info[SpecID2,logZ] - Iso_use[sel2,logZ]
     }
@@ -351,15 +367,15 @@ progenyInterpStat = function(Iso, Spec_combine, Interp_combine){
   if(do3){
     sel3 = Iso_use[best == 3L,, which = TRUE]
     SpecID3 = as.integer(Interp_combine[[3]]$nn.idx[sel3,1])
-    
+
     if(doT3){
       stats[sel3,1] = Spec_combine[[3]]$info[SpecID3,log10(Teff)] - log10(Iso_use[sel3,Teff])
     }
-    
+
     if(doG3){
       stats[sel3,2] = Spec_combine[[3]]$info[SpecID3,logG] - Iso_use[sel3,logG]
     }
-    
+
     if(doZ3){
       stats[sel3,3] = Spec_combine[[3]]$info[SpecID3,logZ] - Iso_use[sel3,logZ]
     }
@@ -368,15 +384,15 @@ progenyInterpStat = function(Iso, Spec_combine, Interp_combine){
   if(do4){
     sel4 = Iso_use[best == 4L,, which = TRUE]
     SpecID4 = as.integer(Interp_combine[[4]]$nn.idx[sel4,1])
-    
+
     if(doT4){
       stats[sel4,1] = Spec_combine[[4]]$info[SpecID4,log10(Teff)] - log10(Iso_use[sel4,Teff])
     }
-    
+
     if(doG4){
       stats[sel4,2] = Spec_combine[[4]]$info[SpecID4,logG] - Iso_use[sel4,logG]
     }
-    
+
     if(doZ4){
       stats[sel4,3] = Spec_combine[[4]]$info[SpecID4,logZ] - Iso_use[sel4,logZ]
     }
@@ -385,15 +401,15 @@ progenyInterpStat = function(Iso, Spec_combine, Interp_combine){
   if(do5){
     sel5 = Iso_use[best == 5L,, which = TRUE]
     SpecID5 = as.integer(Interp_combine[[5]]$nn.idx[sel5,1])
-    
+
     if(doT5){
       stats[sel5,1] = Spec_combine[[5]]$info[SpecID5,log10(Teff)] - log10(Iso_use[sel5,Teff])
     }
-    
+
     if(doG5){
       stats[sel5,2] = Spec_combine[[5]]$info[SpecID5,logG] - Iso_use[sel5,logG]
     }
-    
+
     if(doZ5){
       stats[sel5,3] = Spec_combine[[5]]$info[SpecID5,logZ] - Iso_use[sel5,logZ]
     }
@@ -402,15 +418,15 @@ progenyInterpStat = function(Iso, Spec_combine, Interp_combine){
   if(do6){
     sel6 = Iso_use[best == 6L,, which = TRUE]
     SpecID6 = as.integer(Interp_combine[[6]]$nn.idx[sel6,1])
-    
+
     if(doT6){
       stats[sel6,1] = Spec_combine[[6]]$info[SpecID6,log10(Teff)] - log10(Iso_use[sel6,Teff])
     }
-    
+
     if(doG6){
       stats[sel6,2] = Spec_combine[[6]]$info[SpecID6,logG] - Iso_use[sel6,logG]
     }
-    
+
     if(doZ6){
       stats[sel6,3] = Spec_combine[[6]]$info[SpecID6,logZ] - Iso_use[sel6,logZ]
     }
@@ -428,7 +444,7 @@ progenyInterpStat = function(Iso, Spec_combine, Interp_combine){
   #   rowMins(abs(logT[,,5]), na.rm=TRUE),
   #   rowMins(abs(logT[,,6]), na.rm=TRUE)
   # )
-  # 
+  #
   # minG = cbind(
   #   rowMins(abs(logG[,,1]), na.rm=TRUE),
   #   rowMins(abs(logG[,,2]), na.rm=TRUE),
@@ -437,7 +453,7 @@ progenyInterpStat = function(Iso, Spec_combine, Interp_combine){
   #   rowMins(abs(logG[,,5]), na.rm=TRUE),
   #   rowMins(abs(logG[,,6]), na.rm=TRUE)
   # )
-  # 
+  #
   # minZ = cbind(
   #   rowMins(abs(logZ[,,1]), na.rm=TRUE),
   #   rowMins(abs(logZ[,,2]), na.rm=TRUE),
@@ -446,7 +462,7 @@ progenyInterpStat = function(Iso, Spec_combine, Interp_combine){
   #   rowMins(abs(logZ[,,5]), na.rm=TRUE),
   #   rowMins(abs(logZ[,,6]), na.rm=TRUE)
   # )
-  # 
+  #
   # meanT = cbind(
   #   rowMeans(logT[,,1], na.rm=TRUE),
   #   rowMeans(logT[,,2], na.rm=TRUE),
@@ -455,7 +471,7 @@ progenyInterpStat = function(Iso, Spec_combine, Interp_combine){
   #   rowMeans(logT[,,5], na.rm=TRUE),
   #   rowMeans(logT[,,6], na.rm=TRUE)
   # )
-  # 
+  #
   # meanG = cbind(
   #   rowMeans(logG[,,1], na.rm=TRUE),
   #   rowMeans(logG[,,2], na.rm=TRUE),
@@ -464,7 +480,7 @@ progenyInterpStat = function(Iso, Spec_combine, Interp_combine){
   #   rowMeans(logG[,,5], na.rm=TRUE),
   #   rowMeans(logG[,,6], na.rm=TRUE)
   # )
-  # 
+  #
   # meanZ = cbind(
   #   rowMeans(logZ[,,1], na.rm=TRUE),
   #   rowMeans(logZ[,,2], na.rm=TRUE),
@@ -473,21 +489,21 @@ progenyInterpStat = function(Iso, Spec_combine, Interp_combine){
   #   rowMeans(logZ[,,5], na.rm=TRUE),
   #   rowMeans(logZ[,,6], na.rm=TRUE)
   # )
-  # 
+  #
   # logT_min = minT[cbind(1:Iso_len, best_ID)]
   # logT_min[!is.finite(logT_min)] = NA
   # logG_min = minG[cbind(1:Iso_len, best_ID)]
   # logG_min[!is.finite(logG_min)] = NA
   # logZ_min = minZ[cbind(1:Iso_len, best_ID)]
   # logZ_min[!is.finite(logZ_min)] = NA
-  # 
+  #
   # logT_mean = meanT[cbind(1:Iso_len, best_ID)]
   # logT_mean[!is.finite(logT_mean)] = NA
   # logG_mean = meanG[cbind(1:Iso_len, best_ID)]
   # logG_mean[!is.finite(logG_mean)] = NA
   # logZ_mean = meanZ[cbind(1:Iso_len, best_ID)]
   # logZ_mean[!is.finite(logZ_mean)] = NA
-  
+
   # stats = data.frame(
   #   logT_min = logT_min,
   #   logG_min = logG_min,
@@ -496,22 +512,22 @@ progenyInterpStat = function(Iso, Spec_combine, Interp_combine){
   #   logG_mean = logG_mean,
   #   logZ_mean = logZ_mean
   # )
-  
+
   colnames(stats) = c('logT_diff', 'logG_diff', 'logZ_diff')
 
   Iso_use = cbind(Iso_use[,1:9], as.data.table(stats))
-  
+
   logT_diff_med = median(Iso_use$logT_diff, na.rm=TRUE)
   logG_diff_med = median(Iso_use$logG_diff, na.rm=TRUE)
   logZ_diff_med = median(Iso_use$logZ_diff, na.rm=TRUE)
-  
+
   logT_diff_sd = sd(Iso_use$logT_diff, na.rm=TRUE)
   logG_diff_sd = sd(Iso_use$logG_diff, na.rm=TRUE)
   logZ_diff_sd = sd(Iso_use$logZ_diff, na.rm=TRUE)
-  
+
   stat_out = data.table(stat = c('logT_diff_med', 'logG_diff_med', 'logZ_diff_med', 'logT_diff_sd', 'logG_diff_sd', 'logZ_diff_sd'),
              val = c(logT_diff_med, logG_diff_med, logZ_diff_med, logT_diff_sd, logG_diff_sd, logZ_diff_sd)
             )
-  
+
   return(list(Iso = Iso_use, stat = stat_out))
 }

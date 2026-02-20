@@ -32,7 +32,7 @@ Numeric vector / matrix / data.frame; y target data we want to maximially overla
 Logical; should smoothing be applied to the inputs? Usually some smoothing is a good thing, but features can also be lost which might make warping harder (probably worth trying both options).
 }
   \item{check_order}{
-Logical; should \option{x_src} and \option{x_tar} be checked for sorting
+Logical; should \option{x_src} and \option{x_tar} be checked for sorting. If already sorted (either ascending or descending is fine) leave this as FALSE since it will run faster.
 }
   \item{open.end}{
 Logical; can the end points be open (TRUE) or should they be forced to align (FALSE). For isochrones this usually need to be set to TRUE.
@@ -106,8 +106,9 @@ abline(0,1,lty=2)
 library(fst)
 library(foreach)
 library(data.table)
+library(magicaxis)
 
-Iso_Mist = read.fst('/path/to/ProGeny_isochrone/MistIso.fst', as.data.table = TRUE)
+Iso_MIST = read.fst('/path/to/ProGeny_isochrone/MistIso.fst', as.data.table = TRUE)
 
 # Imagine we have logAge = 9 and 9.2 available:
 src = Iso_MIST[abs(logAge - 9) < 1e-4 & logZ==0, list(Mini, logL=log10(Lum), logT=log10(Teff), logG)]
@@ -147,22 +148,22 @@ par(mar=c(3.1,3.1,1.1,1.1))
 magplot(src$Mini, src$logL, type = "l", col = "blue", xlab = "Mini / Msol", ylab = "Lum / Lsol", unlog='y')
 lines(tar$Mini, tar$logL, col = "red")
 lines(cmp$Mini, cmp$logL, col = "darkgreen")
-lines(temp_warp$Mini, temp_warp$logL, col='blue', lty=2)
-legend("topleft", legend = c("Source", "Target", "Compare", "Source Warp"), col = c("blue", "red", 'darkgreen', "blue"), lty = c(1,1,1,2), bty = "n")
+lines(temp_warp$Mini, temp_warp$logL, col="darkgreen", lty=2)
+legend("topleft", legend = c("Source", "Target", "Compare", "Param Warp"), col = c("blue", "red", 'darkgreen', "darkgreen"), lty = c(1,1,1,2), bty = "n")
 
 par(mar=c(3.1,3.1,1.1,1.1))
 magplot(src$Mini, src$logT, type = "l", col = "blue", xlab = "Mini / Msol", ylab = "Teff / K", unlog='y')
 lines(tar$Mini, tar$logT, col = "red")
 lines(cmp$Mini, cmp$logT, col = "darkgreen")
-lines(temp_warp$Mini, temp_warp$logT, col='blue', lty=2)
-legend("topleft", legend = c("Source", "Target", "Compare", "Source Warp"), col = c("blue", "red", 'darkgreen', "blue"), lty = c(1,1,1,2), bty = "n")
+lines(temp_warp$Mini, temp_warp$logT, col="darkgreen", lty=2)
+legend("topleft", legend = c("Source", "Target", "Compare", "Param Warp"), col = c("blue", "red", 'darkgreen', "darkgreen"), lty = c(1,1,1,2), bty = "n")
 
 par(mar=c(3.1,3.1,1.1,1.1))
 magplot(src$Mini, src$logG, type = "l", col = "blue", xlab = "Mini / Msol", ylab = "logG")
 lines(tar$Mini, tar$logG, col = "red")
 lines(cmp$Mini, cmp$logG, col = "darkgreen")
-lines(temp_warp$Mini, temp_warp$logG, col='blue', lty=2)
-legend("topleft", legend = c("Source", "Target", "Compare", "Source Warp"), col = c("blue", "red", 'darkgreen', "blue"), lty = c(1,1,1,2), bty = "n")
+lines(temp_warp$Mini, temp_warp$logG, col="darkgreen", lty=2)
+legend("topleft", legend = c("Source", "Target", "Compare", "Param Warp"), col = c("blue", "red", 'darkgreen', "darkgreen"), lty = c(1,1,1,2), bty = "n")
 
 # Mass mapping is a special case, because in general we just need to scale it:
 mass_scale = max(temp_warp$Mini)/max(src$Mini)
@@ -170,23 +171,33 @@ par(mar=c(3.1,3.1,1.1,1.1))
 magplot(src$Mini, Iso_MIST[abs(logAge - 9) < 1e-4 & logZ==0,Mass], type = "l", col = "blue", xlab = "Mini / Msol", ylab = "Mass / Msol")
 lines(tar$Mini, Iso_MIST[abs(logAge - 9.2) < 1e-4 & logZ==0,Mass], col = "red")
 lines(cmp$Mini, Iso_MIST[abs(logAge - 9.1) < 1e-4 & logZ==0,Mass], col = "darkgreen")
-lines(src$Mini*mass_scale, Iso_MIST[abs(logAge - 9) < 1e-4 & logZ==0,Mass]*mass_scale, col='blue', lty=2)
-legend("topleft", legend = c("Source", "Target", "Compare", "Source Warp"), col = c("blue", "red", 'darkgreen', "blue"), lty = c(1,1,1,2), bty = "n")
+lines(src$Mini*mass_scale, Iso_MIST[abs(logAge - 9) < 1e-4 & logZ==0,Mass]*mass_scale, col="darkgreen", lty=2)
+legend("topleft", legend = c("Source", "Target", "Compare", "Param Warp"), col = c("blue", "red", 'darkgreen', "darkgreen"), lty = c(1,1,1,2), bty = "n")
 
 # Look at the classic Teff versus logG space:
-par(mfrow = c(2, 1))
+par(mfrow = c(3, 1))
+par(mar=c(3.1,3.1,1.1,1.1))
 magplot(src$logT, src$logG, type = "l", col = "blue", xlab = "Teff / K", ylab = "logG", unlog='x')
 lines(tar$logT, tar$logG, col = "red")
 lines(cmp$logT, cmp$logG, col = "darkgreen")
-lines(temp_warp$logT, temp_warp$logG, col='blue', lty=2)
-legend("bottomright", legend = c("Source", "Target", "Compare", "Source Warp"), col = c("blue", "red", 'darkgreen', "blue"), lty = c(1,1,1,2), bty = "n")
+lines(temp_warp$logT, temp_warp$logG, col="darkgreen", lty=2)
+legend("bottomright", legend = c("Source", "Target", "Compare", "Param Warp"), col = c("blue", "red", 'darkgreen', "darkgreen"), lty = c(1,1,1,2), bty = "n")
 
 # Definitely not perfect, but not too bad:
-magplot(src$logT, src$logG, type = "l", col = "blue", xlab = "Teff / K", ylab = "logG", unlog='x', xlim=c(3.5,4), ylim=c(3,4))
+par(mar=c(3.1,3.1,1.1,1.1))
+magplot(src$logT, src$logG, type = "l", col = "blue", xlab = "Teff / K", ylab = "logG", xlim=c(3.7,3.9), ylim=c(3,4))
 lines(tar$logT, tar$logG, col = "red")
 lines(cmp$logT, cmp$logG, col = "darkgreen")
-lines(temp_warp$logT, temp_warp$logG, col='blue', lty=2)
-legend("bottomright", legend = c("Source", "Target", "Compare", "Source Warp"), col = c("blue", "red", 'darkgreen', "blue"), lty = c(1,1,1,2), bty = "n")
+lines(temp_warp$logT, temp_warp$logG, col="darkgreen", lty=2)
+legend("bottomright", legend = c("Source", "Target", "Compare", "Param Warp"), col = c("blue", "red", 'darkgreen', "darkgreen"), lty = c(1,1,1,2), bty = "n")
+
+# TP AGB region is complex to interpolate too:
+par(mar=c(3.1,3.1,1.1,1.1))
+magplot(src$logT, src$logG, type = "l", col = "blue", xlab = "Teff / K", ylab = "logG", xlim=c(3.4,3.6), ylim=c(-1,0))
+lines(tar$logT, tar$logG, col = "red")
+lines(cmp$logT, cmp$logG, col = "darkgreen")
+lines(temp_warp$logT, temp_warp$logG, col="darkgreen", lty=2)
+legend("bottomright", legend = c("Source", "Target", "Compare", "Param Warp"), col = c("blue", "red", 'darkgreen', "darkgreen"), lty = c(1,1,1,2), bty = "n")
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

@@ -1,0 +1,370 @@
+---
+title: "ProGeny: Isochrone Interpolation"
+author: "Aaron Robotham"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: flatly
+    highlight: tango
+vignette: >
+  %\VignetteIndexEntry{ProGeny: Isochrone Interpolation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 7,
+  fig.align = "center"
+)
+
+```
+
+Load the libraries we will need:
+
+```{r}
+library(ProGeny)
+library(fst)
+library(foreach)
+library(data.table)
+library(magicaxis)
+```
+
+## Overview
+
+A common challenge when working with stellar isochrones is that the same physical 
+parameter (e.g. initial stellar mass, `Mini`) traces the same evolutionary features 
+across different ages or metallicities — but not in a perfectly linear way. The x-axis 
+values that correspond to, say, the tip of the red giant branch will shift between 
+isochrones of different ages.
+
+The MIST 0 paper (Dotter+ 2016) tackles this topic by taking stellar evolutionary tracks
+(i.e. where a specific star is evolved over time) and identifying equivalent evolutionary
+phases (EEPs). Using this mapping, it is then possible to interpolate stellar properties
+at specific ages that potentially do not exist in the original stellar tracks.
+
+Alas EEPs only work on the tracks directly, and using it involved installing a lot of MIST
+and compiling the Dotter Iso Fortran software that is no longer maintained (private comm).
+`progenyParamWarp` solves this by using **Dynamic Time Warping (DTW)** to find an 
+optimal monotone remapping of the x-axis of a *source* dataset so that its y-values 
+maximally overlap with a *target* dataset. The y-values themselves are left intact — 
+only the x-axis is warped.
+
+This vignette demonstrates the approach on a simple synthetic curve, then shows the 
+full workflow for interpolating between two real MIST stellar isochrones.
+
+---
+
+## Part 1: Simple Synthetic Example
+
+Before diving into isochrones, it helps to see `progenyParamWarp` in action on a 
+simple, controllable case.
+
+### Setup
+
+```{r simple-setup}
+# --- Source curve ---
+# A modulated sine wave sampled at 400 evenly spaced points
+x_src <- seq(0, 10, length.out = 400)
+y_src <- sin(x_src) + 0.2 * cos(3 * x_src)
+
+# --- Target curve ---
+# Same underlying shape, but:
+#   (1) sampled at 800 points (different resolution)
+#   (2) x-axis nonlinearly distorted by a power-law warp
+#   (3) small amount of Gaussian noise added to y
+x_tar        <- seq(0, 10, len = 800)
+x_tar_warped <- 10 * (x_tar / 10)^1.3   # monotone power-law distortion
+
+ysp_src <- smooth.spline(x_src, y_src, spar = 0.6)
+y_tar   <- predict(ysp_src, x_tar_warped)$y + rnorm(length(x_tar), sd = 0.05)
+```
+
+### Fitting the Warp
+
+```{r simple-fit}
+# progenyParamWarp returns, among other things, two warp functions:
+#   $warp_src2tar  — maps x_src values onto the x_tar scale
+#   $warp_tar2src  — the inverse mapping
+fit <- progenyParamWarp(x_src, y_src, x_tar, y_tar)
+```
+
+### Visualising the Result
+
+```{r simple-plot, fig.height=5}
+# Plot the original source and target curves, then overlay the warped source.
+# After warping, the blue dashed line (source) should closely follow the red line (target).
+magplot(x_src, y_src,
+        type = "l", col = "blue", lwd = 2,
+        main = "Source, Target, and Warped Source",
+        xlab = "x", ylab = "y")
+lines(x_tar, y_tar, col = "red", lwd = 2)
+lines(fit$warp_src2tar(x_src), y_src, col = "blue", lty = 2, lwd = 2)
+legend("bottomleft",
+       legend = c("Source (original)", "Target", "Source (warped)"),
+       col    = c("blue", "red", "blue"),
+       lty    = c(1, 1, 2),
+       bty    = "n")
+```
+
+```{r simple-warp-fn, fig.height=4}
+# The warp function itself is worth inspecting.
+# Points above the diagonal mean the source x is being stretched forward in time;
+# points below mean it is compressed. The warp is constrained to be monotone.
+magplot(fit$warp_src2tar, xlim = c(0, 10),
+        xlab = "x_src", ylab = "x_tar (warped)",
+        main = "Warp function: src → tar")
+abline(0, 1, lty = 2, col = "grey50")   # identity line for reference
+```
+
+---
+
+## Part 2: Isochrone Interpolation with MIST
+
+The primary scientific use case is interpolating between stellar isochrones. Here we 
+demonstrate how to create an intermediate isochrone (logAge = 9.1) from two bounding 
+isochrones (logAge = 9.0 and 9.2) using `progenyParamWarp` and `progenyWarpInterp`.
+
+### Loading Data
+
+```{r iso-load, eval=TRUE}
+library(fst)
+library(foreach)
+library(data.table)
+library(magicaxis)
+
+# Load the pre-computed MIST isochrone grid bundled with ProGeny (you'll need your local path here)
+Iso_MIST <- read.fst('~/Google Drive/My Drive/ProGeny_isochrone/MistIso.fst', as.data.table = TRUE)
+
+# Extract the two bounding isochrones at solar metallicity (logZ = 0)
+src <- Iso_MIST[abs(logAge - 9.0) < 1e-4 & logZ == 0,
+                list(Mini, logL = log10(Lum), logT = log10(Teff), logG)]
+
+tar <- Iso_MIST[abs(logAge - 9.2) < 1e-4 & logZ == 0,
+                list(Mini, logL = log10(Lum), logT = log10(Teff), logG)]
+
+# Ground-truth comparison isochrone at the midpoint age (used for validation only)
+cmp <- Iso_MIST[abs(logAge - 9.1) < 1e-4 & logZ == 0,
+                list(Mini, logL = log10(Lum), logT = log10(Teff), logG)]
+```
+
+> **Note:** `src` and `tar` are data.frames with `Mini` as the x-axis and 
+> `logL`, `logT`, `logG` as multi-variate y-columns. `progenyParamWarp` can 
+> accept data.frames directly and will use all y-columns jointly to find the 
+> optimal warp.
+
+### Fitting the Warp
+
+```{r iso-fit, eval=TRUE}
+# Fit the warp from src (logAge=9.0) to tar (logAge=9.2).
+# No smoothing here — isochrone grids are already well-sampled and smoothing
+# can wash out sharp evolutionary features (e.g. the tip of the RGB or the AGB).
+fit <- progenyParamWarp(x_src = src, x_tar = tar, smooth = FALSE)
+```
+
+### Inspecting the x-axis Warp
+
+```{r iso-warp-plot, eval=TRUE}
+# Visualise how Mini is remapped for each evolutionary parameter.
+# The dashed line shows where the source ends up on the target's Mini axis.
+
+par(mfrow = c(3, 1))
+par(mar = c(3.1, 3.1, 1.1, 1.1))
+
+# --- Luminosity ---
+magplot(src$Mini, src$logL,
+        type = "l", col = "blue",
+        xlab = "Mini / Msol", ylab = "Lum / Lsol", unlog = "y")
+lines(tar$Mini,               tar$logL,              col = "red")
+lines(fit$warp_src2tar(src$Mini), src$logL,           col = "blue", lty = 2)
+legend("topleft",
+       legend = c("Source (logAge=9.0)", "Target (logAge=9.2)", "Source (warped)"),
+       col = c("blue", "red", "blue"), lty = c(1, 1, 2), bty = "n")
+
+# --- Effective Temperature ---
+magplot(src$Mini, src$logT,
+        type = "l", col = "blue",
+        xlab = "Mini / Msol", ylab = "Teff / K", unlog = "y")
+lines(tar$Mini,               tar$logT,              col = "red")
+lines(fit$warp_src2tar(src$Mini), src$logT,           col = "blue", lty = 2)
+legend("topleft",
+       legend = c("Source (logAge=9.0)", "Target (logAge=9.2)", "Source (warped)"),
+       col = c("blue", "red", "blue"), lty = c(1, 1, 2), bty = "n")
+
+# --- Surface Gravity ---
+magplot(src$Mini, src$logG,
+        type = "l", col = "blue",
+        xlab = "Mini / Msol", ylab = "logG")
+lines(tar$Mini,               tar$logG,              col = "red")
+lines(fit$warp_src2tar(src$Mini), src$logG,           col = "blue", lty = 2)
+legend("topleft",
+       legend = c("Source (logAge=9.0)", "Target (logAge=9.2)", "Source (warped)"),
+       col = c("blue", "red", "blue"), lty = c(1, 1, 2), bty = "n")
+```
+
+### Interpolating to an Intermediate Age
+
+Once the warp is fitted, `progenyWarpInterp` creates the interpolated isochrone. 
+The `wt` parameter controls where between source and target the output sits:
+
+- `wt = 0` → returns the source curve unchanged  
+- `wt = 0.5` → returns the midpoint (logAge = 9.1 in our case)  
+- `wt = 1` → returns the target curve
+
+```{r iso-interp, eval=TRUE}
+# wt = 0.5 because logAge 9.1 is exactly halfway between 9.0 and 9.2
+wt <- 0.5
+
+temp_warp <- progenyWarpInterp(
+  x_src         = src,
+  x_tar         = tar,
+  ParamWarp_out = fit,
+  wt            = wt
+)
+```
+
+### Validating the Interpolation
+
+We compare the interpolated isochrone (`temp_warp`, dashed green) against the actual 
+MIST grid isochrone at logAge = 9.1 (`cmp`, solid green).
+
+```{r iso-validate, eval=TRUE}
+par(mfrow = c(3, 1))
+par(mar = c(3.1, 3.1, 1.1, 1.1))
+
+leg_args <- list(
+  legend = c("Source (9.0)", "Target (9.2)", "True (9.1)", "Interpolated (9.1)"),
+  col    = c("blue", "red", "darkgreen", "darkgreen"),
+  lty    = c(1, 1, 1, 2),
+  bty    = "n"
+)
+
+# --- Luminosity ---
+magplot(src$Mini, src$logL,
+        type = "l", col = "blue",
+        xlab = "Mini / Msol", ylab = "Lum / Lsol", unlog = "y")
+lines(tar$Mini,       tar$logL,       col = "red")
+lines(cmp$Mini,       cmp$logL,       col = "darkgreen")
+lines(temp_warp$Mini, temp_warp$logL, col = "darkgreen", lty = 2)
+do.call(legend, c(list(x = "topleft"), leg_args))
+
+# --- Effective Temperature ---
+magplot(src$Mini, src$logT,
+        type = "l", col = "blue",
+        xlab = "Mini / Msol", ylab = "Teff / K", unlog = "y")
+lines(tar$Mini,       tar$logT,       col = "red")
+lines(cmp$Mini,       cmp$logT,       col = "darkgreen")
+lines(temp_warp$Mini, temp_warp$logT, col = "darkgreen", lty = 2)
+do.call(legend, c(list(x = "topleft"), leg_args))
+
+# --- Surface Gravity ---
+magplot(src$Mini, src$logG,
+        type = "l", col = "blue",
+        xlab = "Mini / Msol", ylab = "logG")
+lines(tar$Mini,       tar$logG,       col = "red")
+lines(cmp$Mini,       cmp$logG,       col = "darkgreen")
+lines(temp_warp$Mini, temp_warp$logG, col = "darkgreen", lty = 2)
+do.call(legend, c(list(x = "topleft"), leg_args))
+```
+
+### Special Case: Current Mass
+
+Current stellar mass (`Mass`) requires separate treatment. Because the DTW warp operates 
+on `Mini` (initial mass) but `Mass` evolves differently with age, the simplest robust 
+approach is a linear rescaling of the mass track using the ratio of turnoff masses 
+between source and target.
+
+```{r iso-mass, eval=TRUE}
+# Scale factor: ratio of maximum Mini in warped output vs original source
+mass_scale <- max(temp_warp$Mini) / max(src$Mini)
+
+par(mar = c(3.1, 3.1, 1.1, 1.1))
+magplot(src$Mini, Iso_MIST[abs(logAge - 9.0) < 1e-4 & logZ == 0, Mass],
+        type = "l", col = "blue",
+        xlab = "Mini / Msol", ylab = "Mass / Msol")
+lines(tar$Mini, Iso_MIST[abs(logAge - 9.2) < 1e-4 & logZ == 0, Mass], col = "red")
+lines(cmp$Mini, Iso_MIST[abs(logAge - 9.1) < 1e-4 & logZ == 0, Mass], col = "darkgreen")
+lines(src$Mini  * mass_scale,
+      Iso_MIST[abs(logAge - 9.0) < 1e-4 & logZ == 0, Mass] * mass_scale,
+      col = "darkgreen", lty = 2)
+do.call(legend, c(list(x = "topleft"), leg_args))
+```
+
+### HR Diagram View
+
+It is instructive to look at the result in the classic Hertzsprung-Russell space 
+(Teff vs logG) rather than vs Mini, as this directly reflects what would be observed 
+in stellar population models.
+
+```{r iso-HR, eval=TRUE}
+par(mfrow = c(3, 1))
+par(mar = c(3.1, 3.1, 1.1, 1.1))
+
+hr_leg <- list(
+  legend = c("Source (9.0)", "Target (9.2)", "True (9.1)", "Interpolated (9.1)"),
+  col    = c("blue", "red", "darkgreen", "darkgreen"),
+  lty    = c(1, 1, 1, 2),
+  bty    = "n"
+)
+
+# --- Full HR diagram ---
+magplot(src$logT, src$logG,
+        type = "l", col = "blue",
+        xlab = "Teff / K", ylab = "logG", unlog = "x")
+lines(tar$logT,       tar$logG,       col = "red")
+lines(cmp$logT,       cmp$logG,       col = "darkgreen")
+lines(temp_warp$logT, temp_warp$logG, col = "darkgreen", lty = 2)
+do.call(legend, c(list(x = "bottomright"), hr_leg))
+
+# --- Main sequence / subgiant zoom ---
+# The interpolation performs well in this relatively smooth region
+magplot(src$logT, src$logG,
+        type = "l", col = "blue",
+        xlab = "Teff / K", ylab = "logG",
+        xlim = c(3.7, 3.9), ylim = c(3, 4))
+lines(tar$logT,       tar$logG,       col = "red")
+lines(cmp$logT,       cmp$logG,       col = "darkgreen")
+lines(temp_warp$logT, temp_warp$logG, col = "darkgreen", lty = 2)
+do.call(legend, c(list(x = "bottomright"), hr_leg))
+
+# --- TP-AGB zoom ---
+# This region has complex, non-monotone behaviour that is inherently harder to warp
+magplot(src$logT, src$logG,
+        type = "l", col = "blue",
+        xlab = "Teff / K", ylab = "logG",
+        xlim = c(3.4, 3.6), ylim = c(-1, 0))
+lines(tar$logT,       tar$logG,       col = "red")
+lines(cmp$logT,       cmp$logG,       col = "darkgreen")
+lines(temp_warp$logT, temp_warp$logG, col = "darkgreen", lty = 2)
+do.call(legend, c(list(x = "bottomright"), hr_leg))
+```
+
+> **Note:** The interpolation is generally very good across the main sequence and 
+> subgiant branch. The thermally pulsing AGB (TP-AGB) is an inherently complex 
+> evolutionary phase with rapidly varying, non-monotone features that make any 
+> parametric interpolation challenging — DTW-based warping still performs better 
+> than naive linear interpolation in this region, but expect some residuals.
+
+---
+
+## Summary
+
+| Function | Role |
+|---|---|
+| `progenyParamWarp()` | Fits DTW-optimal warp functions between source and target x-axes |
+| `progenyWarpInterp()` | Uses the fitted warp to create a y-interpolated curve at fractional `wt` |
+
+**Key parameters to tune:**
+
+- `smooth`: Try `TRUE` first for noisy data; use `FALSE` for well-sampled isochrones 
+  where fine features matter.
+- `open.end = TRUE`: Recommended for isochrones — the upper mass end often has 
+  different lengths between age grids and should not be forced to align.
+- `wt`: Set to the fractional position of your desired age between src and tar.
+
+

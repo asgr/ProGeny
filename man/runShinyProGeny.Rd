@@ -1,6 +1,5 @@
 \name{runShinyProGeny}
 \alias{runShinyProGeny}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Interactive Tool to Build SSPs
 }

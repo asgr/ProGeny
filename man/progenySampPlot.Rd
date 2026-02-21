@@ -1,6 +1,5 @@
 \name{progenySampPlot}
 \alias{progenySampPlot}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Plot of Wavelength Sampling
 }
@@ -29,10 +28,10 @@ Numeric vector; horizontal (sampling resolution) reference lines to add. These w
 Logical; if TRUE then line is added, if FALSE then a new plot is created.
 }
   \item{xlim}{
-Numeroc vector; range of x data to display with format c(low_xlim, high_xlim) . Default of 'auto' will span the full range.
+Numeric vector; range of x data to display with format c(low_xlim, high_xlim). Default of 'auto' will span the full range.
 }
   \item{ylim}{
-Numeroc vector; range of y data to display with format c(low_ylim, high_ylim) . Default of 'auto' will span 0 to the max sampling resolution.
+Numeric vector; range of y data to display with format c(low_ylim, high_ylim). Default of 'auto' will span 0 to the max sampling resolution.
 }
   \item{xlab}{
 Character scalar; x axis name.

@@ -1,11 +1,10 @@
 \name{progenyMakeSSP}
 \alias{progenyMakeSSP}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 High Level SSP Creator
 }
 \description{
-The main interface via which users will likely use ProGeny to create SSPs. This can either create SSPs on the exact logAge and logZ grid that exists within the provided isochrone, or be interplated onto an arbitrary logAge and logZ grid.
+The main interface via which users will likely use ProGeny to create SSPs. This can either create SSPs on the exact logAge and logZ grid that exists within the provided isochrone, or be interpolated onto an arbitrary logAge and logZ grid.
 }
 \usage{
 progenyMakeSSP(Iso, IMFfunc = IMF_Chabrier, ..., rem_frac = 'get', Spec_combine,
@@ -20,16 +19,16 @@ progenyMakeSSP(Iso, IMFfunc = IMF_Chabrier, ..., rem_frac = 'get', Spec_combine,
 Data.frame / data.table; the input table of Isochrones. This must have a particular format (see e.g. MistIso in \code{\link{progenyIsoDownload}}).
 }
   \item{IMFfunc}{
-Function; the IMF to be analysed. \code{ProSpect} comes with IMF_Chabrier and IMF_Kroupa, which are good starting points. Must accept a \option{masslow}/\option{massmax} arguments as input.
+Function; the IMF to be analysed. \code{ProGeny} comes with \code{\link{IMF_Chabrier}}, \code{\link{IMF_Kroupa}} and \code{\link{IMF_Salpeter}}, which are good starting points. Must accept \option{masslow}/\option{massmax} arguments as input.
 }
   \item{\dots}{
 Other arguments that can be accepted by the input \option{IMFfunc}.
 }
   \item{rem_frac}{
-Character/numeric scalar; the fraction of stellar mass that remans locked up in remnants after a star leaves the main sequence. If 'get' then this is estimated direclty from the isochrones, but this only works if the isochrones at least partially follow the mass loss phases of the star (MIST and PARSEC). Other the value needs to be specified directly (usually somewhere between 0.5 - 0.6 in practice). This is necessary for BaSTI_New, which terminates at the point of mass loss (so this phase is not well tracked).
+Character/numeric scalar; the fraction of stellar mass that remains locked up in remnants after a star leaves the main sequence. If 'get' then this is estimated directly from the isochrones, but this only works if the isochrones at least partially follow the mass loss phases of the star (MIST and PARSEC). Otherwise the value needs to be specified directly (usually somewhere between 0.5 - 0.6 in practice). This is necessary for BaSTI_New, which terminates at the point of mass loss (so this phase is not well tracked).
 }
   \item{Spec_combine}{
-List; the required spectral atmspheres. This should probably be loaded via \code{\link{progenyAtmosLoad}}, where the inputs for that come via \code{\link{progenyAtmosDownload}}.
+List; the required spectral atmospheres. This should probably be loaded via \code{\link{progenyAtmosLoad}}, where the inputs for that come via \code{\link{progenyAtmosDownload}}.
 }
   \item{Interp_combine}{
 List; information that allows us to map Teff, logG, logZ information from the target \option{Iso} with the provided \option{Spec_combine}. This is made via \code{\link{progenyInterpGrid_All}}.
@@ -76,20 +75,20 @@ Bellstedt & Robotham, 2025, MNRAS, 540, 2703
 Aaron Robotham
 }
 \seealso{
-\code{\link{progenyMakeSSP}}
+\code{\link{progenyAtmosLoad}}, \code{\link{progenyInterpGrid_All}}, \code{\link{progenyInterpBest}}, \code{\link{IMF}}
 }
 \examples{
 \dontrun{
 #Load isochrone:
 Iso  = read.fst('path/to/Iso.fst', as.data.table=TRUE)
 
-#Load stellar atmosheres:
+#Load stellar atmospheres:
 Spec_combine = progenyAtmosLoad('path/to/atmos/')
 
-#Interpolate stellar atmosheres onto isochrone grid:
+#Interpolate stellar atmospheres onto isochrone grid:
 Interp_combine = progenyInterpGrid_All(Iso=Iso, Spec_combine=Spec_combine)
 
-#Select best stellar atmoshere library:
+#Select best stellar atmosphere library:
 Iso = progenyInterpBest(Iso=Iso, Interp_combine=Interp_combine)
 
 #Note above you might want to set label_AGB and label_white to restrict how AGB

@@ -4,7 +4,6 @@
 \alias{progenyIsoPlot}
 \alias{progenyIsoBestPlot}
 \alias{progenyAtmosErrorPlot}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Progeny Plotting
 }
@@ -34,7 +33,7 @@ progenyAtmosErrorPlot(Iso, xsel = 'logZ', log = '', Nsamp = 1e4, seed = 666)
 Data.frame / data.table; the input table of Isochrones. This must have a particular format (see ParsecIso in \code{\link{progenyIsoDownload}}).
 }
   \item{Spec_combine}{
-List; the required spectral atmspheres. This must be loaded via \code{\link{progenyAtmosLoad}}, where the inputs for that come via \code{\link{progenyAtmosDownload}}.
+List; the required spectral atmospheres. This must be loaded via \code{\link{progenyAtmosLoad}}, where the inputs for that come via \code{\link{progenyAtmosDownload}}.
 }
   \item{add}{
 Logical; should information be added to the current plot device (TRUE) or should a fresh plot be made (FALSE). This is useful for overlaying \code{progenyIsoPlot} on \code{progenyAtmosPlot}.
@@ -113,13 +112,14 @@ Additional arguments to pass to the \code{\link{points}} plotting function.
 
 \code{progenyIsoBestPlot} shows which atmosphere spectral library is being used as a function of different isochrone properties (so useful to check for good/poor coverage). \cr
 
-\code{progenyAtmosErrorPlot} reveals if there are large parameter mismatches when interpolating the atmospheris spectra onto the isochrones.
+\code{progenyAtmosErrorPlot} reveals if there are large parameter mismatches when interpolating the atmospheric spectra onto the isochrones.
 }
 \value{
 Nothing, run for the side effect of generating plot (or plot points).
 }
 \references{
-Nothing yet
+Robotham & Bellstedt, 2025, RASTI, 4, 19 \cr
+Bellstedt & Robotham, 2025, MNRAS, 540, 2703
 }
 \author{
 Aaron Robotham
@@ -132,13 +132,13 @@ Aaron Robotham
 #Load isochrone:
 Iso  = read.fst('path/to/Iso.fst', as.data.table=TRUE)
 
-#Load stellar atmosheres:
+#Load stellar atmospheres:
 Spec_combine = progenyAtmosLoad('path/to/atmos/')
 
 #Plot the whole isochrone:
 progenyIsoPlot(Iso)
 
-#Plot all stellar atmosheres:
+#Plot all stellar atmospheres:
 progenyAtmosPlot(Spec_combine)
 
 #Plot a particular part of the isochrone on the current stellar atmosphere plot:

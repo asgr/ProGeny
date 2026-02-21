@@ -1,6 +1,5 @@
 \name{progenyUpdateIMF}
 \alias{progenyUpdateIMF}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Integrate IMF Between Mass Limits
 }
@@ -16,7 +15,7 @@ progenyUpdateIMF(Iso, IMFfunc, ...)
 Data.frame / data.table; the input table of Isochrones. This must have a particular format (see ParsecIso in \code{\link{progenyIsoDownload}}).
 }
   \item{IMFfunc}{
-Function; the IMF to be analysed. \code{ProSpect} comes with IMF_Chabrier and IMF_Kroupa, which are good starting points. Must accept a \option{masslow}/\option{massmax} arguments as input.
+Function; the IMF to be analysed. \code{ProGeny} comes with \code{\link{IMF_Chabrier}}, \code{\link{IMF_Kroupa}} and \code{\link{IMF_Salpeter}}, which are good starting points. Must accept \option{masslow}/\option{massmax} arguments as input.
 }
   \item{\dots}{
 Other arguments that can be accepted by the input \option{IMFfunc}.
@@ -32,7 +31,8 @@ This is a low level function that generally only need to be run if manually gene
 \item{IMFint}{The integrated number counts inside the target IMF bin.}
 }
 \references{
-Nothing yet
+Robotham & Bellstedt, 2025, RASTI, 4, 19 \cr
+Bellstedt & Robotham, 2025, MNRAS, 540, 2703
 }
 \author{
 Aaron Robotham

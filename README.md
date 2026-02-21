@@ -43,7 +43,7 @@ Load stellar atmospheres:
 Spec_combine = progenyAtmosLoad('path/to/atmos/')
 ```
 
-Interpolate stellar atmosheres onto isochrone grid:
+Interpolate stellar atmospheres onto isochrone grid:
 
 ```r
 Interp_combine = progenyInterpGrid_All(Iso=Iso, Spec_combine=Spec_combine)

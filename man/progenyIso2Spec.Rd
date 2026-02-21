@@ -1,6 +1,5 @@
 \name{progenyIso2Spec}
 \alias{progenyIso2Spec}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Convert a Specific Age and Z Isochrone and IMF to a Stacked Spectrum
 }
@@ -14,7 +13,7 @@ progenyIso2Spec(logAge = 8.4, logZ = 0, logA = NULL, Iso, IMFint, Spec_combine,
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{logAge}{
-Numeric scalar; target log10 Age in Gyrs.
+Numeric scalar; target log10 Age in Yrs.
 }
   \item{logZ}{
 Numeric scalar; target log10 Z (relative to solar, where \option{logZ} = 0 means solar).
@@ -29,7 +28,7 @@ Data.frame / data.table; the input table of Isochrones. This must have a particu
 A pre-integrated target IMF (made using \option{progenyUpdateIMF}, where you need the IMFint list element).
 }
   \item{Spec_combine}{
-List; the required spectral atmspheres. This must be loaded via \code{\link{progenyAtmosLoad}}, where the inputs for that come via \code{\link{progenyAtmosDownload}}.
+List; the required spectral atmospheres. This must be loaded via \code{\link{progenyAtmosLoad}}, where the inputs for that come via \code{\link{progenyAtmosDownload}}.
 }
   \item{Interp_combine}{
 List; information that allows us to map Teff, logG, logZ information from the target \option{Iso} with the provided \option{Spec_combine}. This is made via \code{\link{progenyInterpGrid_All}}.
@@ -45,8 +44,8 @@ This is a lower level function that can create a single realisation spectra for 
 Numeric vector; the stacked spectrum. Units will be Lsol/Ang.
 }
 \references{
-Robotham & Bellstedt, 2025, RASTI, Vol, Page \cr
-Bellstedt & Robotham, 2025, MNRAS, Vol, Page
+Robotham & Bellstedt, 2025, RASTI, 4, 19 \cr
+Bellstedt & Robotham, 2025, MNRAS, 540, 2703
 }
 \author{
 Aaron Robotham
@@ -59,13 +58,13 @@ Aaron Robotham
 #Load isochrone:
 Iso  = read.fst('path/to/Iso.fst', as.data.table=TRUE)
 
-#Load stellar atmosheres:
+#Load stellar atmospheres:
 Spec_combine = progenyAtmosLoad('path/to/atmos/')
 
-#Interpolate stellar atmosheres onto isochrone grid:
+#Interpolate stellar atmospheres onto isochrone grid:
 Interp_combine = progenyInterpGrid_All(Iso=Iso, Spec_combine=Spec_combine)
 
-#Select best stellar atmoshere library:
+#Select best stellar atmosphere library:
 Iso = progenyInterpBest(Iso=Iso, Interp_combine=Interp_combine)
 
 #Integrate the IMF:

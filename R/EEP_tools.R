@@ -559,7 +559,7 @@ plot_eep = function(track,
 
   legend("bottomright",
          legend = c("Original track", "EEP-based track", "Primary EEPs", "Secondary EEPs"),
-         col    = c("grey50", "blue", "black", adjustcolor("blue", alpha.f = 0.4)),
+         col    = c("grey50", "blue", "black", "blue"),
          pt.bg  = c(NA, NA, "red", "blue"),
          pch    = c(NA, NA, 21, 20),
          lty    = c(1, 1, NA, NA),

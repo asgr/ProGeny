@@ -1,21 +1,4 @@
-## Column mapping – adjust this to your actual MIST output
-# default_cols = list(
-#   star_age = "star_age",
-#   logL     = "log_L",
-#   logTeff  = "log_Teff",
-#   logTc    = "log_center_T",
-#   Xc       = "center_h1",
-#   Yc       = "center_he4",
-#   logLH      = "log_LH",      # optional
-#   Gamma_c  = "center_gamma",     # optional
-#   M_star   = "star_mass",   # optional
-#   M_Hshell = "m_shell_H",   # optional
-#   M_Heshell= "m_shell_He",   # optional
-#   Xc_C     = "center_c12",   # optional (for C burning)
-#   M_core  = "he_core_mass"   # optional (for PostAGB)
-# )
-
-## Simple helper
+## Simple helpers
 .first_or_na = function(idx) if (length(idx) == 0) NA_integer_ else idx[1]
 
 identify_primary_eeps = function(track,
@@ -50,23 +33,33 @@ identify_primary_eeps = function(track,
                                     wdcs_Gamma_max   = 100
                                   )) {
   n = nrow(track)
-  get = function(name) track[[cols[[name]]]]
 
-  logTc = get("logTc")
-  logL  = get("logL")
-  logTeff = get("logTeff")
-  Xc   = get("Xc")
-  Yc   = get("Yc")
-
+  .get = function(name, req=TRUE){
+    if(!is.null(cols[[name]]) && cols[[name]] %in% names(track)){
+      return(track[[cols[[name]]]])
+    }else{
+      if(req){
+        stop('Column ',name,' is missing and is required!')
+      }else{
+        return(NULL)
+      }
+    }
+  }
+  
+  ## Required columns
+  logTc = .get("logTc")
+  logL  = .get("logL")
+  logTeff = .get("logTeff")
+  Xc   = .get("Xc")
+  Yc   = .get("Yc")
   ## Optional columns (may be NULL if not present)
-  has_col = function(name) !is.null(cols[[name]]) && cols[[name]] %in% names(track)
-  logLH     = if (has_col("logLH"))  get("logLH") else NULL
-  Gamma_c = if (has_col("Gamma_c")) get("Gamma_c") else NULL
-  M_star  = if (has_col("M_star")) get("M_star") else NULL
-  M_Hshell= if (has_col("M_Hshell")) get("M_Hshell") else NULL
-  M_Heshell= if (has_col("M_Heshell")) get("M_Heshell") else NULL
-  Xc_C    = if (has_col("Xc_C")) get("Xc_C") else NULL
-  M_core    = if (has_col("M_core")) get("M_core") else NULL
+  logLH     = .get("logLH", req=FALSE)
+  Gamma_c   = .get("Gamma_c", req=FALSE)
+  M_star    = .get("M_star", req=FALSE)
+  M_Hshell  = .get("M_Hshell", req=FALSE)
+  M_Heshell = .get("M_Heshell", req=FALSE)
+  Xc_C      = .get("Xc_C", req=FALSE)
+  M_core    = .get("M_core", req=FALSE)
   if(!is.null(M_core)){
     M_env = M_star - M_core
   }else{
@@ -509,6 +502,18 @@ plot_eep = function(track,
                          xlab = cols$x, ylab = cols$y,
                          show_secondary = TRUE,
                          ...) {
+  if(is.vector(cols)){
+    cols = as.list(cols)  
+  }
+  
+  if(!'x' %in% names(cols)){
+    names(cols)[1] = 'x'
+  }
+  
+  if(!'y' %in% names(cols)){
+    names(cols)[2] = 'y'
+  }
+  
   # Extract originals
   x_orig   = track[[cols$x]]
   y_orig= track[[cols$y]]
@@ -522,25 +527,25 @@ plot_eep = function(track,
 
   # Base HRD plot (Teff decreases to the right)
   magplot(x_orig, y_orig,
-       type = "l", lwd = 1, col = "grey50",
+       type = "l", lwd = 2, col = "grey50",
        xlab = xlab, ylab = ylab, ...
        )
 
   # EEP-based continuous track
   lines(x_eep, y_eep,
-        col = "blue", lwd = 2)
+        col = "lightblue", lwd = 1)
 
   # Secondary EEPs (small points)
   if (show_secondary) {
     points(x_eep[!prim_mask],
            y_eep[!prim_mask],
-           pch = 20, cex = 0.2, col = adjustcolor("blue", alpha.f = 0.4))
+           pch = 20, cex = 0.5, col = "blue")
   }
 
   # Primary EEPs (larger, coloured points)
   points(x_eep[prim_mask],
          y_eep[prim_mask],
-         pch = 1, bg = "red", col = "black", cex = 1.2)
+         pch = 21, bg = "red", col = "black", cex = 1.2)
 
   # Add text labels for primary EEPs
   labs = as.character(eep_track$EEP_phase[prim_mask])
@@ -552,12 +557,12 @@ plot_eep = function(track,
        labels = labs[valid],
        pos = 4, cex = 0.7, col = "red")
 
-  legend("bottomleft",
+  legend("bottomright",
          legend = c("Original track", "EEP-based track", "Primary EEPs", "Secondary EEPs"),
          col    = c("grey50", "blue", "black", adjustcolor("blue", alpha.f = 0.4)),
-         pt.bg  = c(NA, NA, "red", adjustcolor("blue", alpha.f = 0.4)),
+         pt.bg  = c(NA, NA, "red", "blue"),
          pch    = c(NA, NA, 21, 20),
          lty    = c(1, 1, NA, NA),
-         lwd    = c(1, 2, NA, NA),
+         lwd    = c(2, 1, NA, NA),
          bty    = "n", cex = 0.8)
 }

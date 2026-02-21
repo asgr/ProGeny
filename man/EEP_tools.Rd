@@ -202,16 +202,8 @@ MIST project documentation and isochrone column descriptions.
 
 \examples{
 ## Minimal synthetic example (toy track; random walk in HRD)
-set.seed(1)
-N = 200
-track <- data.frame(
-  star_age = cumsum(rexp(N, rate = 1/N)),
-  log_L = cumsum(abs(rnorm(N, sd = 0.02))) + 0.5,
-  log_Teff = rev(cumsum(abs(rnorm(N, sd = 0.01))) + 3.75),
-  log_center_T = cumsum(abs(rnorm(N, mean = 0.01, sd = 0.005))) + 5.0,
-  center_h1 = pmax(0, 0.7 - cumsum(abs(rnorm(N, sd = 0.01)))),
-  center_he4 = pmin(1, cumsum(abs(rnorm(N, sd = 0.008))))
-)
+track = read.table(system.file("extdata", '02000M.track',
+  package="ProGeny"))
 
 ## Pick primaries (using defaults and available columns)
 prim = identify_primary_eeps(track)
@@ -219,6 +211,15 @@ prim = identify_primary_eeps(track)
 ## Build EEP track with 20 secondaries between primaries
 eep = build_eep_track(track, prim, n_secondary_between = 20)
 
-## Plot HR diagram (requires magicaxis)
+## Plot HR diagram (notice glitches near ZAM)
 plot_eep(track, eep)
+
+## Build EEP track with 100 secondaries between primaries
+eep = build_eep_track(track, prim, n_secondary_between = 100)
+
+## Plot HR diagram (looks much cleaner)
+plot_eep(track, eep)
+
+## Classic log_Teff versus log_g plot:
+plot_eep(track, eep, cols = c('log_Teff', 'log_g'))
 }

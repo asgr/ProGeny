@@ -1,7 +1,6 @@
 \name{progenyParamWarp}
 \alias{progenyParamWarp}
 \alias{progenyWarpInterp}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Warp [x,y] Source Data to Target
 }
@@ -20,13 +19,13 @@ progenyWarpInterp(x_src, y_src, x_tar, y_tar, ParamWarp_out, wt = 0)
 Numeric vector / matrix / data.frame; x source data we want to warp.
 }
   \item{y_src}{
-Numeric vector / matrix / data.frame; y source data we want to maximially overlap with \option{t_tar} after warping. Must be same length as \option{x_src} if vector. If matrix then rows must match to \option{x_src} and columns are the multi-variate parameters we want to warp against.
+Numeric vector / matrix / data.frame; y source data we want to maximally overlap with \option{y_tar} after warping. Must be same length as \option{x_src} if vector. If matrix then rows must match to \option{x_src} and columns are the multi-variate parameters we want to warp against.
 }
   \item{x_tar}{
 Numeric vector / matrix / data.frame; x target data.
 }
   \item{y_tar}{
-Numeric vector / matrix / data.frame; y target data we want to maximially overlap with \option{y_src} after warping. Must be same length as \option{x_tar}. If matrix then rows must match to \option{x_tar} and columns are the multi-variate parameters we want to warp against.
+Numeric vector / matrix / data.frame; y target data we want to maximally overlap with \option{y_src} after warping. Must be same length as \option{x_tar}. If matrix then rows must match to \option{x_tar} and columns are the multi-variate parameters we want to warp against.
 }
   \item{smooth}{
 Logical; should smoothing be applied to the inputs? Usually some smoothing is a good thing, but features can also be lost which might make warping harder (probably worth trying both options).
@@ -57,7 +56,7 @@ The main use case for this function is to allow isochrone properties (like Mini 
 
 Note source inputs (\option{x_src} and \option{y_src}) do no need to be the same length as the target inputs (\option{x_tar} and \option{y_tar}).
 
-Witht the output \code{warp_src2tar} and \code{warp_tar2src} function, the \option{wt} parameter describes how biased to the RHS the output is, so in \code{warp_src2tar} \option{wt} = 1 would give purely tar mapping, whereas \option{wt} = 0 would simply return the input x.
+With the output \code{warp_src2tar} and \code{warp_tar2src} function, the \option{wt} parameter describes how biased to the RHS the output is, so in \code{warp_src2tar} \option{wt} = 1 would give purely tar mapping, whereas \option{wt} = 0 would simply return the input x.
 
 For \code{progenyWarpInterp} the \option{x_src} and \option{x_tar} should be the same parameter as passed to \code{progenyParamWarp} (e.g. \option{Mini} is typical), but \option{y_src} and \option{y_tar} can be totally different. In this sense we can use the computed x-dimension warp to create a new Teff, Lum or logG curve. \option{y_src} and \option{y_tar} can be matrices / data.frames, meaning we can conveniently warp multiple parameters (Teff, Lum or logG), which is useful for isochrones.
 }

@@ -3,7 +3,6 @@
 \alias{progenyTrackInterp}
 \alias{progenyFindMass}
 \alias{progenyExtendIso}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Isochrone Creation Tools
 }
@@ -84,7 +83,28 @@ Aaron Robotham (not Dotter!)
 \code{\link{progenyMakeSSP}}
 }
 \examples{
-## Nothing here yet (need to create a small example data set).
+\dontrun{
+# Assume you have loaded all your EEP track files into a single data.table
+# called 'tracklist', with columns: logZ, star_age, star_mass (initial),
+# star_mass (current), log_L, log_Teff, log_g, and phase.
+# Then rename/create the required ProGeny columns:
+# logZ, logAge (log10(star_age)), Mini (initial mass), Mass (current mass),
+# Lum (10^log_L), Teff (10^log_Teff), logG (log_g), label (phase).
+
+# Find the optimal mass resolution for each age bin at solar metallicity:
+target = progenyFindMass(tracklist, logAge_lim = c(5, 10.3), logAge_bin = 0.05,
+  logZ_use = 0)
+
+# Interpolate tracks onto a regular isochrone grid for solar metallicity:
+Iso_solar = progenyTrackInterp(tracklist, target = target, make_iso = TRUE,
+  logAge_lim = c(5, 10.3), logAge_bin = 0.05, logZ_use = 0)
+
+# Repeat for each metallicity in your tracklist and then row-bind the results:
+# Iso = rbind(Iso_solar, Iso_metal_poor, ...)
+
+# If you have a base isochrone missing post-AGB phases, extend it:
+# Iso_full = progenyExtendIso(Iso_base = Iso, Iso_extend = Iso_PARSEC)
+}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory (show via RShowDoc("KEYWORDS")):

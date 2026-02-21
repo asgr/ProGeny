@@ -3,12 +3,11 @@
 \alias{progenyInterpGrid_All}
 \alias{progenyInterpBest}
 \alias{progenyInterpStat}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Interpolate Isochrone Grids onto Stellar Atmosphere Grids
 }
 \description{
-Fast interpolation between target isochrone stellar paramaters and spectra from stellar atmospheres. Interpolation can use any combination of \option{Teff} (Kelvin), \option{logG} (log10(SurfaceGravity / [cm/s^2])) and \option{logZ} (log10(Z / 0.02).
+Fast interpolation between target isochrone stellar parameters and spectra from stellar atmospheres. Interpolation can use any combination of \option{Teff} (Kelvin), \option{logG} (log10(SurfaceGravity / [cm/s^2])) and \option{logZ} (log10(Z / 0.02)).
 }
 \usage{
 progenyInterpGrid(loc, info, rescale, radius = 2, weight_pow = 2, k = 8)
@@ -133,8 +132,8 @@ Post-AGB: post asymptotic giant branch (usually white dwarfs)
 \code{progenyInterpStat} should be run with the Iso output of \code{progenyInterpBest}. It gives users additional information about the quality of isochrone property matching including the minimum and mean distance between the isochrone and the preferred atmosphere for logTeff, logG and logZ. This can be plotted using the \option{zsel} argument in \code{\link{progenyIsoPlot}} to provide insights into where the matching might be lacking.
 }
 \references{
-Robotham & Bellstedt, 2025, RASTI, Vol, Page \cr
-Bellstedt & Robotham, 2025, MNRAS, Vol, Page
+Robotham & Bellstedt, 2025, RASTI, 4, 19 \cr
+Bellstedt & Robotham, 2025, MNRAS, 540, 2703
 }
 \author{
 Aaron Robotham
@@ -147,13 +146,13 @@ Aaron Robotham
 #Load isochrone:
 Iso  = read.fst('path/to/Iso.fst', as.data.table=TRUE)
 
-#Load stellar atmosheres:
+#Load stellar atmospheres:
 Spec_combine = progenyAtmosLoad('path/to/atmos/')
 
-#Interpolate stellar atmosheres onto isochrone grid:
+#Interpolate stellar atmospheres onto isochrone grid:
 Interp_combine = progenyInterpGrid_All(Iso=Iso, Spec_combine=Spec_combine)
 
-#Select best stellar atmoshere library:
+#Select best stellar atmosphere library:
 Iso = progenyInterpBest(Iso=Iso, Interp_combine=Interp_combine)
 }
 }

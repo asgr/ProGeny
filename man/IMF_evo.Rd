@@ -4,9 +4,8 @@
 \alias{IMF_Lacey_evo}
 \alias{IMF_Kroupa_Zevo}
 \alias{IMF_Lacey_Zevo}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Evoloving Kroupa Initial Mass Functions (IMF)
+Evolving Kroupa Initial Mass Functions (IMF)
 }
 \description{
 An evolving form of the differential Kroupa IMF. This can be used to encode a evolving IMF in a target simple stellar population (SSP) library with ProGeny.
@@ -39,7 +38,7 @@ IMF_Lacey_Zevo(mass, logZ = 0, logZ_lim = c(-4, 0), alpha1_lim = c(2, 0.4),
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{mass}{
-Numeric vector or data.frame/list; the target stellar mass to be evaluated (Msol). If a numeric vector then it will be the value of the IMF at the mass specfied. If a data.frame/list it must have components mass$lo and mass$hi (same length), and the output is the IMF integral between these mass limits (either numeric integral if \option{massmult} = FALSE, or mass integral if \option{massmult} = TRUE).
+Numeric vector or data.frame/list; the target stellar mass to be evaluated (Msol). If a numeric vector then it will be the value of the IMF at the mass specified. If a data.frame/list it must have components mass$lo and mass$hi (same length), and the output is the IMF integral between these mass limits (either numeric integral if \option{massmult} = FALSE, or mass integral if \option{massmult} = TRUE).
 }
   \item{Age}{
 Numeric scalar; the linear age of the population in Gyrs. This basically informs the interpolation relative the range defined by \option{Age_lim}. The \code{\link{approxfun}} function is used to calculate the interpolation between \option{Age} given the vector of \option{Age_lim}  (which is treat as \option{x}). and the parameter of interest (which is treat as \option{y}).
@@ -96,7 +95,7 @@ Additional arguments to pass into \code{\link{approxfun}}.
 \details{
 These are potentially useful evolving forms of the IMF. We include a simple linearly evolving form fo the Kroupa IMF, where by default we interpolate linearly and smoothly along the age in Gyrs. We also have a step wise version of the Lacey evolving IMF. In more quiescent star formation this is determined to be Kennicutt 1983 like, and when star formation rate becomes bursty (so above a lookback of about 10 Gyrs, which is redshift 1.7) we transition sharply to a top-heavy single power law form (since \option{method} = 'constant'). For \code{IMF_Kroupa_evo} at 0 Gyrs (the default) we get the canonical Kroupa IMF shape, and at the earliest times in the Universe (13.8 Gyrs) we have a top-heavy (more massive stars) IMF.
 
-Note for galaxies observed at different epochs the correct looback age needs to be accounted for. The simplest way to deal with this is to leave the \option{Age_lim} alone, and add the lookback age of the Universe as the \option{lookback_Age} argument. This is because if IMF evolves, it is probably relative to the age of the actual Universe, not relative to the age of stellar populations themselves (i.e a 10 Gyr stellar population today probably had a similar IMF to a 6 Gyr stellar population that formed at a lookback time of 4 Gyrs ago). In detail this does mean that you need to create a distinct evolving IMF SSP for every target observation, but in practice creating the library of SSPs that are in Gyr steps would suffice for most use cases (i.e. 0 < redshift < 0.1 can probably all use a common SSP).
+Note for galaxies observed at different epochs the correct lookback age needs to be accounted for. The simplest way to deal with this is to leave the \option{Age_lim} alone, and add the lookback age of the Universe as the \option{Lookback_Age} argument. This is because if IMF evolves, it is probably relative to the age of the actual Universe, not relative to the age of stellar populations themselves (i.e a 10 Gyr stellar population today probably had a similar IMF to a 6 Gyr stellar population that formed at a lookback time of 4 Gyrs ago). In detail this does mean that you need to create a distinct evolving IMF SSP for every target observation, but in practice creating the library of SSPs that are in Gyr steps would suffice for most use cases (i.e. 0 < redshift < 0.1 can probably all use a common SSP).
 }
 \value{
 If \option{massmult} = FALSE then the return is dN/dM for the specified \option{mass}, if \option{massmult} = TRUE then the return is M.dN/dM.

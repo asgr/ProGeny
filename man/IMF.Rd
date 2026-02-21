@@ -4,7 +4,6 @@
 \alias{IMF_Kroupa}
 \alias{IMF_Salpeter}
 \alias{binlims}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Chabrier and Kroupa Initial Mass Functions (IMFs)
 }
@@ -27,7 +26,7 @@ binlims(input, log = FALSE)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{mass}{
-Numeric vector or data.frame/list; the target stellar mass to be evaluated (Msol). If a numeric vector then it will be the value of the IMF at the mass specfied. If a data.frame/list it must have components mass$lo and mass$hi (same length), and the output is the IMF integral between these mass limits (either numeric integral if \option{massmult} = FALSE, or mass integral if \option{massmult} = TRUE).
+Numeric vector or data.frame/list; the target stellar mass to be evaluated (Msol). If a numeric vector then it will be the value of the IMF at the mass specified. If a data.frame/list it must have components mass$lo and mass$hi (same length), and the output is the IMF integral between these mass limits (either numeric integral if \option{massmult} = FALSE, or mass integral if \option{massmult} = TRUE).
 }
   \item{input}{
 Numeric vector; the mid-point of the targets bins (in log or linear space depending on the \option{log} arguments).

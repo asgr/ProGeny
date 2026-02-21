@@ -1,6 +1,5 @@
 \name{progenyIsoSamp}
 \alias{progenyIsoSamp}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Sample a Subset of Stellar Spectra
 }
@@ -18,7 +17,7 @@ progenyIsoSamp(Iso, IMFfunc, ..., Nsamp = 10000, mag_lim = NULL, rad_lim = NULL,
 Data.frame / data.table; the input table of Isochrones. This must have a particular format (see e.g. MistIso in \code{\link{progenyIsoDownload}}).
 }
   \item{IMFfunc}{
-Function; the IMF to be analysed. \code{ProSpect} comes with IMF_Chabrier and IMF_Kroupa, which are good starting points. Must accept a \option{masslow}/\option{massmax} arguments as input.
+Function; the IMF to be analysed. \code{ProGeny} comes with \code{\link{IMF_Chabrier}}, \code{\link{IMF_Kroupa}} and \code{\link{IMF_Salpeter}}, which are good starting points. Must accept \option{masslow}/\option{massmax} arguments as input.
 }
   \item{\dots}{
 Other arguments that can be accepted by the input \option{IMFfunc}.

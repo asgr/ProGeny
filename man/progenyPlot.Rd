@@ -106,9 +106,9 @@ Additional arguments to pass to the \code{\link{points}} plotting function.
 }
 }
 \details{
-\code{progenyIsoPlot} produces a plot if Teff versus logG coverage. Generally added on top of \code{progenyAtmosPlot} by setting \option{add} = TRUE. \cr
+\code{progenyIsoPlot} produces a plot of Teff versus logG coverage. Generally added on top of \code{progenyAtmosPlot} by setting \option{add} = TRUE. \cr
 
-\code{progenyAtmosPlot} produces a plot if Teff versus logG coverage. \cr
+\code{progenyAtmosPlot} produces a plot of Teff versus logG coverage. \cr
 
 \code{progenyIsoBestPlot} shows which atmosphere spectral library is being used as a function of different isochrone properties (so useful to check for good/poor coverage). \cr
 

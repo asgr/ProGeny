@@ -5,10 +5,10 @@
 \alias{IMF_Kroupa_Zevo}
 \alias{IMF_Lacey_Zevo}
 \title{
-Evolving Kroupa Initial Mass Functions (IMF)
+Evolving Kroupa and Lacey Initial Mass Functions (IMF)
 }
 \description{
-An evolving form of the differential Kroupa IMF. This can be used to encode a evolving IMF in a target simple stellar population (SSP) library with ProGeny.
+Evolving forms of the differential Kroupa and Lacey IMFs. These can be used to encode an evolving IMF in a target simple stellar population (SSP) library with ProGeny.
 }
 \usage{
 IMF_Kroupa_evo(mass, Age = 0, Age_lim = c(0, 13.8), alpha1_lim = c(0.3, 0.3),
@@ -101,7 +101,7 @@ Note for galaxies observed at different epochs the correct lookback age needs to
 If \option{massmult} = FALSE then the return is dN/dM for the specified \option{mass}, if \option{massmult} = TRUE then the return is M.dN/dM.
 }
 \references{
-Kroupa, 2001, MNRAS, 322, 231
+Kroupa, 2001, MNRAS, 322, 231 \cr
 Lacey et al, 2016, MNRAS, 462, 3854
 }
 \author{

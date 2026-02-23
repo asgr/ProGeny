@@ -54,6 +54,8 @@ jobs:
             github::asgr/Rwcs@master,
             github::asgr/Rfits@master,
             github::asgr/ParmOff@main,
+            any::fst,
+            any::dtw,
             any::knitr,
             any::rmarkdown
 

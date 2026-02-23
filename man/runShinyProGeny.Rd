@@ -34,8 +34,8 @@ Run the the side effect of launching the interactive Shiny UI.
 On each tab it is possible to return the specified outputs product alone (isochrones, atmospheres or interpolation grids), or in the last tab you can return the full SSP.
 }
 \references{
-Robotham & Bellstedt, 2025, RASTI \cr
-Bellstedt & Robotham, 2025, MNRAS
+Robotham & Bellstedt, 2025, RASTI, 4, 19 \cr
+Bellstedt & Robotham, 2025, MNRAS, 540, 2703
 }
 \author{
 Aaron Robotham

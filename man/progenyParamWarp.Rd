@@ -100,6 +100,22 @@ legend("bottomleft", legend = c("Source", "Target", "Source Warp"),
 magplot(fit$warp_src2tar, xlim=c(0,10), xlab='x_src', ylab='x_tar')
 abline(0,1,lty=2)
 
+# Demonstrate progenyWarpInterp: interpolate a different y variable (e.g. a phase curve)
+# using the same x-axis warp computed above.
+y_phase_src = cos(x_src * 2)
+y_phase_tar = predict(smooth.spline(x_src, y_phase_src, spar = 0.6), x_tar_warped)$y
+
+# Interpolate halfway (wt = 0.5) between source and target in x:
+interp = progenyWarpInterp(x_src, y_phase_src, x_tar, y_phase_tar, fit, wt = 0.5)
+
+magplot(x_src, y_phase_src, type = "l", col = "blue", lwd = 2,
+  main = "progenyWarpInterp: interpolated phase curve",
+  xlab = "x", ylab = "y_phase")
+lines(x_tar, y_phase_tar, col = "red", lwd = 2)
+lines(interp$x, interp$y, col = "darkgreen", lwd = 2, lty = 2)
+legend("bottomleft", legend = c("Source", "Target", "Interpolated (wt=0.5)"),
+       col = c("blue", "red", "darkgreen"), lty = c(1, 1, 2), bty = "n")
+
 \dontrun{
 #this is an example with the pre-made ProGeny MIST isochrone, were we want to interpolate between ages:
 library(fst)

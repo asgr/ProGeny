@@ -5,10 +5,10 @@
 \alias{IMF_Salpeter}
 \alias{binlims}
 \title{
-Chabrier and Kroupa Initial Mass Functions (IMFs)
+Chabrier, Kroupa and Salpeter Initial Mass Functions (IMFs)
 }
 \description{
-Simple interface to differential forms of the Chabrier and Kroupa IMFs. This is useful when checking the fraction of mass returned for different IMFs etc.
+Simple interface to differential forms of the Chabrier, Kroupa and Salpeter IMFs. This is useful when checking the fraction of mass returned for different IMFs etc.
 }
 \usage{
 IMF_Chabrier(mass, alpha = 2.3, a = 0.08, b = 0.69, masslow = 0.01, massmax = 150,
@@ -118,6 +118,18 @@ integrate(IMF_Chabrier, lower=0.01, upper=150, massform=1e6, massmult=FALSE)$val
 #So numerically 6\% of the stars will be more massive than Msol, but more than half the
 #mass will be in these stars! This shows why rare processes in a massive stars can matter
 #so much.
+
+#Demonstrate binlims: create log-spaced mass bin limits from a set of mid-points.
+#This is useful for computing the IMF mass/number in each mass bin.
+
+mass_mids = c(0.1, 0.3, 1, 3, 10, 30, 100)
+bins = binlims(mass_mids, log=TRUE)
+
+#Number of stars (dN) in each bin for 1 Msol of star formation:
+IMF_Chabrier(bins)
+
+#Mass of stars (M*dN) in each bin:
+IMF_Chabrier(bins, massmult=TRUE)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

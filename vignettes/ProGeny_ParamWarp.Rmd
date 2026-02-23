@@ -29,7 +29,6 @@ Load the libraries we will need:
 
 ```{r}
 library(ProGeny)
-library(fst)
 library(foreach)
 library(data.table)
 library(magicaxis)
@@ -137,7 +136,7 @@ isochrones (logAge = 9.0 and 9.2) using `progenyParamWarp` and `progenyWarpInter
 
 ### Loading Data
 
-```{r iso-load, eval=TRUE}
+```{r iso-load, eval=FALSE}
 library(fst)
 library(foreach)
 library(data.table)
@@ -164,7 +163,7 @@ cmp = Iso_MIST[abs(logAge - 9.1) < 1e-4 & logZ == 0,
 
 ### Fitting the Warp
 
-```{r iso-fit, eval=TRUE}
+```{r iso-fit, eval=FALSE}
 # Fit the warp from src (logAge=9.0) to tar (logAge=9.2).
 # No smoothing here — isochrone grids are already well-sampled and smoothing
 # can wash out sharp evolutionary features (e.g. the tip of the RGB or the AGB).
@@ -173,7 +172,7 @@ fit = progenyParamWarp(x_src = src, x_tar = tar, smooth = FALSE)
 
 ### Inspecting the x-axis Warp
 
-```{r iso-warp-plot, eval=TRUE}
+```{r iso-warp-plot, eval=FALSE}
 # Visualise how Mini is remapped for each evolutionary parameter.
 # The dashed line shows where the source ends up on the target's Mini axis.
 
@@ -219,7 +218,7 @@ Once the warp is fitted, `progenyWarpInterp` creates the interpolated isochrone.
 - `wt = 0.5` → returns the midpoint (logAge = 9.1 in our case)  
 - `wt = 1` → returns the target curve
 
-```{r iso-interp, eval=TRUE}
+```{r iso-interp, eval=FALSE}
 # wt = 0.5 because logAge 9.1 is exactly halfway between 9.0 and 9.2
 wt = 0.5
 
@@ -235,7 +234,7 @@ temp_warp = progenyWarpInterp(
 
 We compare the interpolated isochrone (`temp_warp`, dashed green) against the actual MIST grid isochrone at logAge = 9.1 (`cmp`, solid green).
 
-```{r iso-validate, eval=TRUE}
+```{r iso-validate, eval=FALSE}
 par(mfrow = c(3, 1))
 par(mar = c(3.1, 3.1, 1.1, 1.1))
 
@@ -278,7 +277,7 @@ do.call(legend, c(list(x = "topleft"), leg_args))
 
 Current stellar mass (`Mass`) requires separate treatment. Because the DTW warp operates on `Mini` (initial mass) but `Mass` evolves differently with age, the simplest robust approach is a linear rescaling of the mass track using the ratio of turnoff masses between source and target.
 
-```{r iso-mass, eval=TRUE}
+```{r iso-mass, eval=FALSE}
 # Scale factor: ratio of maximum Mini in warped output vs original source
 mass_scale = max(temp_warp$Mini) / max(src$Mini)
 
@@ -298,7 +297,7 @@ do.call(legend, c(list(x = "topleft"), leg_args))
 
 It is instructive to look at the result in the classic Hertzsprung-Russell space (Teff vs logG) rather than vs Mini, as this directly reflects what would be observed in stellar population models.
 
-```{r iso-HR, eval=TRUE}
+```{r iso-HR, eval=FALSE}
 par(mfrow = c(3, 1))
 par(mar = c(3.1, 3.1, 1.1, 1.1))
 

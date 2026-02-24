@@ -160,10 +160,7 @@ progenyInterpBest = function(Iso, Interp_combine, do_base=TRUE, do_extend=TRUE, 
                              label_AGB=NULL, label_white=NULL, label_WR=NULL){
   setDT(Iso)
 
-  #To be safe to not alter the original Isochrones
-  Iso_temp = copy(Iso)
-
-  best_spec = rep(0L, dim(Iso_temp)[1])
+  best_spec = rep(0L, nrow(Iso))
 
   if(do_base){
     best_spec[best_spec == 0L & Interp_combine$base$nn.idx[,1] > 0 & (Interp_combine$base$nn.dists[,1] < Interp_combine$extend$nn.dists[,1]*b2e)] = 1L
@@ -186,13 +183,13 @@ progenyInterpBest = function(Iso, Interp_combine, do_base=TRUE, do_extend=TRUE, 
       if(is.null(label_AGB)){
         best_spec[Interp_combine$AGB$nn.idx[,1] > 0] = 4L
       }else{
-        best_spec[Interp_combine$AGB$nn.idx[,1] > 0 & Iso_temp$label %in% label_AGB] = 4L
+        best_spec[Interp_combine$AGB$nn.idx[,1] > 0 & Iso$label %in% label_AGB] = 4L
       }
     }else{
       if(is.null(label_AGB)){
         best_spec[best_spec == 0L & Interp_combine$AGB$nn.idx[,1] > 0] = 4L
       }else{
-        best_spec[best_spec == 0L & Interp_combine$AGB$nn.idx[,1] > 0 & Iso_temp$label %in% label_AGB] = 4L
+        best_spec[best_spec == 0L & Interp_combine$AGB$nn.idx[,1] > 0 & Iso$label %in% label_AGB] = 4L
       }
     }
   }
@@ -202,13 +199,13 @@ progenyInterpBest = function(Iso, Interp_combine, do_base=TRUE, do_extend=TRUE, 
       if(is.null(label_white)){
         best_spec[Interp_combine$white$nn.idx[,1] > 0] = 5L
       }else{
-        best_spec[Interp_combine$white$nn.idx[,1] > 0 & Iso_temp$label %in% label_white] = 5L
+        best_spec[Interp_combine$white$nn.idx[,1] > 0 & Iso$label %in% label_white] = 5L
       }
     }else{
       if(is.null(label_white)){
         best_spec[best_spec == 0L & Interp_combine$white$nn.idx[,1] > 0] = 5L
       }else{
-        best_spec[best_spec == 0L & Interp_combine$white$nn.idx[,1] > 0 & Iso_temp$label %in% label_white] = 5L
+        best_spec[best_spec == 0L & Interp_combine$white$nn.idx[,1] > 0 & Iso$label %in% label_white] = 5L
       }
     }
   }
@@ -218,27 +215,28 @@ progenyInterpBest = function(Iso, Interp_combine, do_base=TRUE, do_extend=TRUE, 
       if(is.null(label_WR)){
         best_spec[Interp_combine$WR$nn.idx[,1] > 0] = 6L
       }else{
-        best_spec[Interp_combine$WR$nn.idx[,1] > 0 & Iso_temp$label %in% label_WR] = 6L
+        best_spec[Interp_combine$WR$nn.idx[,1] > 0 & Iso$label %in% label_WR] = 6L
       }
     }else{
       if(is.null(label_WR)){
         best_spec[best_spec == 0L & Interp_combine$WR$nn.idx[,1] > 0] = 6L
       }else{
-        best_spec[best_spec == 0L & Interp_combine$WR$nn.idx[,1] > 0 & Iso_temp$label %in% label_WR] = 6L
+        best_spec[best_spec == 0L & Interp_combine$WR$nn.idx[,1] > 0 & Iso$label %in% label_WR] = 6L
       }
     }
   }
 
   best = NULL
-  return(invisible(Iso_temp[,best:=best_spec]))
+  set(Iso, j='best', value=best_spec)  # modifies Iso in-place (standard data.table semantics)
+  return(invisible(Iso))
 }
 
 progenyInterpStat = function(Iso, Spec_combine, Interp_combine){
-  Iso_use = copy(Iso)
+  setDT(Iso)
 
-  Iso_len = dim(Iso_use)[1]
+  Iso_len = nrow(Iso)
   mat_dim = dim(Interp_combine[[1]]$nn.idx)
-  best_ID = Iso_use$best
+  best_ID = Iso$best
   best_ID[best_ID == 0L] = NA
 
   do1 = !is.null(Spec_combine[[1]])
@@ -331,104 +329,104 @@ progenyInterpStat = function(Iso, Spec_combine, Interp_combine){
     # }else{
     #   logZ1 = rep(NA, Iso_len)
     # }
-    sel1 = Iso_use[best == 1L,, which = TRUE]
+    sel1 = Iso[best == 1L,, which = TRUE]
     SpecID1 = as.integer(Interp_combine[[1]]$nn.idx[sel1,1])
 
     if(doT1){
-      stats[sel1,1] = Spec_combine[[1]]$info[SpecID1,log10(Teff)] - log10(Iso_use[sel1,Teff])
+      stats[sel1,1] = Spec_combine[[1]]$info[SpecID1,log10(Teff)] - log10(Iso[sel1,Teff])
     }
 
     if(doG1){
-      stats[sel1,2] = Spec_combine[[1]]$info[SpecID1,logG] - Iso_use[sel1,logG]
+      stats[sel1,2] = Spec_combine[[1]]$info[SpecID1,logG] - Iso[sel1,logG]
     }
 
     if(doZ1){
-      stats[sel1,3] = Spec_combine[[1]]$info[SpecID1,logZ] - Iso_use[sel1,logZ]
+      stats[sel1,3] = Spec_combine[[1]]$info[SpecID1,logZ] - Iso[sel1,logZ]
     }
   }
 
   if(do2){
-    sel2 = Iso_use[best == 2L,, which = TRUE]
+    sel2 = Iso[best == 2L,, which = TRUE]
     SpecID2 = as.integer(Interp_combine[[2]]$nn.idx[sel2,1])
 
     if(doT2){
-      stats[sel2,1] = Spec_combine[[2]]$info[SpecID2,log10(Teff)] - log10(Iso_use[sel2,Teff])
+      stats[sel2,1] = Spec_combine[[2]]$info[SpecID2,log10(Teff)] - log10(Iso[sel2,Teff])
     }
 
     if(doG2){
-      stats[sel2,2] = Spec_combine[[2]]$info[SpecID2,logG] - Iso_use[sel2,logG]
+      stats[sel2,2] = Spec_combine[[2]]$info[SpecID2,logG] - Iso[sel2,logG]
     }
 
     if(doZ2){
-      stats[sel2,3] = Spec_combine[[2]]$info[SpecID2,logZ] - Iso_use[sel2,logZ]
+      stats[sel2,3] = Spec_combine[[2]]$info[SpecID2,logZ] - Iso[sel2,logZ]
     }
   }
 
   if(do3){
-    sel3 = Iso_use[best == 3L,, which = TRUE]
+    sel3 = Iso[best == 3L,, which = TRUE]
     SpecID3 = as.integer(Interp_combine[[3]]$nn.idx[sel3,1])
 
     if(doT3){
-      stats[sel3,1] = Spec_combine[[3]]$info[SpecID3,log10(Teff)] - log10(Iso_use[sel3,Teff])
+      stats[sel3,1] = Spec_combine[[3]]$info[SpecID3,log10(Teff)] - log10(Iso[sel3,Teff])
     }
 
     if(doG3){
-      stats[sel3,2] = Spec_combine[[3]]$info[SpecID3,logG] - Iso_use[sel3,logG]
+      stats[sel3,2] = Spec_combine[[3]]$info[SpecID3,logG] - Iso[sel3,logG]
     }
 
     if(doZ3){
-      stats[sel3,3] = Spec_combine[[3]]$info[SpecID3,logZ] - Iso_use[sel3,logZ]
+      stats[sel3,3] = Spec_combine[[3]]$info[SpecID3,logZ] - Iso[sel3,logZ]
     }
   }
 
   if(do4){
-    sel4 = Iso_use[best == 4L,, which = TRUE]
+    sel4 = Iso[best == 4L,, which = TRUE]
     SpecID4 = as.integer(Interp_combine[[4]]$nn.idx[sel4,1])
 
     if(doT4){
-      stats[sel4,1] = Spec_combine[[4]]$info[SpecID4,log10(Teff)] - log10(Iso_use[sel4,Teff])
+      stats[sel4,1] = Spec_combine[[4]]$info[SpecID4,log10(Teff)] - log10(Iso[sel4,Teff])
     }
 
     if(doG4){
-      stats[sel4,2] = Spec_combine[[4]]$info[SpecID4,logG] - Iso_use[sel4,logG]
+      stats[sel4,2] = Spec_combine[[4]]$info[SpecID4,logG] - Iso[sel4,logG]
     }
 
     if(doZ4){
-      stats[sel4,3] = Spec_combine[[4]]$info[SpecID4,logZ] - Iso_use[sel4,logZ]
+      stats[sel4,3] = Spec_combine[[4]]$info[SpecID4,logZ] - Iso[sel4,logZ]
     }
   }
 
   if(do5){
-    sel5 = Iso_use[best == 5L,, which = TRUE]
+    sel5 = Iso[best == 5L,, which = TRUE]
     SpecID5 = as.integer(Interp_combine[[5]]$nn.idx[sel5,1])
 
     if(doT5){
-      stats[sel5,1] = Spec_combine[[5]]$info[SpecID5,log10(Teff)] - log10(Iso_use[sel5,Teff])
+      stats[sel5,1] = Spec_combine[[5]]$info[SpecID5,log10(Teff)] - log10(Iso[sel5,Teff])
     }
 
     if(doG5){
-      stats[sel5,2] = Spec_combine[[5]]$info[SpecID5,logG] - Iso_use[sel5,logG]
+      stats[sel5,2] = Spec_combine[[5]]$info[SpecID5,logG] - Iso[sel5,logG]
     }
 
     if(doZ5){
-      stats[sel5,3] = Spec_combine[[5]]$info[SpecID5,logZ] - Iso_use[sel5,logZ]
+      stats[sel5,3] = Spec_combine[[5]]$info[SpecID5,logZ] - Iso[sel5,logZ]
     }
   }
 
   if(do6){
-    sel6 = Iso_use[best == 6L,, which = TRUE]
+    sel6 = Iso[best == 6L,, which = TRUE]
     SpecID6 = as.integer(Interp_combine[[6]]$nn.idx[sel6,1])
 
     if(doT6){
-      stats[sel6,1] = Spec_combine[[6]]$info[SpecID6,log10(Teff)] - log10(Iso_use[sel6,Teff])
+      stats[sel6,1] = Spec_combine[[6]]$info[SpecID6,log10(Teff)] - log10(Iso[sel6,Teff])
     }
 
     if(doG6){
-      stats[sel6,2] = Spec_combine[[6]]$info[SpecID6,logG] - Iso_use[sel6,logG]
+      stats[sel6,2] = Spec_combine[[6]]$info[SpecID6,logG] - Iso[sel6,logG]
     }
 
     if(doZ6){
-      stats[sel6,3] = Spec_combine[[6]]$info[SpecID6,logZ] - Iso_use[sel6,logZ]
+      stats[sel6,3] = Spec_combine[[6]]$info[SpecID6,logZ] - Iso[sel6,logZ]
     }
   }
 
@@ -515,19 +513,19 @@ progenyInterpStat = function(Iso, Spec_combine, Interp_combine){
 
   colnames(stats) = c('logT_diff', 'logG_diff', 'logZ_diff')
 
-  Iso_use = cbind(Iso_use[,1:9], as.data.table(stats))
+  Iso_out = cbind(Iso[,1:9], as.data.table(stats))
 
-  logT_diff_med = median(Iso_use$logT_diff, na.rm=TRUE)
-  logG_diff_med = median(Iso_use$logG_diff, na.rm=TRUE)
-  logZ_diff_med = median(Iso_use$logZ_diff, na.rm=TRUE)
+  logT_diff_med = median(Iso_out$logT_diff, na.rm=TRUE)
+  logG_diff_med = median(Iso_out$logG_diff, na.rm=TRUE)
+  logZ_diff_med = median(Iso_out$logZ_diff, na.rm=TRUE)
 
-  logT_diff_sd = sd(Iso_use$logT_diff, na.rm=TRUE)
-  logG_diff_sd = sd(Iso_use$logG_diff, na.rm=TRUE)
-  logZ_diff_sd = sd(Iso_use$logZ_diff, na.rm=TRUE)
+  logT_diff_sd = sd(Iso_out$logT_diff, na.rm=TRUE)
+  logG_diff_sd = sd(Iso_out$logG_diff, na.rm=TRUE)
+  logZ_diff_sd = sd(Iso_out$logZ_diff, na.rm=TRUE)
 
   stat_out = data.table(stat = c('logT_diff_med', 'logG_diff_med', 'logZ_diff_med', 'logT_diff_sd', 'logG_diff_sd', 'logZ_diff_sd'),
              val = c(logT_diff_med, logG_diff_med, logZ_diff_med, logT_diff_sd, logG_diff_sd, logZ_diff_sd)
             )
 
-  return(list(Iso = Iso_use, stat = stat_out))
+  return(list(Iso = Iso_out, stat = stat_out))
 }

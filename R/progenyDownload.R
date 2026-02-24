@@ -33,9 +33,13 @@ progenyAtmosLoad = function(destpath = '',
                       WR = 'combine_WNE_PoWR',
                       wavegrid = NULL,
                       cores = 8,
+                      pointer = FALSE,
                       ...
                       ){
   if(!is.null(wavegrid)){
+    if(pointer){
+      stop('wavegrid rebinning requires the full spec matrix in memory; use pointer=FALSE to rebin spectra.')
+    }
     if(!requireNamespace("ProSpect", quietly = TRUE)){
       stop('The ProSpect package is needed for spectral re-binning. Please install from GitHub asgr/ProSpect.', call. = FALSE)
     }
@@ -47,16 +51,22 @@ progenyAtmosLoad = function(destpath = '',
   if(is.character(base)){
     base_file = paste0(destpath,'/',base,'.fits')
     if(file.exists(base_file)){
-      base = Rfits_read(base_file, pointer=F, header=F)
+      base = Rfits_read(base_file, pointer=pointer, header=F)
     }else{
       stop('No file at: ', base_file)
     }
 
-    if(anyNA(base$spec)){
-      base$spec[is.na(base$spec)] = 0
-    }
+    if(pointer){
+      if(inherits(base$wave, 'Rfits_pointer')){
+        base$wave = Rfits_read_image(base$wave$filename, ext=base$wave$ext, header=FALSE)
+      }
+    }else{
+      if(anyNA(base$spec)){
+        base$spec[is.na(base$spec)] = 0
+      }
 
-    base$spec[base$spec < 0] = 0
+      base$spec[base$spec < 0] = 0
+    }
 
     if(!is.null(wavegrid)){
       if(wavegrid[1] == 'get'){
@@ -88,16 +98,22 @@ progenyAtmosLoad = function(destpath = '',
   if(is.character(extend)){
     extend_file = paste0(destpath,'/',extend,'.fits')
     if(file.exists(extend_file)){
-      extend = Rfits_read(extend_file, pointer=F, header=F)
+      extend = Rfits_read(extend_file, pointer=pointer, header=F)
     }else{
       stop('No file at: ', extend_file)
     }
 
-    if(anyNA(extend$spec)){
-      extend$spec[is.na(extend$spec)] = 0
-    }
+    if(pointer){
+      if(inherits(extend$wave, 'Rfits_pointer')){
+        extend$wave = Rfits_read_image(extend$wave$filename, ext=extend$wave$ext, header=FALSE)
+      }
+    }else{
+      if(anyNA(extend$spec)){
+        extend$spec[is.na(extend$spec)] = 0
+      }
 
-    extend$spec[extend$spec < 0] = 0
+      extend$spec[extend$spec < 0] = 0
+    }
 
     if(!is.null(wavegrid)){
       Nrow = dim(extend$spec)[1]
@@ -124,16 +140,22 @@ progenyAtmosLoad = function(destpath = '',
   if(is.character(hot)){
     hot_file = paste0(destpath,'/',hot,'.fits')
     if(file.exists(hot_file)){
-      hot = Rfits_read(hot_file, pointer=F, header=F)
+      hot = Rfits_read(hot_file, pointer=pointer, header=F)
     }else{
       stop('No file at: ', hot_file)
     }
 
-    if(anyNA(hot$spec)){
-      hot$spec[is.na(hot$spec)] = 0
-    }
+    if(pointer){
+      if(inherits(hot$wave, 'Rfits_pointer')){
+        hot$wave = Rfits_read_image(hot$wave$filename, ext=hot$wave$ext, header=FALSE)
+      }
+    }else{
+      if(anyNA(hot$spec)){
+        hot$spec[is.na(hot$spec)] = 0
+      }
 
-    hot$spec[hot$spec < 0] = 0
+      hot$spec[hot$spec < 0] = 0
+    }
 
     if(!is.null(wavegrid)){
       Nrow = dim(hot$spec)[1]
@@ -160,16 +182,22 @@ progenyAtmosLoad = function(destpath = '',
   if(is.character(AGB)){
     AGB_file = paste0(destpath,'/',AGB,'.fits')
     if(file.exists(AGB_file)){
-      AGB = Rfits_read(AGB_file, pointer=F, header=F)
+      AGB = Rfits_read(AGB_file, pointer=pointer, header=F)
     }else{
       stop('No file at: ', AGB_file)
     }
 
-    if(anyNA(AGB$spec)){
-      AGB$spec[is.na(AGB$spec)] = 0
-    }
+    if(pointer){
+      if(inherits(AGB$wave, 'Rfits_pointer')){
+        AGB$wave = Rfits_read_image(AGB$wave$filename, ext=AGB$wave$ext, header=FALSE)
+      }
+    }else{
+      if(anyNA(AGB$spec)){
+        AGB$spec[is.na(AGB$spec)] = 0
+      }
 
-    AGB$spec[AGB$spec < 0] = 0
+      AGB$spec[AGB$spec < 0] = 0
+    }
 
     if(!is.null(wavegrid)){
       Nrow = dim(AGB$spec)[1]
@@ -196,16 +224,22 @@ progenyAtmosLoad = function(destpath = '',
   if(is.character(white)){
     white_file = paste0(destpath,'/',white,'.fits')
     if(file.exists(white_file)){
-      white = Rfits_read(white_file, pointer=F, header=F)
+      white = Rfits_read(white_file, pointer=pointer, header=F)
     }else{
       stop('No file at: ', white_file)
     }
 
-    if(anyNA(white$spec)){
-      white$spec[is.na(white$spec)] = 0
-    }
+    if(pointer){
+      if(inherits(white$wave, 'Rfits_pointer')){
+        white$wave = Rfits_read_image(white$wave$filename, ext=white$wave$ext, header=FALSE)
+      }
+    }else{
+      if(anyNA(white$spec)){
+        white$spec[is.na(white$spec)] = 0
+      }
 
-    white$spec[white$spec < 0] = 0
+      white$spec[white$spec < 0] = 0
+    }
 
     if(!is.null(wavegrid)){
       Nrow = dim(white$spec)[1]
@@ -230,13 +264,24 @@ progenyAtmosLoad = function(destpath = '',
   }
 
   if(is.character(WR)){
-    WR = Rfits_read(paste0(destpath,'/',WR,'.fits'), pointer=F, header=F)
-
-    if(anyNA(WR$spec)){
-      WR$spec[is.na(WR$spec)] = 0
+    WR_file = paste0(destpath,'/',WR,'.fits')
+    if(file.exists(WR_file)){
+      WR = Rfits_read(WR_file, pointer=pointer, header=F)
+    }else{
+      stop('No file at: ', WR_file)
     }
 
-    WR$spec[WR$spec < 0] = 0
+    if(pointer){
+      if(inherits(WR$wave, 'Rfits_pointer')){
+        WR$wave = Rfits_read_image(WR$wave$filename, ext=WR$wave$ext, header=FALSE)
+      }
+    }else{
+      if(anyNA(WR$spec)){
+        WR$spec[is.na(WR$spec)] = 0
+      }
+
+      WR$spec[WR$spec < 0] = 0
+    }
 
     if(!is.null(wavegrid)){
       Nrow = dim(WR$spec)[1]

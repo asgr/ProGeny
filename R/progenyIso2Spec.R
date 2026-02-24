@@ -95,7 +95,7 @@ progenyIso2Spec = function(logAge=8.4, logZ=0, logA=NULL, Iso, IMFint, Spec_comb
   bb_spec = numeric(length(wave_grid))
 
   for(i in use){
-    temp_stack = {}
+    temp_stack_list = list()
     for(logAge_j in seq_along(logAge_steps)){
       logAge_step = logAge_steps[logAge_j]
       for(logZ_k in seq_along(logZ_steps)){
@@ -111,7 +111,7 @@ progenyIso2Spec = function(logAge=8.4, logZ=0, logA=NULL, Iso, IMFint, Spec_comb
             temp_DT = temp_DT[ID > 0,]
             pre_stack = temp_DT[,list(wt_sum=sum(wt)),by=ID]
             pre_stack[,wt_sum:=wt_sum*interp_wt]
-            temp_stack = rbind(temp_stack, pre_stack)
+            temp_stack_list[[length(temp_stack_list) + 1L]] = pre_stack
           }
         }else{
 #          if('logA' %in% colnames(Spec_combine[[i]]$info)){
@@ -127,18 +127,28 @@ progenyIso2Spec = function(logAge=8.4, logZ=0, logA=NULL, Iso, IMFint, Spec_comb
                 temp_DT = temp_DT[ID > 0,]
                 pre_stack = temp_DT[,list(wt_sum=sum(wt)),by=ID]
                 pre_stack[,wt_sum:=wt_sum*interp_wt]
-                temp_stack = rbind(temp_stack, pre_stack)
+                temp_stack_list[[length(temp_stack_list) + 1L]] = pre_stack
               }
             }
 #          }
         }
       }
     }
-    if(!is.null(temp_stack)){
+    if(length(temp_stack_list) > 0L){
+      temp_stack = rbindlist(temp_stack_list)
       temp_stack = temp_stack[,list(wt_sum=sum(wt_sum)),by=ID]
       #This version didn't seem to help, so removed to reduce complication installing ProGeny
       #.vec_add_cpp(spec_stack, crossprod(temp_stack$wt_sum, Spec_combine[[i]]$spec[temp_stack$ID,]))
-      spec_stack = spec_stack + as.numeric(crossprod(temp_stack$wt_sum, Spec_combine[[i]]$spec[temp_stack$ID,]))
+      spec_mat = Spec_combine[[i]]$spec
+      if(inherits(spec_mat, 'Rfits_pointer')){
+        id_lo = min(temp_stack$ID)
+        id_hi = max(temp_stack$ID)
+        spec_block = spec_mat[id_lo:id_hi, ]  # reads only the needed row range from disk
+        # relative indexing is safe: all IDs are in [id_lo, id_hi] by construction
+        spec_stack = spec_stack + as.numeric(crossprod(temp_stack$wt_sum, spec_block[temp_stack$ID - id_lo + 1L, ]))
+      }else{
+        spec_stack = spec_stack + as.numeric(crossprod(temp_stack$wt_sum, spec_mat[temp_stack$ID,]))
+      }
     }
   }
 

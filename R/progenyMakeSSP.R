@@ -126,6 +126,8 @@ progenyMakeSSP = function(Iso, IMFfunc = IMF_Chabrier, ..., rem_frac = 'get', Sp
     }
   }
 
+  setkeyv(Iso_temp, c('logZ', 'logAge', 'Mini'))
+
   logZ = logAge = Mini = Mass = NULL
 
   Iso_temp[,IMFint := 0]

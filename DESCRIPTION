@@ -8,6 +8,11 @@ Description: Flexible generation of SSPs, where it is possible to vary the IMF, 
 License: LGPL-3
 Imports: foreach, doParallel, data.table, Rfits, RANN, NISTunits, celestial, magicaxis, ParmOff, knitr, checkmate, matrixStats
 Suggests: ProSpect, ProPane, akima, shiny, shinyFiles, shinybusy, fst, dtw, knitr, rmarkdown
+Remotes:
+  asgr/ParmOff
+  asgr/ProPane
+  asgr/ProSpect
+  asgr/Rfits
 Encoding: UTF-8
 LazyData: true
 LazyDataCompression: gzip

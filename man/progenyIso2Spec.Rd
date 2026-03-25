@@ -8,7 +8,7 @@ Given a full Isochrone table and IMF, this will subset by a target Age and Z and
 }
 \usage{
 progenyIso2Spec(logAge = 8.4, logZ = 0, logA = NULL, Iso, IMFint, Spec_combine,
-  Interp_combine, interp = FALSE)
+  Interp_combine, interp = FALSE, clip_quan = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -35,6 +35,9 @@ List; information that allows us to map Teff, logG, logZ information from the ta
 }
   \item{interp}{
 Logical; should the spectrum be interpolated? This is relevant if you wish to create metallicity outputs that are not on the same grid as the input isochrone. TRUE means a weighted log-linear interpolation is carried out using the surrounding 4 values of logAge and logZ, FALSE means the nearest exact grid values are used regardless of what is requested.
+}
+  \item{clip_quan}{
+Numeric scalar; if NULL this does nothing, if set to numeric scalar then this becomes the quantile level to clip the product of Luminosity and IMF integral weight. Basically, certain isochrones can have big gaps in their outputs which occur at phase transition points. This can mean a highly luminous start gets too much nominal IMF weight (the integral is allowed to go too far). Setting to a large-ish value (0.99) should work to fix the glitchy isochrones. Ideally you see little difference when leaving this as NULL or setting at 0.99 (in which case leave at NULL).
 }
 }
 \details{

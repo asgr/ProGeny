@@ -123,7 +123,7 @@ TP-AGB: the thermally pulsing asymptotic giant branch
 Post-AGB: post asymptotic giant branch (usually white dwarfs)
 }
 \value{
-\code{progenyInterpGrid} returns a list output that contain the various outputs of \code{\link{nn2}}, with an additional weights list item that contains our bespokely scaled weights that will be used when interpolating an Isochrone vs Atmosphere solution.
+\code{progenyInterpGrid} returns a list output that contain the various outputs of \code{\link[RANN]{nn2}}, with an additional weights list item that contains our bespokely scaled weights that will be used when interpolating an Isochrone vs Atmosphere solution.
 
 \code{progenyInterpGrid_All} returns a list output from \code{progenyInterpGrid} for each spectral atmosphere present in \option{Spec_combine}.
 

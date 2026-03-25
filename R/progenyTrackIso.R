@@ -303,10 +303,8 @@ progenyExtendIso = function(Iso_base, Iso_extend, label=NA, logA=NA){
     temp[,logZ:= Mini_end[i,logZ]]
     temp[,logAge:= Mini_end[i,logAge]]
 
-    if(!is.na(label_use)){
-      if(!identical(label_use, 'extend_get')){
+    if(!identical(label_use, 'extend_get')){
         temp[,label:=label_use]
-      }
     }
 
     return(temp)

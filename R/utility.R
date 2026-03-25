@@ -2,7 +2,12 @@
   return(norm*cosplanckLawRadWave(lambda=wave/1e10, Temp=Temp)/cosplanckSBLawRad_sr(Temp)/1e10)
 }
 
-.binlims = function(input, log=FALSE){
+.binlims = function(input, log=FALSE, max_width=NULL){
+  # max_width: maximum bin width.
+  #   - if log=FALSE: additive width (same units as input)
+  #   - if log=TRUE : multiplicative width in dex, i.e. cap=0.1 means x10^0.1
+  # max_width can be useful to catch pathological gaps in isochrones, but this can leave gaps.
+
   N_in = length(input)
 
   if(log){
@@ -20,6 +25,19 @@
 
   bin_lo = bins[1:N_in]
   bin_hi = bins[2:(N_in + 1L)]
+
+  if(!is.null(max_width)){
+    if (!is.numeric(max_width) || length(max_width) != 1L || is.na(max_width)) stop("max_width must be a single non-NA number")
+    if (max_width < 0) stop("max_width must be >= 0")
+
+    if(log){
+      bin_lim = bin_lo*10^max_width
+    }else{
+      bin_lim = bin_lo + max_width
+    }
+
+    bin_hi = pmin(bin_hi, bin_lim)
+  }
 
   return(list(lo = bin_lo, hi = bin_hi))
 }

@@ -1,8 +1,8 @@
 progenyMakeSSP = function(Iso, IMFfunc = IMF_Chabrier, ..., rem_frac = 'get', Spec_combine,
-                          Interp_combine, logAge_steps = NULL, logZ_steps = NULL, Mini_range=NULL, Zsol=0.02,
-                          cores=8, Labels = list(Zlab = "Metallicity", Agelab = "Time since ZAM / Yrs",
-                          Wavelab = "Wavelength / Ang", Lumlab = "Lsun / Ang (for 1 Msun SF)",
-                          LumAgelab = "Lsun / Ang (for 1 Msun/Yr SFR)")){
+                          Interp_combine, logAge_steps = NULL, logZ_steps = NULL, Mini_range = NULL,
+                          max_width = NULL, clip_quan = NULL, Zsol = 0.02, cores = 8, Labels = list(Zlab = "Metallicity",
+                          Agelab = "Time since ZAM / Yrs", Wavelab = "Wavelength / Ang",
+                          Lumlab = "Lsun / Ang (for 1 Msun SF)", LumAgelab = "Lsun / Ang (for 1 Msun/Yr SFR)")){
   #currently takes about a minute or two to generate a target SSP on 8 cores
 
   interp = FALSE
@@ -41,8 +41,9 @@ progenyMakeSSP = function(Iso, IMFfunc = IMF_Chabrier, ..., rem_frac = 'get', Sp
 
   setDT(Iso)
 
-  #To be safe to not alter the original Isochrones
-  Iso_temp = copy(Iso)
+  # Make reference copy
+  # Shouldn't usually need full copy, but trigger a copy later if needed: search for copy(Iso):
+  Iso_temp = Iso
 
   if(!is.null(Mini_range)){
     temp_Mini_cut = which(Iso_temp$Mini >= Mini_range[1] & Iso_temp$Mini <= Mini_range[2])
@@ -87,6 +88,7 @@ progenyMakeSSP = function(Iso, IMFfunc = IMF_Chabrier, ..., rem_frac = 'get', Sp
 
   temp_order = order(Iso_temp$logZ, Iso_temp$logAge, Iso_temp$Mini)
   if(max(diff(temp_order)) > 1){
+    Iso_temp = copy(Iso)
     Iso_temp = Iso_temp[temp_order,]
 
     if(!is.null(Interp_combine$base)){
@@ -128,10 +130,11 @@ progenyMakeSSP = function(Iso, IMFfunc = IMF_Chabrier, ..., rem_frac = 'get', Sp
 
   logZ = logAge = Mini = Mass = NULL
 
-  Iso_temp[,IMFint := 0]
+  #Iso_temp[,IMFint := 0]
+  IMFint = rep(0, dim(Iso_temp)[1])
 
   #The below should work more generically (regardless of isochrone)
-  Iso_temp[Lum > 1e-6, IMFint := progenyUpdateIMF(Iso_temp[Lum > 1e-6,], IMFfunc, ...)$IMFint]
+  IMFint[Iso_temp$Lum > 1e-6] = progenyUpdateIMF(Iso_temp[Lum > 1e-6], IMFfunc, max_width=max_width, ...)$IMFint
 
   cores = min(cores, length(logZ_steps), detectCores())
   message('ProGeny can see ',cores,' cores!')
@@ -146,8 +149,8 @@ progenyMakeSSP = function(Iso, IMFfunc = IMF_Chabrier, ..., rem_frac = 'get', Sp
     message('  ',logZ_step)
     output = foreach(logAge_step = logAge_steps)%do%{
       #message('    ',logAge_step)
-      progenyIso2Spec(logAge=logAge_step, logZ=logZ_step, logA=NULL, Iso=Iso_temp, IMFint=Iso_temp$IMFint,
-                      Spec_combine=Spec_combine, Interp_combine=Interp_combine, interp=interp)
+      progenyIso2Spec(logAge=logAge_step, logZ=logZ_step, logA=NULL, Iso=Iso_temp, IMFint=IMFint,
+                      Spec_combine=Spec_combine, Interp_combine=Interp_combine, interp=interp, clip_quan=clip_quan)
     }
     return(do.call(rbind, output))
   }

@@ -1,26 +1,4 @@
-.binlims = function(input, log=FALSE){
-  N_in = length(input)
-
-  if(log){
-    input = log10(input)
-  }
-
-  in_diff = diff(input)
-
-  bins = input[1:(N_in - 1L)] + in_diff/2
-  bins = c(input[1] - in_diff[1]/2, bins, input[N_in] + in_diff[N_in - 1L]/2)
-
-  if(log){
-    bins = 10^bins
-  }
-
-  bin_lo = bins[1:N_in]
-  bin_hi = bins[2:(N_in + 1L)]
-
-  return(list(lo = bin_lo, hi = bin_hi))
-}
-
-progenyUpdateIMF = function(Iso, IMFfunc, ...){
+progenyUpdateIMF = function(Iso, IMFfunc, max_width=NULL, ...){
   setDT(Iso)
 
   order_check = order(Iso$logZ, Iso$logAge, Iso$Mini)
@@ -40,7 +18,8 @@ progenyUpdateIMF = function(Iso, IMFfunc, ...){
   #If we are using an evolving form of the IMF then we need to compute
   output = foreach(i = 1:length(split_lib), .combine = 'rbind') %do% {
     foreach(j = 1:length(split_lib[[i]]), .combine = 'rbind') %do% {
-      sub_bins = data.frame(.binlims(split_lib[[i]][[j]]$Mini, log = TRUE))
+      #when set to log, using 0.1/0.2 means the Mini can only change by 26/58% between bins
+      sub_bins = data.frame(.binlims(split_lib[[i]][[j]]$Mini, log = TRUE, max_width = max_width))
       if ('Age' %in% names(formals(IMFfunc))){
         sub_bins$IMFint = (sub_bins$hi - sub_bins$lo) * IMFfunc(split_lib[[i]][[j]]$Mini,
                                                                 Age = 10^split_lib[[i]][[j]]$logAge[1] / 1e9, ...)

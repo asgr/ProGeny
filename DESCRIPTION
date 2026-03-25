@@ -1,13 +1,19 @@
 Package: ProGeny
 Type: Package
 Title: Generate Simple Stellar Population Library
-Version: 0.6.2
+Version: 0.6.4
+Date: 2026-03-25
 Author: Aaron Robotham
 Maintainer: Aaron Robotham <aaron.robotham@uwa.edu.au>
 Description: Flexible generation of SSPs, where it is possible to vary the IMF, the isochrones and the spectral atmospheres, interpolate them together and create a stacked spectra SSP.
 License: LGPL-3
-Imports: foreach, doParallel, data.table, Rfits, RANN, NISTunits, celestial, magicaxis, ParmOff, knitr, checkmate, matrixStats
+Imports: foreach, doParallel, data.table, Rfits, RANN, NISTunits, celestial, magicaxis, ParmOff, checkmate, matrixStats
 Suggests: ProSpect, ProPane, akima, shiny, shinyFiles, shinybusy, fst, dtw, knitr, rmarkdown
+Remotes:
+  asgr/ParmOff,
+  asgr/ProPane,
+  asgr/ProSpect,
+  asgr/Rfits
 Encoding: UTF-8
 LazyData: true
 LazyDataCompression: gzip

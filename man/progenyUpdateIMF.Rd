@@ -7,7 +7,7 @@ Integrate IMF Between Mass Limits
 This function only needs to be run when generating a ProGeny output for a new combination of Isochrones and/or IMF.
 }
 \usage{
-progenyUpdateIMF(Iso, IMFfunc, ...)
+progenyUpdateIMF(Iso, IMFfunc, max_width = NULL, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -16,6 +16,9 @@ Data.frame / data.table; the input table of Isochrones. This must have a particu
 }
   \item{IMFfunc}{
 Function; the IMF to be analysed. \code{ProGeny} comes with \code{\link{IMF_Chabrier}}, \code{\link{IMF_Kroupa}} and \code{\link{IMF_Salpeter}}, which are good starting points. Must accept \option{masslow}/\option{massmax} arguments as input.
+}
+  \item{max_width}{
+Numeric scalar; if NULL this does nothing, if set to numeric scalar then this is the upper limit allowed in any given bin width during IMF integration. This prevents pathological behavious when you get big gaps in Mini masses during phase transitions. Since bins are processed in log space, a value of 0.1/0.2 would be a factor 1.25/1.58 (these are sensible limits to use based on good quality ProGeny isochrones.
 }
   \item{\dots}{
 Other arguments that can be accepted by the input \option{IMFfunc}.

@@ -1,5 +1,5 @@
 progenyIso2Spec = function(logAge=8.4, logZ=0, logA=NULL, Iso, IMFint, Spec_combine,
-                           Interp_combine, interp=FALSE){
+                           Interp_combine, interp=FALSE, clip_quan=NULL){
   setDT(Iso)
 
   Lum = ID = wt = wt_sum = Teff = best = NULL
@@ -104,9 +104,13 @@ progenyIso2Spec = function(logAge=8.4, logZ=0, logA=NULL, Iso, IMFint, Spec_comb
         if(is.null(logA)){
           subset = Iso[logZ==logZ_step & logAge==logAge_step & best==i, which=TRUE] #faster!
           if(length(subset) > 0){
+            scale = Iso[subset,Lum]*IMFint[subset]
+            if(!is.null(clip_quan)){
+              scale = pmin(scale, quantile(scale, clip_quan, na.rm=TRUE))
+            }
             temp_DT = data.table(
               ID=as.vector(Interp_combine[[i]]$nn.idx[subset,]),
-              wt=as.vector(Interp_combine[[i]]$weights[subset,])*Iso[subset,Lum]*IMFint[subset]
+              wt=as.vector(Interp_combine[[i]]$weights[subset,])*scale
             )
             temp_DT = temp_DT[ID > 0,]
             pre_stack = temp_DT[,list(wt_sum=sum(wt)),by=ID]
@@ -120,9 +124,13 @@ progenyIso2Spec = function(logAge=8.4, logZ=0, logA=NULL, Iso, IMFint, Spec_comb
               interp_wt = logAge_wt[logAge_j]*logZ_wt[logZ_k]*logA_wt[logA_m]
               subset = Iso[logZ==logZ_step & logAge==logAge_step & logA==logA_step & best==i, which=TRUE] #faster!
               if(length(subset) > 0){
+                scale = Iso[subset,Lum]*IMFint[subset]
+                if(!is.null(clip_quan)){
+                  scale = pmin(scale, quantile(scale, clip_quan, na.rm=TRUE))
+                }
                 temp_DT = data.table(
                   ID=as.vector(Interp_combine[[i]]$nn.idx[subset,]),
-                  wt=as.vector(Interp_combine[[i]]$weights[subset,])*Iso[subset,Lum]*IMFint[subset]
+                  wt=as.vector(Interp_combine[[i]]$weights[subset,])*scale
                 )
                 temp_DT = temp_DT[ID > 0,]
                 pre_stack = temp_DT[,list(wt_sum=sum(wt)),by=ID]

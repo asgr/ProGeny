@@ -40,7 +40,7 @@ Character scalar; x axis name.
 Character scalar; y axis name.
 }
   \item{\dots}{
-Other arguments to pass to \code{\link{magplot}} (\option{add} = FALSE) or \code{\link{lines}} (\option{add} = TRUE).
+Other arguments to pass to \code{\link[magicaxis]{magplot}} (\option{add} = FALSE) or \code{\link{lines}} (\option{add} = TRUE).
 }
 }
 \details{
@@ -62,7 +62,7 @@ Note the number of rows will be 1 fewer than the length of the input \option{wav
 Aaron Robotham
 }
 \seealso{
-\code{\link{magplot}}
+\code{\link[magicaxis]{magplot}}
 }
 \examples{
 wave_grid_lin = seq(3e3, 1e4, by=1)

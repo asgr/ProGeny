@@ -45,7 +45,7 @@ Numeric/character scalar; the sparse sampling of the \option{Iso} being plotted.
 Integer scalar; random seed to use when sparse sampling with \option{Nsamp}.
 }
   \item{xsel}{
-Character scalar; the column to use for x axis in \code{\link{magrun}}.
+Character scalar; the column to use for x axis in \code{\link[magicaxis]{magrun}}.
 }
   \item{zsel}{
 Character scalar; the column to use for z axis colouring. Any column present in \option{Iso} can be used.

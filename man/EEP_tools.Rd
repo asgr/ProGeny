@@ -15,15 +15,15 @@ These functions are designed to work with MESA-like tracks whose columns are map
 All functions expect a data frame \code{track} with at least the following columns (or mapped equivalents):
 \itemize{
   \item \code{star_age}: stellar age in years (numeric)
-  \item \code{log_L}: log$_{10}$ of luminosity in solar units (numeric)
-  \item \code{log_Teff}: log$_{10}$ of effective temperature in Kelvin (numeric)
-  \item \code{log_center_T}: log$_{10}$ of central temperature (numeric)
+  \item \code{log_L}: \eqn{log_{10}} of luminosity in solar units (numeric)
+  \item \code{log_Teff}: \eqn{log_{10}} of effective temperature in Kelvin (numeric)
+  \item \code{log_center_T}: \eqn{log_{10}} of central temperature (numeric)
   \item \code{center_h1}: central H mass fraction (numeric)
   \item \code{center_he4}: central He mass fraction (numeric)
 }
 Optional columns, if present (or if their names are provided in \code{cols}), enable additional phase detections:
 \itemize{
-  \item \code{log_LH}: log$_{10}$ H-burning luminosity (for precise ZAMS detection)
+  \item \code{log_LH}: \eqn{log_{10}} H-burning luminosity (for precise ZAMS detection)
   \item \code{center_gamma}: central Coulomb coupling parameter Gamma_c (for WDCS detection)
   \item \code{star_mass}: total stellar mass (for envelope-based PostAGB detection)
   \item \code{m_shell_H}, \code{m_shell_He}: shell mass coordinates (for TP-AGB detection)
@@ -89,7 +89,7 @@ plot_eep(
               to column names present in \code{track}. Entries may be set to \code{NULL} to indicate absence.}
   \item{params}{For \code{identify_primary_eeps}, a named \code{list} of thresholds controlling phase picks:
   \describe{
-    \item{\code{prems_logTc}}{log$_{10}$ central temperature threshold for \strong{PreMS} start.}
+    \item{\code{prems_logTc}}{\eqn{log_{10}} central temperature threshold for \strong{PreMS} start.}
     \item{\code{zams_lburn_frac}}{Required fraction of luminosity from H-burning at ZAMS (if \code{log_LH} available).}
     \item{\code{zams_dXc_max}}{Maximum allowed central-H depletion prior to ZAMS (fallback).}
     \item{\code{iams_Xc}}{Central H abundance for \strong{IAMS}.}

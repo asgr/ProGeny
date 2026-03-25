@@ -8,10 +8,10 @@ The main interface via which users will likely use ProGeny to create SSPs. This 
 }
 \usage{
 progenyMakeSSP(Iso, IMFfunc = IMF_Chabrier, ..., rem_frac = 'get', Spec_combine,
-  Interp_combine, logAge_steps = NULL, logZ_steps = NULL, Mini_range = NULL, Zsol = 0.02,
-  cores = 8, Labels = list(Zlab = "Metallicity", Agelab = "Time since ZAM / Yrs",
-  Wavelab = "Wavelength / Ang", Lumlab = "Lsun / Ang (for 1 Msun SF)",
-  LumAgelab = "Lsun / Ang (for 1 Msun/Yr SFR)"))
+  Interp_combine, logAge_steps = NULL, logZ_steps = NULL, Mini_range = NULL,
+  max_width = NULL, clip_quan = NULL, Zsol = 0.02, cores = 8, Labels = list(
+  Zlab = "Metallicity", Agelab = "Time since ZAM / Yrs", Wavelab = "Wavelength / Ang",
+  Lumlab = "Lsun / Ang (for 1 Msun SF)", LumAgelab = "Lsun / Ang (for 1 Msun/Yr SFR)"))
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -41,6 +41,12 @@ Numeric vector; if provided it is the log10(Z/Zsol) values that you want the out
 }
   \item{Mini_range}{
 Numeric vector; optional. Lower and upper ranges of \option{Iso} Mini to use. This can be useful if wanting to combine mass ranges from different isochrone to make a better combined SSP (say one is better for low mass stars, and another better for high mass stars). If provided it must be length 2.
+}
+  \item{max_width}{
+Numeric scalar; if NULL this does nothing, if set to numeric scalar then this is the upper limit allowed in any given bin width during IMF integration. This prevents pathological behavious when you get big gaps in Mini masses during phase transitions. Since bins are processed in log space, a value of 0.1/0.2 would be a factor 1.25/1.58 (these are sensible limits to use based on good quality ProGeny isochrones. Usually used in conjunction with \option{clip_quan}.
+}
+  \item{clip_quan}{
+Numeric scalar; if NULL this does nothing, if set to numeric scalar then this becomes the quantile level to clip the product of Luminosity and IMF integral weight. Basically, certain isochrones can have big gaps in their outputs which occur at phase transition points. This can mean a highly luminous start gets too much nominal IMF weight (the integral is allowed to go too far). Setting to a large-ish value (0.99) should work to fix the glitchy isochrones. Ideally you see little difference when leaving this as NULL or setting at 0.99 (in which case leave at NULL). Usually used in conjunction with \option{max_width}.
 }
   \item{Zsol}{
 Numeric scalar; value of the Sun's solar metallicity (to convert logZ to Z). Sensible values to use are 0.02 (the standard BC03 and many other SPLs) or 0.014 (Asplund, 2009). Conflicting works have measured values as low as 0.013 and as high as 0.02 even in recent years so this should be treated a bit like H0, where values relative to the assumed value of solar are what we are really measuring with any resulting SSP.

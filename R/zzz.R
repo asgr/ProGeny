@@ -12,3 +12,9 @@ Iso = progenyInterpBest(Iso=Iso, Interp_combine=Interp_combine)
 progenyMakeSSP(Iso=Iso, Spec_combine=Spec_combine, Interp_combine=Interp_combine)'
 )
 }
+
+utils::globalVariables(
+  c("..col_keep", "..xsel", "..zsel", "IMFint", "Isochrone", "Lum", "Mass", "Mini",
+    "Teff", "V1", "V2", "best", "i", "label", "logA", "logAge", "logAge_hi", "logAge_lo",
+    "logG", "logG_diff", "logT_diff", "logZ", "logZ_diff")
+)

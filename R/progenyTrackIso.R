@@ -32,7 +32,7 @@ progenyTrackInterp = function(tracklist, target,
 
   sel_track_bins = unique(track_bins)
 
-  cores = min(cores, length(weights), detectCores())
+  cores = min(cores, length(sel_track_bins), parallel::detectCores())
   registerDoParallel(cores=cores)
 
   bin = NULL
@@ -45,7 +45,7 @@ progenyTrackInterp = function(tracklist, target,
     target_loc = target
 
     #The RHS of the OR is to catch masses at the extreme massive end that exactly match the max input tracklist (these can still be computed)
-    sel = (target_loc >= target_start & target_loc < target_end) | (bin == max(sel_track_bins) & target_loc == max(target_type))
+    sel = (target_loc >= target_start & target_loc < target_end) | (bin == max(sel_track_bins) & target_loc == max(track_vals))
     target_loc = target_loc[sel]
 
     if(target_log){
@@ -98,29 +98,29 @@ progenyTrackInterp = function(tracklist, target,
     tag_vec_end = 1:dim(track_end)[1]
 
 
-    #logAge2tag_start = approxfun(track_start$logAge, tag_vec_start, yleft=NA, yright=NA)
-    #logAge2tag_end = approxfun(track_end$logAge, tag_vec_end, yleft=NA, yright=NA)
+    #logAge2tag_start = approxfun(track_start$logAge, tag_vec_start, yleft=NA, yright=NA, na.rm=TRUE)
+    #logAge2tag_end = approxfun(track_end$logAge, tag_vec_end, yleft=NA, yright=NA, na.rm=TRUE)
 
-    start_func_logAge = approxfun(tag_vec_start, track_start$logAge, yleft=NA, yright=NA)
-    end_func_logAge = approxfun(tag_vec_end, track_end$logAge, yleft=NA, yright=NA)
+    start_func_logAge = approxfun(tag_vec_start, track_start$logAge, yleft=NA, yright=NA, na.rm=TRUE)
+    end_func_logAge = approxfun(tag_vec_end, track_end$logAge, yleft=NA, yright=NA, na.rm=TRUE)
 
-    start_func_logMini = approxfun(tag_vec_start, log10(track_start$Mini), yleft=NA, yright=NA)
-    end_func_logMini = approxfun(tag_vec_end, log10(track_end$Mini), yleft=NA, yright=NA)
+    start_func_logMini = approxfun(tag_vec_start, log10(track_start$Mini), yleft=NA, yright=NA, na.rm=TRUE)
+    end_func_logMini = approxfun(tag_vec_end, log10(track_end$Mini), yleft=NA, yright=NA, na.rm=TRUE)
 
-    start_func_logMass = approxfun(tag_vec_start, log10(track_start$Mass), yleft=NA, yright=NA)
-    end_func_logMass = approxfun(tag_vec_end, log10(track_end$Mass), yleft=NA, yright=NA)
+    start_func_logMass = approxfun(tag_vec_start, log10(track_start$Mass), yleft=NA, yright=NA, na.rm=TRUE)
+    end_func_logMass = approxfun(tag_vec_end, log10(track_end$Mass), yleft=NA, yright=NA, na.rm=TRUE)
 
-    start_func_logLum = approxfun(tag_vec_start, log10(track_start$Lum), yleft=NA, yright=NA)
-    end_func_logLum = approxfun(tag_vec_end, log10(track_end$Lum), yleft=NA, yright=NA)
+    start_func_logLum = approxfun(tag_vec_start, log10(track_start$Lum), yleft=NA, yright=NA, na.rm=TRUE)
+    end_func_logLum = approxfun(tag_vec_end, log10(track_end$Lum), yleft=NA, yright=NA, na.rm=TRUE)
 
-    start_func_logTeff = approxfun(tag_vec_start, log10(track_start$Teff), yleft=NA, yright=NA)
-    end_func_logTeff = approxfun(tag_vec_end, log10(track_end$Teff), yleft=NA, yright=NA)
+    start_func_logTeff = approxfun(tag_vec_start, log10(track_start$Teff), yleft=NA, yright=NA, na.rm=TRUE)
+    end_func_logTeff = approxfun(tag_vec_end, log10(track_end$Teff), yleft=NA, yright=NA, na.rm=TRUE)
 
-    start_func_logG = approxfun(tag_vec_start, track_start$logG, yleft=NA, yright=NA)
-    end_func_logG = approxfun(tag_vec_end, track_end$logG, yleft=NA, yright=NA)
+    start_func_logG = approxfun(tag_vec_start, track_start$logG, yleft=NA, yright=NA, na.rm=TRUE)
+    end_func_logG = approxfun(tag_vec_end, track_end$logG, yleft=NA, yright=NA, na.rm=TRUE)
 
-    start_func_label = approxfun(tag_vec_start, track_start$label, yleft=NA, yright=NA)
-    end_func_label = approxfun(tag_vec_end, track_end$label, yleft=NA, yright=NA)
+    start_func_label = approxfun(tag_vec_start, track_start$label, yleft=NA, yright=NA, na.rm=TRUE)
+    end_func_label = approxfun(tag_vec_end, track_end$label, yleft=NA, yright=NA, na.rm=TRUE)
 
     #Still working on this: map ages to mean tag, then mean tag to properties.
 
@@ -160,12 +160,12 @@ progenyTrackInterp = function(tracklist, target,
 
       if(make_iso){
         if(iso_type == 'approx'){
-          temp_vec_logMini = approxfun(temp_vec_logAge, temp_vec_logMini, ties = "ordered", ...)(logAge_vec)
-          temp_vec_logMass = approxfun(temp_vec_logAge, temp_vec_logMass, ties = "ordered", ...)(logAge_vec)
-          temp_vec_logLum = approxfun(temp_vec_logAge, temp_vec_logLum, ties = "ordered", ...)(logAge_vec)
-          temp_vec_logTeff = approxfun(temp_vec_logAge, temp_vec_logTeff, ties = "ordered", ...)(logAge_vec)
-          temp_vec_logG = approxfun(temp_vec_logAge, temp_vec_logG, ties = "ordered", ...)(logAge_vec)
-          temp_vec_label = approxfun(temp_vec_logAge, temp_vec_label, ties = "ordered", ...)(logAge_vec)
+          temp_vec_logMini = approxfun(temp_vec_logAge, temp_vec_logMini, ties = "ordered", na.rm=TRUE, ...)(logAge_vec)
+          temp_vec_logMass = approxfun(temp_vec_logAge, temp_vec_logMass, ties = "ordered", na.rm=TRUE, ...)(logAge_vec)
+          temp_vec_logLum = approxfun(temp_vec_logAge, temp_vec_logLum, ties = "ordered", na.rm=TRUE, ...)(logAge_vec)
+          temp_vec_logTeff = approxfun(temp_vec_logAge, temp_vec_logTeff, ties = "ordered", na.rm=TRUE, ...)(logAge_vec)
+          temp_vec_logG = approxfun(temp_vec_logAge, temp_vec_logG, ties = "ordered", na.rm=TRUE, ...)(logAge_vec)
+          temp_vec_label = approxfun(temp_vec_logAge, temp_vec_label, ties = "ordered", na.rm=TRUE, ...)(logAge_vec)
         }else if(iso_type == 'integral' | iso_type == 'integrate'){
           temp_vec_Age = 10^temp_vec_logAge
           Age_vec = 10^logAge_vec

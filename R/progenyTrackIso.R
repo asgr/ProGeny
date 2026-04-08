@@ -33,6 +33,7 @@ progenyTrackInterp = function(tracklist, target,
   sel_track_bins = unique(track_bins)
 
   cores = min(cores, length(sel_track_bins), parallel::detectCores())
+
   registerDoParallel(cores=cores)
 
   bin = NULL
@@ -189,7 +190,7 @@ progenyTrackInterp = function(tracklist, target,
           Lum = 10^temp_vec_logLum,
           Teff = 10^temp_vec_logTeff,
           logG = temp_vec_logG,
-          label = ceiling(temp_vec_label)
+          label = round(temp_vec_label)
         )
       }else if(target_type == 'logZ'){
         temp_out = data.table(
@@ -200,7 +201,7 @@ progenyTrackInterp = function(tracklist, target,
           Lum = 10^temp_vec_logLum,
           Teff = 10^temp_vec_logTeff,
           logG = temp_vec_logG,
-          label = ceiling(temp_vec_label)
+          label = round(temp_vec_label)
         )
       }
 
@@ -217,6 +218,8 @@ progenyTrackInterp = function(tracklist, target,
 
   setkey(combine_out, logZ, logAge, Mini)
 
+  logAge = logAge_lo = logAge_hi = NULL
+
   if(!is.null(target_orig)){
     use_age = unique(target_orig[,list(logAge_lo, logAge_hi)])
 
@@ -229,6 +232,8 @@ progenyTrackInterp = function(tracklist, target,
     combine_out = rbindlist(combine_out)
   }
 
+  Mini = Mass = Lum = Teff = logG = NULL
+
   combine_out = combine_out[is.finite(Mini) &
                     is.finite(Mass) &
                     is.finite(Lum) &
@@ -239,44 +244,59 @@ progenyTrackInterp = function(tracklist, target,
   return(combine_out)
 }
 
-progenyFindMass = function(tracklist, logAge_lim = c(5,10.3), logAge_bin=0.05, logZ_use=0){
+progenyFindMass = function(tracklist, logAge_lim = c(5,10.3), logAge_bin=0.05, logZ_use=0, label_use=-1:9){
 
   if(!requireNamespace("akima", quietly = TRUE)){
     stop('The akima package is needed for this function to work. Please install it from CRAN.', call. = FALSE)
   }
 
+  label = label_val = logAge = Mini = eep_i = NULL
+
   logAge_vec = seq(logAge_lim[1], logAge_lim[2], by=logAge_bin)
 
-  eep_range = 1:dim(tracklist[logZ==0 & Mini==unique(tracklist$Mini)[1],])[1]
+  temp = tracklist[logZ==logZ_use, list(logAge, eep_i=1:.N), by=list(Mini, label)]
 
-  temp = foreach(i = eep_range, .combine=rbind)%do%{
-    tracklist[logZ==logZ_use, list(i,logAge=logAge[i]), by=Mini]
+  #to compute the interpolated linear fit onto a regular isochrone grid
+
+  #need to loop round all labels, because some phases have different numbers of EEPs, and we want to make sure we are interpolating within the same phase (e.g. MS to MS, not MS to RGB)
+  label_use = label_use[label_use %in% unique(temp$label)]
+
+  output_all = foreach(label_val = label_use)%do%{
+    temp_sub = temp[label==label_val,]
+    akima.si = akima::interp(temp_sub[,logAge], temp_sub[, eep_i], temp_sub[, log10(Mini)],
+                             xo=logAge_vec, yo=min(temp_sub[, eep_i]):max(temp_sub[, eep_i]),
+                             linear = FALSE, extrap = FALSE, duplicate = 'median')
+    #clean the top part for bits that go out of domain
+    clean = ProPane::propaneBin2D(temp_sub[,logAge], temp_sub[, eep_i], image=matrix(0,length(akima.si$x), length(akima.si$y)),
+                                  xlim=range(akima.si$x), ylim=range(akima.si$y))
+    ymax = apply(clean$z != 0, 1, function(x) {if (any(x)) max(which(x)) else NA_integer_})
+    if(length(which(!is.na(ymax))) > 1){
+      temp_func = approxfun(akima.si$x, ymax)
+      temp_grid = expand.grid(akima.si$x, akima.si$y)
+      akima.si$z[temp_grid[,2] > (temp_func(temp_grid[,1]) + 0.5)] = NA
+    }
+
+    #make sure all mass values are in domain
+    lims = range(log10(temp_sub[, Mini]), na.rm = TRUE)
+    akima.si$z[] = pmax(pmin(akima.si$z, lims[2]), lims[1])
+
+    i = NULL
+
+    output = foreach(i = seq_along(akima.si$x))%do%{
+      Mini_use = 10^akima.si$z[i,]
+      Mini_use = Mini_use[is.finite(Mini_use)]
+      Mini_use = sort(unique(Mini_use))
+      data.table(Mini=Mini_use,
+                 logAge_lo = akima.si$x[i] - logAge_bin/2,
+                 logAge_hi = akima.si$x[i] + logAge_bin/2
+      )
+    }
+
+    return(rbindlist(output))
   }
-
-  temp = temp[!is.na(logAge)]
-
-  #to compute the interpolated bicubic fit onto a regular isochrone grid
-
-  akima.si = akima::interp(temp$logAge, temp$i, log10(temp$Mini),
-                           xo=logAge_vec, yo=min(temp$i):max(temp$i),
-                           linear = FALSE, extrap = FALSE, duplicate = 'median')
-
-  clean = ProPane::propaneBin2D(temp$logAge, temp$i, image=matrix(0,length(akima.si$x), length(akima.si$y)),
-                       xlim=range(akima.si$x), ylim=range(akima.si$y))
-  akima.si$z[clean$z == 0] = NA
-  akima.si$z[akima.si$z < min(log10(temp$Mini)) | akima.si$z > max(log10(temp$Mini))] = NA
-
-
-  output = foreach(i = seq_along(akima.si$x))%do%{
-    Mini_use = 10^akima.si$z[i,]
-    Mini_use = Mini_use[is.finite(Mini_use)]
-    data.table(Mini=Mini_use,
-               logAge_lo = akima.si$x[i] - logAge_bin/2,
-               logAge_hi = akima.si$x[i] + logAge_bin/2
-    )
-  }
-
-  return(rbindlist(output))
+  target = rbindlist(output_all)
+  setkey(target, logAge_lo, Mini)
+  return(target)
 }
 
 progenyExtendIso = function(Iso_base, Iso_extend, label=NA, logA=NA){
@@ -285,6 +305,8 @@ progenyExtendIso = function(Iso_base, Iso_extend, label=NA, logA=NA){
 
   setDT(Iso_base)
   setDT(Iso_extend)
+
+  Mini = logZ = logAge = NULL
 
   Mini_end = Iso_base[,max(Mini),by=list(logZ, logAge)]
 
@@ -295,6 +317,8 @@ progenyExtendIso = function(Iso_base, Iso_extend, label=NA, logA=NA){
   if(identical(logA_use, 'base_get')){
     logA_use = Iso_base[,max(logA, na.rm=TRUE)] + 1
   }
+
+  i = V1 = NULL
 
   output = foreach(i = 1:dim(Mini_end)[1])%do%{
     best_logZ = Iso_extend[which.min(abs(logZ - Mini_end[i,logZ])), logZ]

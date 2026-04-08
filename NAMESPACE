@@ -8,7 +8,7 @@ import("NISTunits")
 import('celestial')
 import('magicaxis')
 import("ParmOff")
-import("knitr")
+#import("knitr")
 import("checkmate")
 #import("future")
 

@@ -13,7 +13,8 @@ Functions to convert MESA/Iso EEP tracks into MIST like isochrone ready for use 
 progenyTrackInterp(tracklist, target, make_iso = TRUE, logAge_lim = c(5, 10.3),
   logAge_bin = 0.05, iso_type = "approx", cores = 8, logZ_use = 0, ...)
 
-progenyFindMass(tracklist, logAge_lim = c(5,10.3), logAge_bin = 0.05, logZ_use = 0)
+progenyFindMass(tracklist, logAge_lim = c(5,10.3), logAge_bin = 0.05, logZ_use = 0,
+  label_use = -1:9)
 
 progenyExtendIso(Iso_base, Iso_extend, label = NA, logA = NA)
 }
@@ -42,6 +43,9 @@ Integer scalar; the number of cores to run on.
 }
   \item{logZ_use}{
 Numeric scalar; the value of \option{logZ} to use. Isochrones can only be computed meaningfully for a specific metallicity, i.e. these functions need to be run for one value of metallicity at a time.
+}
+  \item{label_use}{
+Logical; limit analysis to these label. The default span (-1:9) is the standard MIST pre-main-sequence to evolved white dwarf stars.
 }
   \item{Iso_base}{
 Data.table; isochrone that you want to be extended. This should be missing post-AGB stellar evolution (i.e. remnants) since they are what will be added via \option{Iso_extend}.

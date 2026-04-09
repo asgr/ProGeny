@@ -127,46 +127,42 @@ progenyTrackInterp = function(tracklist, target,
 
     tag_vec_out = seq_along(remap_start)
 
+    # Pre-compute approxfun evaluations once, outside the per-mass loop
+    start_logAge_vals  = start_func_logAge(remap_start[tag_vec_out])
+    end_logAge_vals    = end_func_logAge(remap_end[tag_vec_out])
+    start_logMini_vals = start_func_logMini(remap_start[tag_vec_out])
+    end_logMini_vals   = end_func_logMini(remap_end[tag_vec_out])
+    start_logMass_vals = start_func_logMass(remap_start[tag_vec_out])
+    end_logMass_vals   = end_func_logMass(remap_end[tag_vec_out])
+    start_logLum_vals  = start_func_logLum(remap_start[tag_vec_out])
+    end_logLum_vals    = end_func_logLum(remap_end[tag_vec_out])
+    start_logTeff_vals = start_func_logTeff(remap_start[tag_vec_out])
+    end_logTeff_vals   = end_func_logTeff(remap_end[tag_vec_out])
+    start_logG_vals    = start_func_logG(remap_start[tag_vec_out])
+    end_logG_vals      = end_func_logG(remap_end[tag_vec_out])
+    start_label_vals   = start_func_label(remap_start[tag_vec_out])
+    end_label_vals     = end_func_label(remap_end[tag_vec_out])
+
     i = NULL
     temp_loop = foreach(i = seq_along(target_loc))%do%{
       weight = weights[i]
 
-      temp_mat_logAge = cbind(start_func_logAge(remap_start[tag_vec_out])*(1 - weight),
-                              end_func_logAge(remap_end[tag_vec_out])*weight)
-      temp_vec_logAge = rowSums(temp_mat_logAge, na.rm = FALSE)
-
-      temp_mat_logMini = cbind(start_func_logMini(remap_start[tag_vec_out])*(1 - weight),
-                               end_func_logMini(remap_end[tag_vec_out])*weight)
-      temp_vec_logMini = rowSums(temp_mat_logMini, na.rm = FALSE)
-
-      temp_mat_logMass = cbind(start_func_logMass(remap_start[tag_vec_out])*(1 - weight),
-                               end_func_logMass(remap_end[tag_vec_out])*weight)
-      temp_vec_logMass = rowSums(temp_mat_logMass, na.rm = FALSE)
-
-      temp_mat_logLum = cbind(start_func_logLum(remap_start[tag_vec_out])*(1 - weight),
-                              end_func_logLum(remap_end[tag_vec_out])*weight)
-      temp_vec_logLum = rowSums(temp_mat_logLum, na.rm = FALSE)
-
-      temp_mat_logTeff = cbind(start_func_logTeff(remap_start[tag_vec_out])*(1 - weight),
-                               end_func_logTeff(remap_end[tag_vec_out])*weight)
-      temp_vec_logTeff = rowSums(temp_mat_logTeff, na.rm = FALSE)
-
-      temp_mat_logG = cbind(start_func_logG(remap_start[tag_vec_out])*(1 - weight),
-                            end_func_logG(remap_end[tag_vec_out])*weight)
-      temp_vec_logG = rowSums(temp_mat_logG, na.rm = FALSE)
-
-      temp_mat_label = cbind(start_func_label(remap_start[tag_vec_out])*(1 - weight),
-                             end_func_label(remap_end[tag_vec_out])*weight)
-      temp_vec_label = rowSums(temp_mat_label, na.rm = FALSE)
+      temp_vec_logAge  = start_logAge_vals  * (1 - weight) + end_logAge_vals  * weight
+      temp_vec_logMini = start_logMini_vals * (1 - weight) + end_logMini_vals * weight
+      temp_vec_logMass = start_logMass_vals * (1 - weight) + end_logMass_vals * weight
+      temp_vec_logLum  = start_logLum_vals  * (1 - weight) + end_logLum_vals  * weight
+      temp_vec_logTeff = start_logTeff_vals * (1 - weight) + end_logTeff_vals * weight
+      temp_vec_logG    = start_logG_vals    * (1 - weight) + end_logG_vals    * weight
+      temp_vec_label   = start_label_vals   * (1 - weight) + end_label_vals   * weight
 
       if(make_iso){
         if(iso_type == 'approx'){
-          temp_vec_logMini = approxfun(temp_vec_logAge, temp_vec_logMini, ties = "ordered", na.rm=TRUE, ...)(logAge_vec)
-          temp_vec_logMass = approxfun(temp_vec_logAge, temp_vec_logMass, ties = "ordered", na.rm=TRUE, ...)(logAge_vec)
-          temp_vec_logLum = approxfun(temp_vec_logAge, temp_vec_logLum, ties = "ordered", na.rm=TRUE, ...)(logAge_vec)
-          temp_vec_logTeff = approxfun(temp_vec_logAge, temp_vec_logTeff, ties = "ordered", na.rm=TRUE, ...)(logAge_vec)
-          temp_vec_logG = approxfun(temp_vec_logAge, temp_vec_logG, ties = "ordered", na.rm=TRUE, ...)(logAge_vec)
-          temp_vec_label = approxfun(temp_vec_logAge, temp_vec_label, ties = "ordered", na.rm=TRUE, ...)(logAge_vec)
+          temp_vec_logMini = approx(temp_vec_logAge, temp_vec_logMini, xout=logAge_vec, ties = "ordered", na.rm=TRUE, ...)$y
+          temp_vec_logMass = approx(temp_vec_logAge, temp_vec_logMass, xout=logAge_vec, ties = "ordered", na.rm=TRUE, ...)$y
+          temp_vec_logLum  = approx(temp_vec_logAge, temp_vec_logLum,  xout=logAge_vec, ties = "ordered", na.rm=TRUE, ...)$y
+          temp_vec_logTeff = approx(temp_vec_logAge, temp_vec_logTeff, xout=logAge_vec, ties = "ordered", na.rm=TRUE, ...)$y
+          temp_vec_logG    = approx(temp_vec_logAge, temp_vec_logG,    xout=logAge_vec, ties = "ordered", na.rm=TRUE, ...)$y
+          temp_vec_label   = approx(temp_vec_logAge, temp_vec_label,   xout=logAge_vec, ties = "ordered", na.rm=TRUE, ...)$y
         }else if(iso_type == 'integral' | iso_type == 'integrate'){
           temp_vec_Age = 10^temp_vec_logAge
           Age_vec = 10^logAge_vec
@@ -282,17 +278,22 @@ progenyFindMass = function(tracklist, logAge_lim = c(5,10.3), logAge_bin=0.05, l
 
     i = NULL
 
-    output = foreach(i = seq_along(akima.si$x))%do%{
-      Mini_use = 10^akima.si$z[i,]
-      Mini_use = Mini_use[is.finite(Mini_use)]
-      Mini_use = sort(unique(Mini_use))
-      data.table(Mini=Mini_use,
-                 logAge_lo = akima.si$x[i] - logAge_bin/2,
-                 logAge_hi = akima.si$x[i] + logAge_bin/2
-      )
+    output = {
+      z_mat = akima.si$z
+      row_idx_all = rep(seq_len(nrow(z_mat)), times = ncol(z_mat))
+      z_vec = as.vector(z_mat)
+      finite_sel = is.finite(z_vec)
+      dt = data.table(row_idx = row_idx_all[finite_sel], Mini = 10^z_vec[finite_sel])
+      dt = unique(dt)
+      dt[, `:=`(
+        logAge_lo = akima.si$x[row_idx] - logAge_bin/2,
+        logAge_hi = akima.si$x[row_idx] + logAge_bin/2
+      )]
+      dt[, row_idx := NULL]
+      dt
     }
 
-    return(rbindlist(output))
+    return(output)
   }
   target = rbindlist(output_all)
   setkey(target, logAge_lo, Mini)

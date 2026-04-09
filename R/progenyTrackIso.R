@@ -30,7 +30,7 @@ progenyTrackInterp = function(tracklist, target,
   track_bins = findInterval(x=target, vec=track_vals, all.inside=TRUE)
   track_bins[target == max(track_vals)] = length(track_vals) - 1L
 
-  sel_track_bins = unique(track_bins)
+  sel_track_bins = sort(unique(track_bins))
 
   cores = min(cores, length(sel_track_bins), parallel::detectCores())
 
@@ -265,7 +265,7 @@ progenyFindMass = function(tracklist, logAge_lim = c(5,10.3), logAge_bin=0.05, l
     temp_sub = temp[label==label_val,]
     akima.si = akima::interp(temp_sub[,logAge], temp_sub[, eep_i], temp_sub[, log10(Mini)],
                              xo=logAge_vec, yo=min(temp_sub[, eep_i]):max(temp_sub[, eep_i]),
-                             linear = FALSE, extrap = FALSE, duplicate = 'median')
+                             linear = TRUE, extrap = FALSE, duplicate = 'median')
     #clean the top part for bits that go out of domain
     clean = ProPane::propaneBin2D(temp_sub[,logAge], temp_sub[, eep_i], image=matrix(0,length(akima.si$x), length(akima.si$y)),
                                   xlim=range(akima.si$x), ylim=range(akima.si$y))

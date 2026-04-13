@@ -62,45 +62,32 @@ progenyTrackInterp = function(tracklist, target,
 
     all_phases = sort(unique(names(track_start_labels_tab), names(track_end_labels_tab)))
 
-    i = NULL
-    max_res_phases = foreach(i = all_phases, .combine='c')%do%{
-      max(track_start_labels_tab[names(track_start_labels_tab) == i], track_end_labels_tab[names(track_end_labels_tab) == i])
-    }
+    #here we calculate the best mapping of phases, making sure they all end up having the same length in terms of indexing
 
-    #here we calculate the best mapping of phases, making sure the all end up having the same length in terms of indexing
+    start_counts = track_start_labels_tab[all_phases]
+    end_counts = track_end_labels_tab[all_phases]
+    start_counts[is.na(start_counts)] = 0L
+    end_counts[is.na(end_counts)] = 0L
+    max_res_phases = pmax(start_counts, end_counts)
 
-    remap_start = {}
-    current_max = 0
+    # cumulative offset into each track for each phase (0 for the first phase, then cumsum of prior counts)
+    start_offsets = cumsum(c(0L, head(start_counts, -1)))
+    end_offsets   = cumsum(c(0L, head(end_counts, -1)))
+
+    total_remap_len = sum(max_res_phases)
+    remap_start = vector("numeric", total_remap_len)
+    remap_end   = vector("numeric", total_remap_len)
+    pos = 1L
     for(i in seq_along(all_phases)){
-      if(all_phases[i] %in% names(track_start_labels_tab)){
-        current_phase_map = seq(1,track_start_labels_tab[names(track_start_labels_tab) == all_phases[i]], length = max_res_phases[i])
-      }else{
-        current_phase_map = rep(NA, max_res_phases[i])
-      }
-
-      remap_start = c(remap_start, current_phase_map + current_max)
-      current_max = max(remap_start, na.rm=TRUE)
-    }
-
-    remap_end = {}
-    current_max = 0
-    for(i in seq_along(all_phases)){
-      if(all_phases[i] %in% names(track_end_labels_tab)){
-        current_phase_map = seq(1,track_end_labels_tab[names(track_end_labels_tab) == all_phases[i]], length = max_res_phases[i])
-      }else{
-        current_phase_map = rep(NA, max_res_phases[i])
-      }
-
-      remap_end = c(remap_end,current_phase_map + current_max)
-      current_max = max(remap_end, na.rm=TRUE)
+      len = max_res_phases[i]
+      idx = pos:(pos + len - 1L)
+      remap_start[idx] = if(start_counts[i] > 0L) seq(1 + start_offsets[i], start_counts[i] + start_offsets[i], length.out = len) else NA_real_
+      remap_end[idx]   = if(end_counts[i] > 0L) seq(1 + end_offsets[i], end_counts[i] + end_offsets[i], length.out = len) else NA_real_
+      pos = pos + len
     }
 
     tag_vec_start = 1:dim(track_start)[1]
     tag_vec_end = 1:dim(track_end)[1]
-
-
-    tag_vec_out = seq_along(remap_start)
-    remap_end = remap_end[tag_vec_out]
 
     #logAge2tag_start = approxfun(track_start$logAge, tag_vec_start, yleft=NA, yright=NA, na.rm=TRUE)
     #logAge2tag_end = approxfun(track_end$logAge, tag_vec_end, yleft=NA, yright=NA, na.rm=TRUE)
@@ -127,24 +114,6 @@ progenyTrackInterp = function(tracklist, target,
     end_label_vals = approx(tag_vec_end, track_end$label, xout = remap_end, yleft=NA, yright=NA, na.rm=TRUE)$y
 
     #Still working on this: map ages to mean tag, then mean tag to properties.
-
-    # tag_vec_out = seq_along(remap_start)
-
-    # Pre-compute approxfun evaluations once, outside the per-mass loop
-    # start_logAge_vals  = start_func_logAge(remap_start[tag_vec_out])
-    # end_logAge_vals    = end_func_logAge(remap_end[tag_vec_out])
-    # start_logMini_vals = start_func_logMini(remap_start[tag_vec_out])
-    # end_logMini_vals   = end_func_logMini(remap_end[tag_vec_out])
-    # start_logMass_vals = start_func_logMass(remap_start[tag_vec_out])
-    # end_logMass_vals   = end_func_logMass(remap_end[tag_vec_out])
-    # start_logLum_vals  = start_func_logLum(remap_start[tag_vec_out])
-    # end_logLum_vals    = end_func_logLum(remap_end[tag_vec_out])
-    # start_logTeff_vals = start_func_logTeff(remap_start[tag_vec_out])
-    # end_logTeff_vals   = end_func_logTeff(remap_end[tag_vec_out])
-    # start_logG_vals    = start_func_logG(remap_start[tag_vec_out])
-    # end_logG_vals      = end_func_logG(remap_end[tag_vec_out])
-    # start_label_vals   = start_func_label(remap_start[tag_vec_out])
-    # end_label_vals     = end_func_label(remap_end[tag_vec_out])
 
     i = NULL
     temp_loop = foreach(i = seq_along(target_loc))%do%{

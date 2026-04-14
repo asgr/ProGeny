@@ -1,70 +1,86 @@
 ## Simple helpers
 .first_or_na = function(idx) if (length(idx) == 0) NA_integer_ else idx[1]
 
+## Default secondary EEP counts per interval, matching Fortran iso input.eep
+## (value = number of secondary EEPs in the interval starting at the named primary)
+.default_n_secondary = c(
+  PreMS   = 200L,
+  ZAMS    = 150L,
+  IAMS    = 100L,
+  TAMS    = 150L,
+  RGBTip  = 25L,
+  ZACHeB  = 75L,
+  TACHeB  = 100L,
+  TPAGB   = 600L,
+  CBurn   = 100L,
+  PostAGB = 300L
+)
+
 identify_primary_eeps = function(track,
                                   cols = list(
-                                    star_age = "star_age",
-                                    logL     = "log_L",
-                                    logTeff  = "log_Teff",
-                                    logTc    = "log_center_T",
-                                    Xc       = "center_h1",
-                                    Yc       = "center_he4",
-                                    logLH      = "log_LH",      # optional
-                                    Gamma_c  = "center_gamma",     # optional
-                                    M_star   = "star_mass",   # optional
-                                    M_Hshell = "m_shell_H",   # optional
-                                    M_Heshell= "m_shell_He",   # optional
-                                    Xc_C     = "center_c12",   # optional (for C burning)
-                                    M_core  = "he_core_mass"   # optional (for PostAGB)
+                                    star_age  = "star_age",
+                                    logL      = "log_L",
+                                    logTeff   = "log_Teff",
+                                    logTc     = "log_center_T",
+                                    logRhoc   = "log_center_Rho",  # for distance metric
+                                    Xc        = "center_h1",
+                                    Yc        = "center_he4",
+                                    logg      = "log_g",           # optional (for ZAMS)
+                                    logLH     = "log_LH",          # optional
+                                    logLHe    = "log_LHe",         # optional (for ZACHeB)
+                                    Gamma_c   = "center_gamma",    # optional
+                                    M_star    = "star_mass",       # optional
+                                    M_He_core = "he_core_mass",    # optional (for TPAGB)
+                                    M_CO_core = "c_core_mass",     # optional (for TPAGB, PostAGB)
+                                    Xc_C      = "center_c12"       # optional (for C burning)
                                   ),
                                   params = list(
-                                    prems_logTc      = 5.0,
-                                    zams_lburn_frac  = 0.999,
-                                    zams_dXc_max     = 0.0015,
-                                    iams_Xc          = 0.3,
-                                    tams_Xc          = 1e-12,
-                                    rgbtip_Yc        = 0.01,
-                                    zacheb_Yc        = 0.03,
-                                    tacheb_Yc        = 1e-4,
-                                    tpagb_Yc         = 1e-6,
-                                    tpagb_delta_M    = 0.1,
-                                    cburn_Xc_X       = 1e-4,
-                                    postagb_env_frac = 0.2,
-                                    wdcs_Gamma_max   = 100
+                                    prems_logTc       = 5.0,
+                                    prems_logTc_adj   = 0.01,     # high-mass Tc adjustment
+                                    zams_dXc_max      = 0.001,    # Fortran: Xmax - 1.0d-3
+                                    iams_Xc           = 0.35,     # Fortran: 3.5d-1
+                                    tams_Xc           = 1e-12,    # Fortran: 1d-12
+                                    tams_max_age      = 1.5e10,   # 15 Gyr low-mass fallback
+                                    rgbtip_Yc         = 0.01,     # Fortran: 1d-2
+                                    zacheb_Yc         = 0.03,     # Fortran: 3d-2
+                                    tacheb_Yc         = 1e-4,     # Fortran: 1d-4
+                                    tpagb_Yc          = 1e-6,     # Fortran: 1d-6
+                                    tpagb_He_shell    = 0.1,      # Fortran: HeShellMin = 1d-1
+                                    cburn_XY_lim      = 1e-8,     # Fortran: limit_XY = 1d-8
+                                    cburn_C_lim       = 1e-4,     # Fortran: center_carbon_limit
+                                    postagb_core_frac = 0.8,      # Fortran: core_mass_frac_limit
+                                    wdcs_Gamma_min    = 100       # Fortran: center_gamma_limit
                                   )) {
   n = nrow(track)
 
-  .get = function(name, req=TRUE){
-    if(!is.null(cols[[name]]) && cols[[name]] %in% names(track)){
+  .get = function(name, req = TRUE) {
+    if (!is.null(cols[[name]]) && cols[[name]] %in% names(track)) {
       return(track[[cols[[name]]]])
-    }else{
-      if(req){
-        stop('Column ',name,' is missing and is required!')
-      }else{
+    } else {
+      if (req) {
+        stop('Column ', name, ' is missing and is required!')
+      } else {
         return(NULL)
       }
     }
   }
-  
+
   ## Required columns
-  logTc = .get("logTc")
-  logL  = .get("logL")
+  logTc   = .get("logTc")
+  logL    = .get("logL")
   logTeff = .get("logTeff")
-  Xc   = .get("Xc")
-  Yc   = .get("Yc")
+  Xc      = .get("Xc")
+  Yc      = .get("Yc")
   ## Optional columns (may be NULL if not present)
-  logLH     = .get("logLH", req=FALSE)
-  Gamma_c   = .get("Gamma_c", req=FALSE)
-  M_star    = .get("M_star", req=FALSE)
-  M_Hshell  = .get("M_Hshell", req=FALSE)
-  M_Heshell = .get("M_Heshell", req=FALSE)
-  Xc_C      = .get("Xc_C", req=FALSE)
-  M_core    = .get("M_core", req=FALSE)
-  if(!is.null(M_core)){
-    M_env = M_star - M_core
-  }else{
-    M_env = NULL
-  }
+  logg      = .get("logg", req = FALSE)
+  logLH     = .get("logLH", req = FALSE)
+  logLHe    = .get("logLHe", req = FALSE)
+  Gamma_c   = .get("Gamma_c", req = FALSE)
+  M_star    = .get("M_star", req = FALSE)
+  M_He_core = .get("M_He_core", req = FALSE)
+  M_CO_core = .get("M_CO_core", req = FALSE)
+  Xc_C      = .get("Xc_C", req = FALSE)
+  star_age  = .get("star_age", req = FALSE)
 
   ## Result container
   eep_idx = c(
@@ -81,147 +97,177 @@ identify_primary_eeps = function(track,
     WDCS    = NA_integer_
   )
 
-  ## Below is all based on Dotter 2016 paper (rather than Iso code)
   ## 1. Pre-MS (PreMS): first point where log Tc > threshold
-  i_prems = .first_or_na(which(logTc > params$prems_logTc))
-  #if (is.na(i_prems)) i_prems = 1L   # if track starts already hotter, use first
+  ## Fortran: if track starts already hotter, use logTc[1] + adjustment
+  my_logTc = params$prems_logTc
+  if (logTc[1] > my_logTc) {
+    my_logTc = logTc[1] + params$prems_logTc_adj
+  }
+  i_prems = .first_or_na(which(logTc > my_logTc))
   eep_idx["PreMS"] = i_prems
+  if (is.na(i_prems) || i_prems == n) return(eep_idx)
 
-  ## 2. ZAMS
-  Xc0 = Xc[1]
-  if (!is.null(logLH)) {
-    ## Using Dotter’s definition: logLH / L_tot > 0.999, before Xc has dropped by 0.0015
-    Ltot  = 10^logL
-    LH    = 10^logLH
-    fracH = LH / Ltot
-    cand  = which(
-      seq_len(n) >= i_prems &
-        fracH > params$zams_lburn_frac &
-        Xc > (Xc0 - params$zams_dXc_max)
-    )
-    i_zams = .first_or_na(cand)
-  } else if(is.na(eep_idx["PreMS"])){
-    ## Fallback: pick first point after PreMS where Xc has begun to decrease slightly
-    dXc   = c(0, diff(Xc))
-    cand  = which(dXc < 0)
-    i_zams = .first_or_na(cand)
-    if (is.na(i_zams)) i_zams = 1L
+  ## 2. ZAMS: Fortran algorithm -- find where Xc drops by zams_dXc_max, then
+  ## pick max(logg) from 1 to that point.
+  Xc0  = Xc[1]
+  Xmin = Xc0 - params$zams_dXc_max
+
+  ## Find first point (starting from PreMS) where Xc has dropped below Xmin
+  i_start = max(1L, i_prems)
+  i_Xcdrop = NA_integer_
+  for (ii in i_start:n) {
+    if (Xc[ii] <= Xmin) { i_Xcdrop = ii; break }
+  }
+  if (is.na(i_Xcdrop)) i_Xcdrop = n
+
+  ## ZAMS = max(logg) from 1 to i_Xcdrop (matching Fortran ZAMS3)
+  if (!is.null(logg)) {
+    i_zams = which.max(logg[1:i_Xcdrop])
   } else {
-    ## Fallback: pick first point after PreMS where Xc has begun to decrease slightly
-    dXc   = c(0, diff(Xc))
-    cand  = which(seq_len(n) > i_prems & dXc < 0)
-    i_zams = .first_or_na(cand)
-    if (is.na(i_zams)) i_zams = i_prems + 1L
+    ## Fallback: use the Xc-drop point itself (ZAMS1)
+    i_zams = i_Xcdrop
   }
   eep_idx["ZAMS"] = i_zams
+  if (i_zams == 0L || i_zams == n) return(eep_idx)
 
-  ## 3. IAMS: Xc ~ 0.3 (absolute)
-  cand_iams = which(seq_len(n) >= i_zams & Xc <= params$iams_Xc)
+  ## 3. IAMS: Xc < 0.35 (Fortran: TAMS(t,3.5d-1,...))
+  cand_iams = which(seq_len(n) >= (i_zams + 1L) & Xc < params$iams_Xc)
   i_iams = .first_or_na(cand_iams)
   eep_idx["IAMS"] = i_iams
+  if (is.na(i_iams) || i_iams == n) return(eep_idx)
 
-  ## 4. TAMS: Xc ~ 1e-12
-  cand_tams = which(seq_len(n) >= i_iams & Xc <= params$tams_Xc)
+  ## 4. TAMS: Xc < 1e-12 (Fortran: TAMS(t,1d-12,...))
+  cand_tams = which(seq_len(n) >= (i_iams + 1L) & Xc < params$tams_Xc)
   i_tams = .first_or_na(cand_tams)
   if (is.na(i_tams)) {
-    ## If Xc never goes that low, use last point with minimum Xc
-    i_tams = which.min(Xc)
+    ## Fortran fallback: if age > max_age for very low mass, accept last point
+    if (!is.null(star_age) && !is.null(M_star) &&
+        M_star[1] <= 0.5 && star_age[n] >= params$tams_max_age) {
+      i_tams = n
+    }
   }
   eep_idx["TAMS"] = i_tams
+  if (is.na(i_tams) || i_tams == n) return(eep_idx)
 
-  ## 5. RGB Tip: L max or Teff min after TAMS, before Yc drops much
-  Yc_TAMS = Yc[i_tams]
+  ## 5. RGB Tip: max logL or min logTeff after TAMS, while Yc has not
+  ## dropped by more than rgbtip_Yc from the starting value.
+  ## Fortran: Ymin = Yc(guess) - 0.01; result = min(idx_Lmax, idx_Teffmin)
+  Yc_start = Yc[i_tams + 1L]
+  Ymin_rgb = Yc_start - params$rgbtip_Yc
   idx_range = seq.int(i_tams + 1L, n)
   if (length(idx_range) > 0) {
-    ok = idx_range[Yc[idx_range] >= (Yc_TAMS - params$rgbtip_Yc)]
-    if (length(ok) == 0) ok = idx_range
-
-    logL_sub   = logL[ok]
-    logTeff_sub= logTeff[ok]
-
-    idx_Lmax   = ok[which.max(logL_sub)]
-    idx_Teffmin= ok[which.min(logTeff_sub)]
-
-    i_rgbtip = min(idx_Lmax, idx_Teffmin)  # whichever occurs first
-    eep_idx["RGBTip"] = i_rgbtip
-  }
-
-  ## 6. ZACHeB: Tc minimum after RGBTip while Yc not yet much reduced
-  if (!is.na(eep_idx["RGBTip"])) {
-    i_rgbtip = eep_idx["RGBTip"]
-    Yc_RGBTip = Yc[i_rgbtip]
-    idx_range = seq.int(i_rgbtip + 1L, n)
-    ok = idx_range[Yc[idx_range] > (Yc_RGBTip - params$zacheb_Yc)]
+    ok = idx_range[Yc[idx_range] > Ymin_rgb]
     if (length(ok) > 0) {
-      logTc_sub = logTc[ok]
-      i_zacheb = ok[which.min(logTc_sub)]
-      eep_idx["ZACHeB"] = i_zacheb
+      idx_Lmax    = ok[which.max(logL[ok])]
+      idx_Teffmin = ok[which.min(logTeff[ok])]
+      i_rgbtip = min(idx_Lmax, idx_Teffmin)
+      eep_idx["RGBTip"] = i_rgbtip
     }
   }
+  if (is.na(eep_idx["RGBTip"]) || eep_idx["RGBTip"] == n) return(eep_idx)
+  i_rgbtip = eep_idx["RGBTip"]
 
-  ## 7. TACHeB: Yc ~ 1e-4 (end of core He burning)
-  if (!is.na(eep_idx["ZACHeB"])) {
-    i_zacheb = eep_idx["ZACHeB"]
-    idx_range = seq.int(i_zacheb + 1L, n)
-    Yc_sub = Yc[idx_range]
-    cand_tacheb = which(Yc_sub <= params$tacheb_Yc)
-    if (length(cand_tacheb) > 0) {
-      i_tacheb = idx_range[cand_tacheb[1]]
+  ## 6. ZACHeB (ZAHB): Fortran two-phase search:
+  ##   Phase 1 -- find max logLHe while Yc > Ymin (He flash peak)
+  ##   Phase 2 -- find min logTc after phase-1 peak while Yc > Ymin
+  Yc_start_zahb = Yc[i_rgbtip + 1L]
+  Ymin_zahb = Yc_start_zahb - params$zacheb_Yc
+  idx_range = seq.int(i_rgbtip + 1L, n)
+  ok_zahb = idx_range[Yc[idx_range] > Ymin_zahb]
+
+  if (length(ok_zahb) > 0) {
+    ## Phase 1: find He luminosity peak (if logLHe available)
+    if (!is.null(logLHe)) {
+      i_LHe_peak = ok_zahb[which.max(logLHe[ok_zahb])]
     } else {
-      i_tacheb = tail(idx_range, 1L)
+      i_LHe_peak = ok_zahb[1]  # fallback: start of range
     }
-    eep_idx["TACHeB"] = i_tacheb
+    ## Phase 2: find min logTc from the peak onward, still under Yc constraint
+    ok_phase2 = ok_zahb[ok_zahb >= i_LHe_peak]
+    if (length(ok_phase2) > 0) {
+      i_zacheb = ok_phase2[which.min(logTc[ok_phase2])]
+      ## Fortran guard: if result equals starting guess, treat as not found
+      if (i_zacheb != (i_rgbtip + 1L)) {
+        eep_idx["ZACHeB"] = i_zacheb
+      }
+    }
   }
+  if (is.na(eep_idx["ZACHeB"]) || eep_idx["ZACHeB"] == n) return(eep_idx)
+  i_zacheb = eep_idx["ZACHeB"]
 
-  ## 8a. TP-AGB: when (M_Hshell - M_Heshell) < 0.1 Msun after He burning (if data available) & Yc_sub < 1e-6
-  if (!is.na(eep_idx["TACHeB"]) && !is.null(M_Hshell) && !is.null(M_Heshell)) {
-    i_tacheb = eep_idx["TACHeB"]
-    idx_range = seq.int(i_tacheb + 1L, n)
+  ## 7. TACHeB (TAHB): Yc < 1e-4  (Fortran returns 0 if not found)
+  idx_range = seq.int(i_zacheb + 1L, n)
+  if (length(idx_range) > 0) {
     Yc_sub = Yc[idx_range]
-    dM = M_Hshell[idx_range] - M_Heshell[idx_range]
-    cand_tp = which(Yc_sub < params$tpagb_Yc & dM < params$tpagb_delta_M)
-    if (length(cand_tp) > 0) {
-      eep_idx["TPAGB"] = idx_range[cand_tp[1]]
+    cand_tacheb = which(Yc_sub < params$tacheb_Yc)
+    if (length(cand_tacheb) > 0) {
+      eep_idx["TACHeB"] = idx_range[cand_tacheb[1]]
+    }
+    ## Fortran: no fallback -- if not found, TACHeB stays NA
+  }
+  if (is.na(eep_idx["TACHeB"]) || eep_idx["TACHeB"] == n) return(eep_idx)
+  i_tacheb = eep_idx["TACHeB"]
+
+  ## 8a. TPAGB: Yc < 1e-6 AND (he_core_mass - c_core_mass) < 0.1
+  ## Fortran: HeShell = i_He_Core - i_CO_Core
+  if (!is.null(M_He_core) && !is.null(M_CO_core)) {
+    idx_range = seq.int(i_tacheb + 1L, n)
+    if (length(idx_range) > 0) {
+      Yc_sub    = Yc[idx_range]
+      HeShell   = M_He_core[idx_range] - M_CO_core[idx_range]
+      cand_tp   = which(Yc_sub < params$tpagb_Yc & HeShell < params$tpagb_He_shell)
+      if (length(cand_tp) > 0) {
+        eep_idx["TPAGB"] = idx_range[cand_tp[1]]
+      }
     }
   }
 
-  ## 8b. CBurn: end of core C burning (Xc_C ~ 1e-4) – massive stars only
-  if (!is.null(Xc_C) && !all(is.na(Xc_C)) & is.na(eep_idx["TPAGB"])) {
-    ## Start after RGBTip / ZACHeB / TACHeB if available
-    start_i = max(eep_idx[c("RGBTip", "ZACHeB", "TACHeB")], na.rm = TRUE)
+  ## 8b. CBurn: Xc < 1e-8 AND Yc < 1e-8 AND Cc < 1e-4 (massive stars only)
+  ## Fortran: limit_XY=1d-8, center_carbon_limit=1d-4
+  ## Only attempted if TPAGB was not found (mutually exclusive branches)
+  if (!is.null(Xc_C) && !all(is.na(Xc_C)) && is.na(eep_idx["TPAGB"])) {
+    start_i = i_tacheb
     if (is.finite(start_i) && start_i < n) {
       idx_range = seq.int(start_i + 1L, n)
-      XcC_sub = Xc_C[idx_range]
-      cand_cb = which(XcC_sub <= params$cburn_Xc_X)
+      cand_cb = which(
+        Xc[idx_range]   < params$cburn_XY_lim &
+        Yc[idx_range]   < params$cburn_XY_lim &
+        Xc_C[idx_range] < params$cburn_C_lim
+      )
       if (length(cand_cb) > 0) {
         eep_idx["CBurn"] = idx_range[cand_cb[1]]
       }
     }
   }
 
-  ## 9. Post-AGB: envelope mass < 0.2 M_star (if envelope mass can be inferred)
-  ## This requires some combination of M_star and core mass; this is very
-  ## model-specific
-  if (!is.null(M_env) && !is.null(M_star)) {
-    start_i = max(eep_idx[c("RGBTip", "ZACHeB", "TACHeB", "TPAGB", "CBurn")], na.rm = TRUE)
+  ## 9. PostAGB: co_core_mass / star_mass > 0.8
+  ## Fortran: core_mass_frac = i_co_core / i_mass, with Tc guard
+  if (!is.null(M_CO_core) && !is.null(M_star)) {
+    start_i = max(eep_idx[c("TPAGB", "CBurn")], na.rm = TRUE)
     if (is.finite(start_i) && start_i < n) {
-      idx_range = seq.int(start_i + 1L, n)
-      M_env_sub = M_env[idx_range]
-      M_star_sub = M_star[idx_range]
-      cand_pagb = which(M_env_sub/M_star_sub <= params$postagb_env_frac)
-      if (length(cand_pagb) > 0) {
-        eep_idx["PostAGB"] = idx_range[cand_pagb[1]]
+      ## Fortran Tc guard: only search if Tc is decreasing (has TP-AGB)
+      Tc_now = logTc[start_i]
+      Tc_end = logTc[n]
+      if (Tc_now > Tc_end) {
+        idx_range = seq.int(start_i + 1L, n)
+        core_frac = M_CO_core[idx_range] / M_star[idx_range]
+        cand_pagb = which(core_frac > params$postagb_core_frac)
+        if (length(cand_pagb) > 0) {
+          eep_idx["PostAGB"] = idx_range[cand_pagb[1]]
+        }
       }
     }
   }
 
-  ## 10. WDCS: Gamma_c <= 100 (if available)
+  ## 10. WDCS: center_gamma >= Gamma_min (Fortran: >= center_gamma_limit)
   if (!is.null(Gamma_c) && !is.na(eep_idx["PostAGB"])) {
     i_post = eep_idx["PostAGB"]
     idx_range = seq.int(i_post + 1L, n)
-    cand_wd = which(Gamma_c[idx_range] <= params$wdcs_Gamma_max)
-    if (length(cand_wd) > 0) {
-      eep_idx["WDCS"] = idx_range[cand_wd[1]]
+    if (length(idx_range) > 0) {
+      cand_wd = which(Gamma_c[idx_range] >= params$wdcs_Gamma_min)
+      if (length(cand_wd) > 0) {
+        eep_idx["WDCS"] = idx_range[cand_wd[1]]
+      }
     }
   }
 
@@ -230,154 +276,215 @@ identify_primary_eeps = function(track,
 }
 
 ## Compute cumulative metric distance along indices ind
-## Note any log (dex) movement positively accumulates monotonically
-## I.e. this captures any change, up or down, in the same sense
-## Can trace other properties like log_center_T and log_center_Rho
-## No limit (does not just have to be 2)
+## Matches the Fortran iso distance_along_track subroutine:
+##   5D weighted Euclidean distance with Xc-dependent weighting
+##   for log_center_Rho and log_center_T.
+## Columns that are absent from the track are silently skipped
+## (their contribution is zero).
 metric_distance = function(track,
                             ind,
-                            vars = c("logL", "logTeff"),
-                            weights = NULL,
+                            Teff_scale = 2.0,
+                            logL_scale = 0.125,
+                            Rhoc_scale = 1.0,
+                            Tc_scale   = 1.0,
+                            age_scale  = 0.05,
+                            weight_center_rho_T_by_Xc = TRUE,
                             cols = list(
-                              star_age = "star_age",
-                              logL     = "log_L",
-                              logTeff  = "log_Teff",
-                              logTc    = "log_center_T",
-                              Xc       = "center_h1",
-                              Yc       = "center_he4",
-                              logLH      = "log_LH",      # optional
-                              Gamma_c  = "center_gamma",     # optional
-                              M_star   = "star_mass",   # optional
-                              M_Hshell = "m_shell_H",   # optional
-                              M_Heshell= "m_shell_He",   # optional
-                              Xc_C     = "center_c12",   # optional (for C burning)
-                              M_core  = "he_core_mass"   # optional (for PostAGB)
+                              star_age  = "star_age",
+                              logL      = "log_L",
+                              logTeff   = "log_Teff",
+                              logTc     = "log_center_T",
+                              logRhoc   = "log_center_Rho",
+                              Xc        = "center_h1",
+                              Yc        = "center_he4",
+                              logg      = "log_g",
+                              logLH     = "log_LH",
+                              logLHe    = "log_LHe",
+                              Gamma_c   = "center_gamma",
+                              M_star    = "star_mass",
+                              M_He_core = "he_core_mass",
+                              M_CO_core = "c_core_mass",
+                              Xc_C      = "center_c12"
                             )) {
-  if (is.null(weights)) weights = rep(1, length(vars))
-  stopifnot(length(weights) == length(vars))
+  nn = length(ind)
+  D  = numeric(nn)
+  if (nn < 2) return(D)
 
-  #x = sapply(vars, function(v) track[[cols[[v]]]][ind])
-  x = as.matrix(track[unlist(cols[vars])][ind,,drop=FALSE])
-  # for (i in 2:n) {
-  #   dx = x[i, ] - x[i - 1, ]
-  #   D[i] = D[i - 1] + sqrt(sum(weights * dx^2))
-  # }
-  dx = diff(x)
-  dx = rbind(rep(0, length(vars)), dx)
-  metric = cumsum(sqrt(dx^2 %*% weights))
-  return(metric)
+  ## Helper to safely extract a column vector for the given indices
+  .col = function(name) {
+    cn = cols[[name]]
+    if (!is.null(cn) && cn %in% names(track)) track[[cn]][ind] else NULL
+  }
+
+  logTeff_v = .col("logTeff")
+  logL_v    = .col("logL")
+  logRhoc_v = .col("logRhoc")
+  logTc_v   = .col("logTc")
+  star_age_v = .col("star_age")
+  Xc_v      = .col("Xc")
+
+  ## Xc-dependent weighting (Fortran: weight = max(0, Xc/max(Xc)))
+  if (weight_center_rho_T_by_Xc && !is.null(Xc_v)) {
+    max_Xc = max(Xc_v, na.rm = TRUE)
+    if (max_Xc <= 0) max_Xc = 1.0
+  } else {
+    max_Xc = 1.0
+  }
+
+  ## Compute log10(age), protecting against non-positive ages
+  log_age = NULL
+  if (!is.null(star_age_v)) {
+    log_age = log10(pmax(star_age_v, 1.0))
+  }
+
+  for (j in 2:nn) {
+    ## Xc weight for this step
+    if (weight_center_rho_T_by_Xc && !is.null(Xc_v)) {
+      w = max(0.0, Xc_v[j] / max_Xc)
+    } else {
+      w = 1.0
+    }
+
+    tmp = 0.0
+    if (!is.null(logTeff_v))
+      tmp = tmp + Teff_scale * (logTeff_v[j] - logTeff_v[j - 1])^2
+    if (!is.null(logL_v))
+      tmp = tmp + logL_scale * (logL_v[j] - logL_v[j - 1])^2
+    if (!is.null(logRhoc_v))
+      tmp = tmp + w * Rhoc_scale * (logRhoc_v[j] - logRhoc_v[j - 1])^2
+    if (!is.null(logTc_v))
+      tmp = tmp + w * Tc_scale * (logTc_v[j] - logTc_v[j - 1])^2
+    if (!is.null(log_age))
+      tmp = tmp + age_scale * (log_age[j] - log_age[j - 1])^2
+
+    D[j] = D[j - 1] + sqrt(tmp)
+  }
+
+  return(D)
 }
 
 ## Interpolate all columns in 'track' along a segment defined by indices 'ind',
 ## placing 'n_secondary' EEPs between the endpoints (i.e. n_secondary+2 total).
+## Uses monotone Hermite spline (monoH.FC), matching the spirit of the Fortran
+## interp_4pt_pm (Steffen's piecewise monotonic method).
+## NOTE: monoH.FC (Fritsch-Carlson) and Steffen's method are both
+## monotonicity-preserving cubic Hermite interpolants; results are very close.
 .interpolate_segment_eep = function(track,
                                     ind,
                                     n_secondary,
-                                    metric_vars = c("logL", "logTeff"),
-                                    metric_weights = NULL,
+                                    Teff_scale = 2.0,
+                                    logL_scale = 0.125,
+                                    Rhoc_scale = 1.0,
+                                    Tc_scale   = 1.0,
+                                    age_scale  = 0.05,
+                                    weight_center_rho_T_by_Xc = TRUE,
                                     cols = list(
-                                      star_age = "star_age",
-                                      logL     = "log_L",
-                                      logTeff  = "log_Teff",
-                                      logTc    = "log_center_T",
-                                      Xc       = "center_h1",
-                                      Yc       = "center_he4",
-                                      logLH      = "log_LH",      # optional
-                                      Gamma_c  = "center_gamma",     # optional
-                                      M_star   = "star_mass",   # optional
-                                      M_Hshell = "m_shell_H",   # optional
-                                      M_Heshell= "m_shell_He",   # optional
-                                      Xc_C     = "center_c12",   # optional (for C burning)
-                                      M_core  = "he_core_mass"   # optional (for PostAGB)
+                                      star_age  = "star_age",
+                                      logL      = "log_L",
+                                      logTeff   = "log_Teff",
+                                      logTc     = "log_center_T",
+                                      logRhoc   = "log_center_Rho",
+                                      Xc        = "center_h1",
+                                      Yc        = "center_he4",
+                                      logg      = "log_g",
+                                      logLH     = "log_LH",
+                                      logLHe    = "log_LHe",
+                                      Gamma_c   = "center_gamma",
+                                      M_star    = "star_mass",
+                                      M_He_core = "he_core_mass",
+                                      M_CO_core = "c_core_mass",
+                                      Xc_C      = "center_c12"
                                     )) {
-  if (length(ind) < 2) message("Segment contain only 1 point!")
+  if (length(ind) < 2) message("Segment contains only 1 point!")
 
-  dist_metric = metric_distance(track, ind, vars = metric_vars,
-                       weights = metric_weights, cols = cols)
-  
+  dist_metric = metric_distance(track, ind,
+                                Teff_scale = Teff_scale,
+                                logL_scale = logL_scale,
+                                Rhoc_scale = Rhoc_scale,
+                                Tc_scale   = Tc_scale,
+                                age_scale  = age_scale,
+                                weight_center_rho_T_by_Xc = weight_center_rho_T_by_Xc,
+                                cols = cols)
+
   n_points = n_secondary + 2
-  D_total = dist_metric[length(dist_metric)]
-  target_D = seq(0, D_total, length.out = n_points)
-  
+  D_total  = dist_metric[length(dist_metric)]
+
+  ## Handle degenerate case where distance is zero
+  if (D_total <= 0) {
+    target_D = seq(0, 1, length.out = n_points)
+    dist_metric = seq(0, 1, length.out = length(ind))
+  } else {
+    target_D = seq(0, D_total, length.out = n_points)
+  }
+
+  ## Remove any duplicate distance values to ensure strictly increasing x for spline
+  dup = duplicated(dist_metric)
+  if (any(dup)) {
+    keep = !dup
+    dist_metric = dist_metric[keep]
+    ind = ind[keep]
+  }
+
   seg = track[ind, , drop = FALSE]
-  
-  out = matrix(NA, n_points, dim(seg)[2])
-  for(i in 1:dim(seg)[2]){
-    if (is.numeric(seg[,i])) {
-      out[,i] = spline(dist_metric, seg[,i], xout=target_D)$y
+
+  out = matrix(NA_real_, n_points, ncol(seg))
+  for (i in seq_len(ncol(seg))) {
+    if (is.numeric(seg[, i])) {
+      if (length(dist_metric) >= 2) {
+        out[, i] = spline(dist_metric, seg[, i], xout = target_D,
+                          method = "monoH.FC")$y
+      } else {
+        out[, i] = rep(seg[1, i], n_points)
+      }
     } else {
-      best_match = ceiling(spline(dist_metric, 1:D_total, xout=target_D))
-      out[,i] = seg[best_match,i]
+      ## Non-numeric: carry forward from nearest lower distance point
+      idx = findInterval(target_D, dist_metric, all.inside = TRUE)
+      out[, i] = seg[idx, i]
     }
   }
-  
+
   return(out)
-  # D_total = D[length(D)]
-  # 
-  # ## Number of points including boundaries
-  # n_points = n_secondary + 2
-  # target_D = seq(0, D_total, length.out = n_points)
-  # 
-  # seg = track[ind, , drop = FALSE]
-  # 
-  # ## For each target_D, find enclosing D interval and linearly interpolate
-  # interp_row = function(tD) {
-  #   if (tD <= min(D)) {
-  #     return(seg[1, , drop = FALSE])
-  #   }
-  #   if (tD >= max(D)) {
-  #     return(seg[nrow(seg), , drop = FALSE])
-  #   }
-  #   k = max(which(D <= tD))
-  #   if (k == length(D)) return(seg[nrow(seg), , drop = FALSE])
-  #   w = (tD - D[k]) / (D[k + 1] - D[k])
-  #   ## linear interpolation for all numeric columns; factor/character copied from lower index
-  #   out = seg[k, , drop = FALSE]
-  #   for (col in names(seg)) {
-  #     v = seg[[col]]
-  #     if (is.numeric(v)) {
-  #       out[[col]] = v[k] + w * (v[k + 1] - v[k])
-  #     } else {
-  #       out[[col]] = v[k]
-  #     }
-  #   }
-  #   out
-  # }
-  # 
-  # return(do.call(rbind, lapply(target_D, interp_row)))
 }
 
 build_eep_track = function(track,
                             primary_idx,
-                            n_secondary_between = 50,
-                            metric_vars = c("logL", "logTeff"),
-                            metric_weights = NULL,
+                            n_secondary_between = NULL,
+                            Teff_scale = 2.0,
+                            logL_scale = 0.125,
+                            Rhoc_scale = 1.0,
+                            Tc_scale   = 1.0,
+                            age_scale  = 0.05,
+                            weight_center_rho_T_by_Xc = TRUE,
                             cols = list(
-                              star_age = "star_age",
-                              logL     = "log_L",
-                              logTeff  = "log_Teff",
-                              logTc    = "log_center_T",
-                              Xc       = "center_h1",
-                              Yc       = "center_he4",
-                              logLH      = "log_LH",      # optional
-                              Gamma_c  = "center_gamma",     # optional
-                              M_star   = "star_mass",   # optional
-                              M_Hshell = "m_shell_H",   # optional
-                              M_Heshell= "m_shell_He",   # optional
-                              Xc_C     = "center_c12",   # optional (for C burning)
-                              M_core  = "he_core_mass"   # optional (for PostAGB)
+                              star_age  = "star_age",
+                              logL      = "log_L",
+                              logTeff   = "log_Teff",
+                              logTc     = "log_center_T",
+                              logRhoc   = "log_center_Rho",
+                              Xc        = "center_h1",
+                              Yc        = "center_he4",
+                              logg      = "log_g",
+                              logLH     = "log_LH",
+                              logLHe    = "log_LHe",
+                              Gamma_c   = "center_gamma",
+                              M_star    = "star_mass",
+                              M_He_core = "he_core_mass",
+                              M_CO_core = "c_core_mass",
+                              Xc_C      = "center_c12"
                             )) {
   ## primary_idx: named integer vector from identify_primary_eeps()
-  ## n_secondary_between: either single integer or vector of length (#segments)
+  ## n_secondary_between: NULL for Fortran defaults, single integer,
+  ##   or vector of length (number_of_intervals)
   ##
   ## Returns:
-  ##   track with interpolated EEPs + columns:
+  ##   data.frame with interpolated EEPs + columns:
   ##     - EEP          : integer index along EEP track
-  ##     - EEP_phase    : phase label (character/factor), inherited by secondaries
+  ##     - EEP_phase    : phase label (character), inherited by secondaries
   ##     - EEP_is_primary: logical, TRUE for primary EEP rows
+  ##     - label        : integer coarse phase code
 
   # Keep only valid primary EEPs (non-NA) in chronological order
-  valid     = !is.na(primary_idx)
+  valid      = !is.na(primary_idx)
   prim_names = names(primary_idx)[valid]
   prim_i     = as.integer(primary_idx[valid])
 
@@ -385,56 +492,67 @@ build_eep_track = function(track,
   prim_names = prim_names[o]
   prim_i     = prim_i[o]
 
-  n_seg = length(prim_i)
-  if (n_seg < 1) stop("Not enough primary EEPs to build segments.")
+  n_prim = length(prim_i)
+  if (n_prim < 2) stop("Need at least 2 primary EEPs to build segments.")
 
-  if (length(n_secondary_between) == 1L) {
-    n_secondary_between = rep(n_secondary_between, n_seg)
+  ## Number of intervals between consecutive primaries (matching Fortran)
+  n_intervals = n_prim - 1
+
+  ## Determine secondary EEP counts per interval
+  if (is.null(n_secondary_between)) {
+    ## Use Fortran-style defaults keyed by primary name
+    n_secondary_between = integer(n_intervals)
+    for (s in seq_len(n_intervals)) {
+      nm = prim_names[s]
+      if (nm %in% names(.default_n_secondary)) {
+        n_secondary_between[s] = .default_n_secondary[[nm]]
+      } else {
+        n_secondary_between[s] = 50L  # safe fallback
+      }
+    }
+  } else if (length(n_secondary_between) == 1L) {
+    n_secondary_between = rep(as.integer(n_secondary_between), n_intervals)
   }
-  stopifnot(length(n_secondary_between) == n_seg)
+  stopifnot(length(n_secondary_between) == n_intervals)
 
   eep_list      = list()
   phase_list    = list()
   primary_flag  = list()
 
-  for (s in seq_len(n_seg)) {
+  for (s in seq_len(n_intervals)) {
     i_start = prim_i[s]
-    if(s < n_seg){
-      i_end   = prim_i[s + 1L]
-    }else{
-      i_end = dim(track)[1]
-    }
-
-    ind = seq.int(i_start, i_end)
+    i_end   = prim_i[s + 1L]
+    ind     = seq.int(i_start, i_end)
 
     seg_eep = .interpolate_segment_eep(
       track,
-      ind            = ind,
-      n_secondary    = n_secondary_between[s],
-      metric_vars    = metric_vars,
-      metric_weights = metric_weights,
-      cols           = cols
+      ind         = ind,
+      n_secondary = n_secondary_between[s],
+      Teff_scale  = Teff_scale,
+      logL_scale  = logL_scale,
+      Rhoc_scale  = Rhoc_scale,
+      Tc_scale    = Tc_scale,
+      age_scale   = age_scale,
+      weight_center_rho_T_by_Xc = weight_center_rho_T_by_Xc,
+      cols        = cols
     )
 
     n_rows_seg = nrow(seg_eep)
 
-    # Phase label for the whole segment: you can use start, end, or something more
-    # sophisticated. For simplicity, use the start primary's label.
-    seg_phase = rep(prim_names[s], n_rows_seg)
+    # Phase label: use the start primary's label
+    seg_phase   = rep(prim_names[s], n_rows_seg)
 
     # Primary flags: first and last rows in the segment are primary
-    primary_seg = rep(FALSE, n_rows_seg)
-    primary_seg[1]           = TRUE
-    primary_seg[n_rows_seg]  = TRUE
+    primary_seg            = rep(FALSE, n_rows_seg)
+    primary_seg[1]         = TRUE
+    primary_seg[n_rows_seg] = TRUE
 
-
-    # Drop the last row of all segments except the last to avoid duplicate primaries
-    if (s < n_seg) {
+    # Drop the last row of all segments except the last to avoid
+    # duplicate primaries at interval boundaries
+    if (s < n_intervals) {
       seg_eep     = seg_eep[-n_rows_seg, , drop = FALSE]
       seg_phase   = seg_phase[-n_rows_seg]
       primary_seg = primary_seg[-n_rows_seg]
-    }else{
-      primary_seg[n_rows_seg] = FALSE
     }
 
     eep_list[[s]]     = seg_eep
@@ -447,47 +565,42 @@ build_eep_track = function(track,
   rownames(eep_track) = NULL
   colnames(eep_track) = colnames(track)
 
-  EEP_phase    = unlist(phase_list, use.names = FALSE)
+  EEP_phase      = unlist(phase_list, use.names = FALSE)
   EEP_is_primary = unlist(primary_flag, use.names = FALSE)
 
   eep_track$EEP            = seq_len(nrow(eep_track))
-  #eep_track$EEP_phase      = factor(EEP_phase, levels = unique(prim_names))
   eep_track$EEP_phase      = EEP_phase
   eep_track$EEP_is_primary = EEP_is_primary
-  
+
   eep_track$label <- NA_integer_
-  
-  # Pre–Main Sequence
+
+  # Pre-Main Sequence
   eep_track$label[eep_track$EEP_phase %in% c("PreMS")] = -1L  # MIST phase = -1
-  
+
   # Main Sequence (ZAMS, IAMS, TAMS all map to MS)
   eep_track$label[eep_track$EEP_phase %in% c("ZAMS", "IAMS", "TAMS")] = 0L
-  
+
   # Red Giant Branch (entire RGB, including the tip)
-  # Currently no specific RGB flag
   eep_track$label[eep_track$EEP_phase %in% c("RGB", "RGBTip")] = 2L
-  
+
   # Core He-burning (from ZACHeB through TACHeB)
   eep_track$label[eep_track$EEP_phase %in% c("ZACHeB", "CHeB", "TACHeB")] = 3L
-  
+
   # Early AGB (after TACHeB; EEP names vary: EAGB/EBGB)
-  # Currently no specific EAGB flag
   eep_track$label[eep_track$EEP_phase %in% c("EAGB", "EBGB")] = 4L
-  
+
   # Thermally Pulsing AGB
   eep_track$label[eep_track$EEP_phase %in% c("TPAGB")] = 5L
-  
-  # Post-AGB bucket (6–8):
+
+  # Post-AGB bucket (6-8):
   # PostAGB
   eep_track$label[eep_track$EEP_phase %in% "PostAGB"] = 6L
   # Central Star Planetary Nebula
-  # Currently no specific CSPN flag
   eep_track$label[eep_track$EEP_phase %in% "CSPN"]   = 7L
   # White Dwarf Central Star
   eep_track$label[eep_track$EEP_phase %in% "WDCS"]   = 8L
-  
-  # Wolf–Rayet phase (if present)
-  # Currently no specific WR flag
+
+  # Wolf-Rayet phase (if present)
   eep_track$label[eep_track$EEP_phase %in% c("WR")] <- 9L
 
   return(eep_track)
@@ -503,17 +616,17 @@ plot_eep = function(track,
                          show_secondary = TRUE,
                          ...) {
   if(is.vector(cols)){
-    cols = as.list(cols)  
+    cols = as.list(cols)
   }
-  
+
   if(!'x' %in% names(cols)){
     names(cols)[1] = 'x'
   }
-  
+
   if(!'y' %in% names(cols)){
     names(cols)[2] = 'y'
   }
-  
+
   # Extract originals
   x_orig   = track[[cols$x]]
   y_orig= track[[cols$y]]

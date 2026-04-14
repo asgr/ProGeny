@@ -120,10 +120,10 @@ plot_eep(
     \item{\code{tacheb_Yc}}{Central He threshold for \strong{TACHeB} (default 1e-4).
       Returns \code{NA} if the threshold is never reached (matching Fortran \code{Iso} returning 0).}
     \item{\code{tpagb_Yc}}{Central He threshold for TP-AGB detection (default 1e-6).}
-    \item{\code{tpagb_He_shell}}{He intershell mass threshold: \code{he_core_mass - c_core_mass < 0.1} (default 0.1, matching Fortran \code{Iso} \code{HeShellMin}).}
+    \item{\code{tpagb_He_shell}}{He intershell mass threshold: \code{he_core_mass - (c_core_mass + o_core_mass) < 0.1} (default 0.1, matching Fortran \code{Iso} \code{HeShellMin}). If \code{o_core_mass} is not available, only \code{c_core_mass} is used.}
     \item{\code{cburn_XY_lim}}{H and He exhaustion threshold for C burning (default 1e-8, matching Fortran \code{Iso} \code{limit_XY}).}
     \item{\code{cburn_C_lim}}{Central C depletion threshold for C burning (default 1e-4, matching Fortran \code{Iso} \code{center_carbon_limit}).}
-    \item{\code{postagb_core_frac}}{CO-core mass fraction threshold for PostAGB: \code{c_core_mass/star_mass > 0.8} (default 0.8, matching Fortran \code{Iso} \code{core_mass_frac_limit}). A Tc guard requires \code{logTc} at the PostAGB search starting point (after TPAGB or CBurn) to exceed \code{logTc} at the track end.}
+    \item{\code{postagb_core_frac}}{CO-core mass fraction threshold for PostAGB: \code{(c_core_mass + o_core_mass)/star_mass > 0.8} (default 0.8, matching Fortran \code{Iso} \code{core_mass_frac_limit}). If \code{o_core_mass} is not available, only \code{c_core_mass} is used. A Tc guard requires \code{logTc} at the PostAGB search starting point (after TPAGB or CBurn) to exceed \code{logTc} at the track end.}
     \item{\code{wdcs_Gamma_min}}{Minimum \eqn{\Gamma_c} for entry onto WD cooling sequence (default 100).
       Looks for \code{center_gamma >= wdcs_Gamma_min}, matching Fortran \code{Iso} \code{>= center_gamma_limit}.}
   }}
@@ -139,7 +139,7 @@ plot_eep(
     structure changes after core-H exhaustion.}
   \item{primary_idx}{For \code{build_eep_track}, a named integer vector of primary EEP indices, as returned by \code{identify_primary_eeps}.}
   \item{n_secondary_between}{\code{NULL} for Fortran \code{Iso}-style defaults (variable per interval, e.g. 200 between PreMS-ZAMS, 150 between ZAMS-IAMS, etc.),
-    a single integer (applied uniformly), or a vector of length equal to the number of intervals between consecutive valid primaries.}
+    a single integer (applied uniformly), or a vector of length equal to the number of valid primaries (one interval per primary, with the final interval running from the last primary to the end of the track).}
   \item{eep_track}{For \code{plot_eep}, the EEP-enhanced track returned by \code{build_eep_track}.}
   \item{xlab, ylab}{Axis labels for the HRD.}
   \item{show_secondary}{Logical; if \code{TRUE}, plot secondary EEPs as faint points.}
@@ -164,9 +164,9 @@ All algorithms match the Fortran \code{Iso} \code{iso} package (\code{eep.f90}):
     (b) find minimum \code{log_center_T} after the peak. If \code{log_LHe} is not available, phase (a) is skipped.
   \item \strong{TACHeB}: (Fortran \code{Iso} TAHB) first index after ZACHeB with \code{center_he4} \eqn{<} \code{tacheb_Yc}.
     Returns \code{NA} if the threshold is never reached (matching Fortran \code{Iso} returning 0).
-  \item \strong{TPAGB}: (low-mass branch) first step after TACHeB with \code{center_he4} \eqn{<} \code{tpagb_Yc} and intershell mass \code{he_core_mass - c_core_mass} \eqn{<} \code{tpagb_He_shell}.
+  \item \strong{TPAGB}: (low-mass branch) first step after TACHeB with \code{center_he4} \eqn{<} \code{tpagb_Yc} and intershell mass \code{he_core_mass - (c_core_mass + o_core_mass)} \eqn{<} \code{tpagb_He_shell}. If \code{o_core_mass} is not available, only \code{c_core_mass} is used.
   \item \strong{CBurn}: (high-mass branch; attempted only if TPAGB was not found) first step after TACHeB where \code{center_h1} \eqn{<} \code{cburn_XY_lim}, \code{center_he4} \eqn{<} \code{cburn_XY_lim}, and \code{center_c12} \eqn{<} \code{cburn_C_lim}.
-  \item \strong{PostAGB}: first step where \code{co_core_mass / star_mass >} \code{postagb_core_frac}, with a Tc guard requiring that \code{logTc} at the starting point exceeds \code{logTc} at the track end.
+  \item \strong{PostAGB}: first step where \code{(c_core_mass + o_core_mass) / star_mass >} \code{postagb_core_frac}, with a Tc guard requiring that \code{logTc} at the starting point exceeds \code{logTc} at the track end. If \code{o_core_mass} is not available, only \code{c_core_mass} is used.
   \item \strong{WDCS}: first step after PostAGB where \code{center_gamma >=} \code{wdcs_Gamma_min}.
 }
 If any EEP is not identifiable (threshold not met, required column missing, etc.), it and all subsequent EEPs return \code{NA_integer_}.
@@ -182,11 +182,12 @@ Columns not present in the track are silently skipped (their contribution is 0).
 \subsection{Building an EEP track (\code{build_eep_track})}{
 For each interval between successive primary EEPs, \code{build_eep_track}
 interpolates \code{n_secondary_between} interior points using the cumulative metric.
-Matching the Fortran \code{Iso} behaviour, the track is only constructed between the first and last
-valid primary EEPs --- it is not extended past the last primary.
+The track is constructed from the first valid primary EEP through
+the end of the input track, with the final segment extending from the last primary EEP
+to the last row of the track.
 
 Numeric columns are interpolated using monotone Hermite cubic splines
-(\code{method = "monoH.FC"} in \code{\link[stats]{spline}}), which approximates the
+(\code{method = "monoH.FC"} in \code{\link[stats]{splinefun}}), which approximates the
 Fortran \code{Iso} \code{interp_4pt_pm} (Steffen's piecewise monotonic method). Both are
 monotonicity-preserving cubic Hermite interpolants that produce similar results,
 though minor numerical differences may exist due to different derivative estimation
@@ -200,10 +201,11 @@ The returned data frame contains the original columns plus:
   \item \code{label}: integer coarse phase code (see \emph{Phase code mapping})
 }
 When \code{n_secondary_between} is \code{NULL}, the function uses Fortran \code{Iso}-style default
-counts per interval: PreMS\eqn{\to}ZAMS: 200, ZAMS\eqn{\to}IAMS: 150,
-IAMS\eqn{\to}TAMS: 100, TAMS\eqn{\to}RGBTip: 150, RGBTip\eqn{\to}ZACHeB: 25,
-ZACHeB\eqn{\to}TACHeB: 75, TACHeB\eqn{\to}TPAGB: 100, TPAGB\eqn{\to}PostAGB: 600,
-PostAGB\eqn{\to}WDCS: 300.
+counts per interval, keyed by the starting primary EEP name:
+PreMS: 200, ZAMS: 150, IAMS: 100, TAMS: 150, RGBTip: 25,
+ZACHeB: 75, TACHeB: 100, TPAGB: 600, CBurn: 100, PostAGB: 300.
+If the last primary EEP is \code{WDCS} or another name not in the default list, a fallback of 50 is used.
+The final interval extends from the last valid primary to the end of the track.
 }
 
 \subsection{Plotting (\code{plot_eep})}{
@@ -269,7 +271,7 @@ MESA instrument papers: Paxton et al. (2011, 2013, 2015, 2018, 2019), \emph{ApJS
 MIST project documentation and isochrone column descriptions.
 }
 
-\seealso{\code{\link[stats]{spline}}, \pkg{magicaxis} (\code{magplot}).}
+\seealso{\code{\link[stats]{splinefun}}, \pkg{magicaxis} (\code{magplot}).}
 
 \examples{
 ## Minimal synthetic example (toy track; random walk in HRD)

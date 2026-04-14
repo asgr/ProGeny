@@ -226,7 +226,7 @@ identify_primary_eeps = function(track,
   if (is.na(eep_idx["TACHeB"]) || eep_idx["TACHeB"] == nrow) return(eep_idx)
   i_tacheb = eep_idx["TACHeB"]
 
-  ## 8a. TPAGB: Yc < 1e-6 AND (he_core_mass - c_core_mass) < 0.1
+  ## 8a. TPAGB: Yc < 1e-6 AND (he_core_mass - co_core_mass) < 0.1
   ## Fortran Iso: HeShell = i_He_Core - i_CO_Core
   if (!is.null(M_He_core) && !is.null(M_CO_core)) {
     idx_range = seq.int(i_tacheb + 1L, nrow)

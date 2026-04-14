@@ -316,10 +316,10 @@ metric_distance = function(track,
   D  = numeric(nn)
   if (nn < 2) return(D)
 
-  ## Helper to safely extract a column vector for the given indices
+  ## Helper to safely extract a column vector for the requested segment
   .get = function(name) {
     if (!is.null(cols[[name]]) && cols[[name]] %in% names(track)) {
-      return(track[[cols[[name]]]])
+      return(track[[cols[[name]]]][ind])
     } else {
       return(NULL)
     }

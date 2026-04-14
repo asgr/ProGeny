@@ -38,7 +38,7 @@ Optional columns, if present (or if their names are provided in \code{cols}), en
   \item \code{center_c12}: central carbon mass fraction (for core C-burning detection)
 }
 The \code{cols} argument maps the semantic names used by these functions to the actual column names in your \code{track}.
-These column names are the standard MESA history column names used by MIST.
+The default values in \code{cols} correspond to standard MESA history column names used by MIST.
 }
 
 \usage{
@@ -131,7 +131,7 @@ plot_eep(
     \item{\code{tpagb_He_shell}}{He intershell mass threshold: \code{he_core_mass - c_core_mass < 0.1} (default 0.1, matching Fortran \code{HeShellMin}).}
     \item{\code{cburn_XY_lim}}{H and He exhaustion threshold for C burning (default 1e-8, matching Fortran \code{limit_XY}).}
     \item{\code{cburn_C_lim}}{Central C depletion threshold for C burning (default 1e-4, matching Fortran \code{center_carbon_limit}).}
-    \item{\code{postagb_core_frac}}{CO-core mass fraction threshold for PostAGB: \code{c_core_mass/star_mass > 0.8} (default 0.8, matching Fortran \code{core_mass_frac_limit}). A Tc guard requires \code{logTc} at the start to exceed \code{logTc} at the track end.}
+    \item{\code{postagb_core_frac}}{CO-core mass fraction threshold for PostAGB: \code{c_core_mass/star_mass > 0.8} (default 0.8, matching Fortran \code{core_mass_frac_limit}). A Tc guard requires \code{logTc} at the PostAGB search starting point (after TPAGB or CBurn) to exceed \code{logTc} at the track end.}
     \item{\code{wdcs_Gamma_min}}{Minimum \eqn{\Gamma_c} for entry onto WD cooling sequence (default 100).
       Looks for \code{center_gamma >= wdcs_Gamma_min}, matching Fortran \code{>= center_gamma_limit}.}
   }}
@@ -194,9 +194,11 @@ Matching the Fortran behaviour, the track is only constructed between the first 
 valid primary EEPs --- it is not extended past the last primary.
 
 Numeric columns are interpolated using monotone Hermite cubic splines
-(\code{method = "monoH.FC"} in \code{\link[stats]{spline}}), which closely matches the
-Fortran \code{interp_4pt_pm} (Steffen's piecewise monotonic method). Both methods
-preserve local monotonicity and avoid overshooting.
+(\code{method = "monoH.FC"} in \code{\link[stats]{spline}}), which approximates the
+Fortran \code{interp_4pt_pm} (Steffen's piecewise monotonic method). Both are
+monotonicity-preserving cubic Hermite interpolants that produce similar results,
+though minor numerical differences may exist due to different derivative estimation
+formulas (Fritsch-Carlson vs Steffen).
 
 The returned data frame contains the original columns plus:
 \itemize{

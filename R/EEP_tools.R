@@ -121,12 +121,9 @@ identify_primary_eeps = function(track,
 
   ## Find first point (starting from PreMS) where Xc has dropped below Xmin
   i_start = max(1L, i_prems)
-  # for (ii in i_start:nrow) {
-  #   if (Xc[ii] <= Xmin) { i_Xcdrop = ii; break }
-  # }
-  i_Xcdrop = which(Xc <= Xmin)
+  i_Xcdrop = which(Xc <= Xmin & seq_along(Xc) >= i_start)
   if(length(i_Xcdrop) > 0){
-    i_Xcdrop = max(i_Xcdrop)
+    i_Xcdrop = min(i_Xcdrop)
   }else{
     i_Xcdrop = NA_integer_
   }
@@ -320,15 +317,11 @@ metric_distance = function(track,
   if (nn < 2) return(D)
 
   ## Helper to safely extract a column vector for the given indices
-  .get = function(name, req = TRUE) {
+  .get = function(name) {
     if (!is.null(cols[[name]]) && cols[[name]] %in% names(track)) {
       return(track[[cols[[name]]]])
     } else {
-      if (req) {
-        message('Column ', name, ' is missing and will not be used to compute distance metric.')
-      } else {
-        return(NULL)
-      }
+      return(NULL)
     }
   }
 
@@ -353,28 +346,48 @@ metric_distance = function(track,
     log_age = log10(pmax(star_age_v, 1.0))
   }
 
-  for (j in 2:nn) {
-    ## Xc weight for this step
-    if (weight_center_rho_T_by_Xc && !is.null(Xc_v)) {
-      w = max(0.0, Xc_v[j] / max_Xc)
-    } else {
-      w = 1.0
-    }
 
-    tmp = 0.0
-    if (!is.null(logTeff_v))
-      tmp = tmp + Teff_scale * (logTeff_v[j] - logTeff_v[j - 1])^2
-    if (!is.null(logL_v))
-      tmp = tmp + logL_scale * (logL_v[j] - logL_v[j - 1])^2
-    if (!is.null(logRhoc_v))
-      tmp = tmp + w * Rhoc_scale * (logRhoc_v[j] - logRhoc_v[j - 1])^2
-    if (!is.null(logTc_v))
-      tmp = tmp + w * Tc_scale * (logTc_v[j] - logTc_v[j - 1])^2
-    if (!is.null(log_age))
-      tmp = tmp + age_scale * (log_age[j] - log_age[j - 1])^2
+  ## Indices 2:nn correspond to diffs
+  idx = 2:nn
 
-    D[j] = D[j - 1] + sqrt(tmp)
+  ## Weight w[j]
+  if (weight_center_rho_T_by_Xc && !is.null(Xc_v)) {
+    w = pmax(0, Xc_v[idx] / max_Xc)
+  } else {
+    w = rep(1.0, length(idx))
   }
+
+  ## Initialise tmp
+  tmp = numeric(length(idx))
+
+  ## Add contributions conditionally
+  if (!is.null(logTeff_v)) {
+    d = diff(logTeff_v)
+    tmp = tmp + Teff_scale * d^2
+  }
+
+  if (!is.null(logL_v)) {
+    d = diff(logL_v)
+    tmp = tmp + logL_scale * d^2
+  }
+
+  if (!is.null(logRhoc_v)) {
+    d = diff(logRhoc_v)
+    tmp = tmp + w * Rhoc_scale * d^2
+  }
+
+  if (!is.null(logTc_v)) {
+    d = diff(logTc_v)
+    tmp = tmp + w * Tc_scale * d^2
+  }
+
+  if (!is.null(log_age)) {
+    d = diff(log_age)
+    tmp = tmp + age_scale * d^2
+  }
+
+  ## Cumulative distance
+  D[idx] = D[1] + cumsum(sqrt(tmp))
 
   return(D)
 }
@@ -490,7 +503,7 @@ build_eep_track = function(track,
   prim_i     = prim_i[o]
 
   n_prim = length(prim_i)
-  if (n_prim < 2) stop("Need at least 2 primary EEPs to build segments.")
+  if (n_prim == 0) stop("Need at least 1 primary EEP to build segments.")
 
   ## Number of intervals between consecutive primaries (matching Fortran Iso)
   #n_intervals = n_prim - 1
@@ -576,7 +589,7 @@ build_eep_track = function(track,
   eep_track$EEP_phase      = EEP_phase
   eep_track$EEP_is_primary = EEP_is_primary
 
-  eep_track$label <- NA_integer_
+  eep_track$label = NA_integer_
 
   # Pre-Main Sequence
   eep_track$label[eep_track$EEP_phase %in% c("PreMS")] = -1L  # MIST phase = -1

@@ -169,7 +169,8 @@ All algorithms match the Fortran \code{Iso} \code{iso} package (\code{eep.f90}):
   \item \strong{PostAGB}: first step where \code{(c_core_mass + o_core_mass) / star_mass >} \code{postagb_core_frac}, with a Tc guard requiring that \code{logTc} at the starting point exceeds \code{logTc} at the track end. If \code{o_core_mass} is not available, only \code{c_core_mass} is used.
   \item \strong{WDCS}: first step after PostAGB where \code{center_gamma >=} \code{wdcs_Gamma_min}.
 }
-If any EEP is not identifiable (threshold not met, required column missing, etc.), it and all subsequent EEPs return \code{NA_integer_}.
+
+If an EEP that is required for the applicable evolutionary sequence is not identifiable (threshold not met, required column missing, etc.), that EEP and any later EEPs that depend on it return \code{NA}. Some phases are not expected for all mass regimes (for example, tracks may proceed to core-He-burning EEPs without an identifiable \code{RGBTip}); such skipped phases do not by themselves imply that all subsequent EEPs are \code{NA}.
 }
 
 \subsection{Metric distance (\code{metric_distance})}{

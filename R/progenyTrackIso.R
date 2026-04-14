@@ -248,7 +248,7 @@ progenyFindMass = function(tracklist, logAge_lim = c(5,10.3), logAge_bin=0.05, l
     lims = range(log10(temp_sub[, Mini]), na.rm = TRUE)
     akima.si$z[] = pmax(pmin(akima.si$z, lims[2]), lims[1])
 
-    i = NULL
+    i = row_idx = NULL
 
     output = {
       z_mat = akima.si$z

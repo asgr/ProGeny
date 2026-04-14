@@ -12,7 +12,7 @@ import("ParmOff")
 import("checkmate")
 #import("future")
 
-importFrom("utils", "browseURL", "tail")
+importFrom("utils", "browseURL", "tail", "head")
 importFrom("grDevices", "hcl.colors", "adjustcolor")
 importFrom("graphics", "legend", "points", "plot.xy", "lines", "polygon", "text", "abline")
 importFrom("parallel", "detectCores")

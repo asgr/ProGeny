@@ -380,7 +380,9 @@ prim = identify_primary_eeps(track)
 print(prim)
 ```
 
-Plot HR diagram with resolution of 20 (notice glitches near ZAM)
+Note here since the star is over ~2 solar masses there is no RGBTip phase.
+
+New we plot HR diagram with resolution of 20 (notice glitches near ZAM):
 
 ```{r}
 ## Build EEP track with 20 secondaries between primaries
@@ -394,6 +396,16 @@ Increase to 100
 ```{r}
 ## Build EEP track with 100 secondaries between primaries
 eep = build_eep_track(track, prim, n_secondary_between = 100)
+
+## Plot HR diagram (looks much cleaner)
+plot_eep(track, eep)
+```
+
+Leaving *n_secondary_between* as the default NULL will silently use the same per phase values as Fortran Iso:
+
+```{r}
+## Build EEP track with varying secondaries between primaries
+eep = build_eep_track(track, prim)
 
 ## Plot HR diagram (looks much cleaner)
 plot_eep(track, eep)

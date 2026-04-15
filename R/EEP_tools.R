@@ -258,7 +258,7 @@ identify_primary_eeps = function(track,
   ## 9. PostAGB: co_core_mass / star_mass > 0.8
   ## Fortran Iso: core_mass_frac = i_co_core / i_mass, with Tc guard
   if (!is.null(M_CO_core) && !is.null(M_star)) {
-    start_i = max(eep_idx[c("TPAGB", "CBurn")], na.rm = TRUE)
+    start_i = max(eep_idx[c("TPAGB", "CBurn")])
     if (is.finite(start_i) && start_i < nrow) {
       ## Fortran Iso Tc guard: only search if Tc is decreasing (has TP-AGB)
       Tc_now = logTc[start_i]
@@ -593,19 +593,22 @@ build_eep_track = function(track,
   # Pre-Main Sequence
   eep_track$label[eep_track$EEP_phase %in% c("PreMS")] = -1L  # MIST phase = -1
 
-  # Main Sequence (ZAMS, IAMS, TAMS all map to MS)
-  eep_track$label[eep_track$EEP_phase %in% c("ZAMS", "IAMS", "TAMS")] = 0L
+  # Main Sequence (ZAMS, IAMS )
+  eep_track$label[eep_track$EEP_phase %in% c("ZAMS", "IAMS")] = 0L
 
-  # Red Giant Branch (entire RGB, including the tip)
-  eep_track$label[eep_track$EEP_phase %in% c("RGB", "RGBTip")] = 2L
+  # Red Giant Branch (TAMS, RGB)
+  # Note TAMS ends up asigned to 2 in original Fortran Iso (which seems odd to me)
+  eep_track$label[eep_track$EEP_phase %in% c("TAMS", "RGB")] = 2L
 
-  # Core He-burning (from ZACHeB through TACHeB)
-  eep_track$label[eep_track$EEP_phase %in% c("ZACHeB", "CHeB", "TACHeB")] = 3L
+  # Core He-burning (ZACHeB, CHeB)
+  # Note RGBTip ends up asigned to 3 in original Fortran Iso (which seems odd to me)
+  eep_track$label[eep_track$EEP_phase %in% c("RGBTip", "ZACHeB", "CHeB")] = 3L
 
-  # Early AGB (after TACHeB; EEP names vary: EAGB/EBGB)
-  eep_track$label[eep_track$EEP_phase %in% c("EAGB", "EBGB")] = 4L
+  # Early AGB (EEP names vary: EAGB / EBGB)
+  # Note TACHeB ends up asigned to 4 in original Fortran Iso (which seems odd to me)
+  eep_track$label[eep_track$EEP_phase %in% c("TACHeB", "EAGB", "EBGB")] = 4L
 
-  # Thermally Pulsing AGB
+  # Thermally Pulsing AGB (TPAGB)
   eep_track$label[eep_track$EEP_phase %in% c("TPAGB")] = 5L
 
   # Post-AGB bucket (6-8):
@@ -616,7 +619,7 @@ build_eep_track = function(track,
   # White Dwarf Central Star
   eep_track$label[eep_track$EEP_phase %in% "WDCS"]   = 8L
 
-  # Wolf-Rayet phase (if present)
+  # Wolf-Rayet phase (if present, currently do not flag this in ProGeny)
   eep_track$label[eep_track$EEP_phase %in% c("WR")] = 9L
 
   return(eep_track)

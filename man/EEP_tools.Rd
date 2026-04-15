@@ -217,16 +217,16 @@ Draws an HRD with the original track (grey), the EEP-enhanced track (blue), prim
 \section{Phase code mapping}{
 The integer column \code{label} in the EEP track maps EEP phases to coarse MIST-like phases as follows:
 \itemize{
-  \item{\code{-1}: PreMS}
-  \item{\code{0}: MS (ZAMS/IAMS/TAMS)}
-  \item{\code{2}: RGB (entire RGB; \code{RGB} or \code{RGBTip})}
-  \item{\code{3}: CHeB (from ZACHeB through TACHeB)}
-  \item{\code{4}: eAGB (if flagged as EAGB/EBGB)}
-  \item{\code{5}: TPAGB}
-  \item{\code{6}: PostAGB}
-  \item{\code{7}: CSPN (central star of PN; if present)}
-  \item{\code{8}: WDCS}
-  \item{\code{9}: WR (if present)}
+  \item{\code{-1}: Pre-Main Sequence (PreMS)}
+  \item{\code{0}: Main Sequence (ZAMS, IAMS)}
+  \item{\code{2}: Red Giant Branch (TAMS)}
+  \item{\code{3}: Core Helium Burning (RGBTip, ZACHeB)}
+  \item{\code{4}: Early AGB (TACHeB; if present)}
+  \item{\code{5}: TP-AGB (TPAGB; if present)}
+  \item{\code{6}: Post AGB (PostAGB; if present)}
+  \item{\code{7}: Central Star Planetary Nebula (CSPN; if present)}
+  \item{\code{8}: White Dwarf Central Star (WDCS; if present)}
+  \item{\code{9}: Wolf-Rayet (WR; if present)}
 }
 
 Note different mass ranges may or may not experience certain phases, e.g.:
@@ -244,11 +244,13 @@ Massive-mass (Mini [Msol] > 10): \cr
 PreMS → ZAMS → IAMS → TAMS → ZACHeB → TACHeB → CBurn → Core collapse\cr
 
 Note in particular the RGBTip only occurs for lower mass stars, and this phase is entirely missed in larger stars.
+
+The mapping above is as advertised in MIST documentation, but running examples I have noticed some odd things: TAMS is assigned to phase = 2; RGBTip is assigned to phase = 3; TACHeB is assigned to phase = 4. I have edited \code{ProGeny} to be consistent with those definitions, since other MIST compatible software no doubt relies on that mapping. This manner of how MIST does mapping is clear from the Examples below (where we check the consistency of star_age, versus logL versus phase label).
 }
 
 \value{
 \describe{
-  \item{\code{identify_primary_eeps}}{A named integer vector of indices (one per primary EEP), with names \code{PreMS}, \code{ZAMS}, \code{IAMS}, \code{TAMS}, \code{RGBTip}, \code{ZACHeB}, \code{TACHeB}, \code{TPAGB}, \code{CBurn}, \code{PostAGB}, \code{WDCS}. Entries may be \code{NA_integer_}.}
+  \item{\code{identify_primary_eeps}}{A named integer vector of indices (one per primary EEP), with names \code{PreMS}, \code{ZAMS}, \code{IAMS}, \code{TAMS}, \code{RGBTip}, \code{ZACHeB}, \code{TACHeB}, \code{TPAGB}, \code{CBurn}, \code{PostAGB}, \code{WDCS}. Entries may be \code{NA}.}
   \item{\code{metric_distance}}{A numeric vector of length \code{length(ind)} giving the cumulative metric distance (first element 0).}
   \item{\code{build_eep_track}}{A \code{data.frame} of interpolated points with columns of \code{track} plus \code{EEP}, \code{EEP_phase}, \code{EEP_is_primary}, and \code{label}.}
   \item{\code{plot_eep}}{Invisibly returns \code{NULL}; called for its side effect of drawing on the active graphics device.}
@@ -275,12 +277,14 @@ MIST project documentation and isochrone column descriptions.
 \seealso{\code{\link[stats]{splinefun}}, \pkg{magicaxis} (\code{magplot}).}
 
 \examples{
+library(magicaxis)
 ## Minimal synthetic example (toy track; random walk in HRD)
 track = read.table(system.file("extdata", '02000M.track',
   package="ProGeny"))
 
 ## Pick primaries (using defaults and available columns)
 prim = identify_primary_eeps(track)
+print(prim)
 
 ## Build EEP track with 20 secondaries between primaries
 eep = build_eep_track(track, prim, n_secondary_between = 20)
@@ -296,4 +300,12 @@ plot_eep(track, eep)
 
 ## Classic log_Teff versus log_g plot:
 plot_eep(track, eep, cols = c('log_Teff', 'log_g'))
+
+## Compare pahse label between ProGeny and Fortran Iso (offset in age and logL):
+zcol = c('blue', 'red','darkgreen','orange','black','purple','brown')
+
+magplot(eep$star_age, eep$log_L, eep$label, log='', position='topleft', zcol=zcol,
+  pch='.', cex=3, title='Phase', xlab='Star Age', ylab='log(L / Lsol)')
+points(track$star_age + 2e5, track$log_L - 0.2, col = zcol[track$phase + 2L], pch='.',
+  cex=3)
 }

@@ -313,24 +313,23 @@ metric_distance = function(track,
                               Xc        = "center_h1"
                             )) {
   nn = length(ind)
-  D  = numeric(nn)
-  if (nn < 2) return(D)
+  if (nn < 2) return(0)
 
   ## Helper to safely extract a column vector for the given indices
-  .get = function(name) {
+  .get = function(name, ind) {
     if (!is.null(cols[[name]]) && cols[[name]] %in% names(track)) {
-      return(track[[cols[[name]]]])
+      return(track[[cols[[name]]]][ind])
     } else {
       return(NULL)
     }
   }
 
-  logTeff_v = .get("logTeff")
-  logL_v    = .get("logL")
-  logRhoc_v = .get("logRhoc")
-  logTc_v   = .get("logTc")
-  star_age_v = .get("star_age")
-  Xc_v      = .get("Xc")
+  logTeff_v = .get("logTeff", ind)
+  logL_v    = .get("logL", ind)
+  logRhoc_v = .get("logRhoc", ind)
+  logTc_v   = .get("logTc", ind)
+  star_age_v = .get("star_age", ind)
+  Xc_v      = .get("Xc", ind)
 
   ## Xc-dependent weighting (Fortran Iso: weight = max(0, Xc/max(Xc)))
   if (weight_center_rho_T_by_Xc && !is.null(Xc_v)) {
@@ -387,9 +386,9 @@ metric_distance = function(track,
   }
 
   ## Cumulative distance
-  D[idx] = D[1] + cumsum(sqrt(tmp))
+  dist_metric = c(0, cumsum(sqrt(tmp)))
 
-  return(D)
+  return(dist_metric)
 }
 
 ## Interpolate all columns in 'track' along a segment defined by indices 'ind',
@@ -427,7 +426,7 @@ metric_distance = function(track,
                                 cols = cols)
 
   n_points = n_secondary + 2
-  D_total  = dist_metric[length(dist_metric)]
+  D_total  = tail(dist_metric, 1)
 
   ## Handle degenerate case where distance is zero
   if (D_total <= 0) {

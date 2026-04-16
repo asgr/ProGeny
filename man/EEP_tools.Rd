@@ -278,9 +278,12 @@ MIST project documentation and isochrone column descriptions.
 
 \examples{
 library(magicaxis)
-## Minimal synthetic example (toy track; random walk in HRD)
-track = read.table(system.file("extdata", '02000M.track',
+## Load in MESA / MIST v1.2 track (1 solar mass):
+track = read.table(system.file("extdata", 'track001p0.eep',
   package="ProGeny"))
+
+# Note we also have:
+# track000p1.eep (0.1 Msol), track020p0.eep (20 Msol), track300p0.eep (300 Msol)
 
 ## Pick primaries (using defaults and available columns)
 prim = identify_primary_eeps(track)
@@ -302,10 +305,11 @@ plot_eep(track, eep)
 plot_eep(track, eep, cols = c('log_Teff', 'log_g'))
 
 ## Compare pahse label between ProGeny and Fortran Iso (offset in age and logL):
-zcol = c('blue', 'red','darkgreen','orange','black','purple','brown')
+set.seed(666)
+zcol = sample(hcl.colors(11, palette='Zissou 1'), 11)
 
-magplot(eep$star_age, eep$log_L, eep$label, log='', position='topleft', zcol=zcol,
-  pch='.', cex=3, title='Phase', xlab='Star Age', ylab='log(L / Lsol)')
-points(track$star_age + 2e5, track$log_L - 0.2, col = zcol[track$phase + 2L], pch='.',
-  cex=3)
+magplot(eep$star_age, eep$log_L, log='', col=zcol[eep$label + 2L], pch='.', cex=3,
+  xlab='Star Age', ylab='log(L / Lsol)')
+points(track$star_age + max(track$star_age)/40, track$log_L - 0.2,
+  col = zcol[track$phase + 2L], pch='.', cex=3)
 }

@@ -120,7 +120,7 @@ identify_primary_eeps = function(track,
   Xmin = Xc0 - params$zams_dXc_max
 
   ## Find first point (starting from PreMS) where Xc has dropped below Xmin
-  i_start = max(1L, i_prems)
+  i_start = max(1L, i_prems, na.rm=TRUE)
   i_Xcdrop = which(Xc <= Xmin & seq_along(Xc) >= i_start)
   if(length(i_Xcdrop) > 0){
     i_Xcdrop = min(i_Xcdrop)
@@ -258,7 +258,7 @@ identify_primary_eeps = function(track,
   ## 9. PostAGB: co_core_mass / star_mass > 0.8
   ## Fortran Iso: core_mass_frac = i_co_core / i_mass, with Tc guard
   if (!is.null(M_CO_core) && !is.null(M_star)) {
-    start_i = max(eep_idx[c("TPAGB", "CBurn")])
+    start_i = max(eep_idx[c("TPAGB", "CBurn")], na.rm=TRUE)
     if (is.finite(start_i) && start_i < nrow) {
       ## Fortran Iso Tc guard: only search if Tc is decreasing (has TP-AGB)
       Tc_now = logTc[start_i]
@@ -558,10 +558,9 @@ build_eep_track = function(track,
     # Phase label: use the start primary's label
     seg_phase   = rep(prim_names[s], n_rows_seg)
 
-    # Primary flags: first and last rows in the segment are primary
+    # Primary flags: first rows in the segment are primary
     primary_seg            = rep(FALSE, n_rows_seg)
     primary_seg[1]         = TRUE
-    primary_seg[n_rows_seg] = TRUE
 
     # Drop the last row of all segments except the last to avoid
     # duplicate primaries at interval boundaries

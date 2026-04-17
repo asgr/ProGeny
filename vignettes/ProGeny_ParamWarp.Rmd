@@ -366,7 +366,7 @@ do.call(legend, c(list(x = "bottomright"), hr_leg))
 Example track of 20 solar mass star created by MESA
 
 ```{r}
-track = read.table(system.file("extdata", '02000M.track',
+track = read.table(system.file("extdata", 'track001p0.eep',
   package="ProGeny"))
 ```
 

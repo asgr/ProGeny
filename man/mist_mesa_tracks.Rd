@@ -54,11 +54,9 @@ MIST (MESA Isochrones and Stellar Tracks), v1.2 tables and documentation:
 }
 \examples{
 f1 <- system.file("extdata", "track001p0.eep", package = "ProGeny")
-if (f1 == "") stop("track001p0.eep not found in extdata")
-track1 <- read.table(f1, header = TRUE)
+if (nzchar(f1)) track1 <- read.table(f1, header = TRUE)
 
 f20 <- system.file("extdata", "track020p0.eep", package = "ProGeny")
-if (f20 == "") stop("track020p0.eep not found in extdata")
-track20 <- read.table(f20, header = TRUE)
+if (nzchar(f20)) track20 <- read.table(f20, header = TRUE)
 }
 \keyword{datasets}

@@ -219,7 +219,7 @@ The integer column \code{label} in the EEP track maps EEP phases to coarse MIST-
 \itemize{
   \item{\code{-1}: Pre-Main Sequence (PreMS)}
   \item{\code{0}: Main Sequence (ZAMS, IAMS)}
-  \item{\code{2}: Red Giant Branch (TAMS)}
+  \item{\code{2}: Red Giant Branch (RGB, TAMS)}
   \item{\code{3}: Core Helium Burning (RGBTip, ZACHeB)}
   \item{\code{4}: Early AGB (TACHeB; if present)}
   \item{\code{5}: TP-AGB (TPAGB; if present)}
@@ -279,11 +279,11 @@ MIST project documentation and isochrone column descriptions.
 \examples{
 library(magicaxis)
 ## Load in MESA / MIST v1.2 track (1 solar mass):
-track = read.table(system.file("extdata", 'track001p0.eep',
-  package="ProGeny"))
+data(track001p0)
+track = track001p0
 
 # Note we also have:
-# track000p1.eep (0.1 Msol), track020p0.eep (20 Msol), track300p0.eep (300 Msol)
+# track000p1 (0.1 Msol), track020p0 (20 Msol), track300p0 (300 Msol)
 
 ## Pick primaries (using defaults and available columns)
 prim = identify_primary_eeps(track)

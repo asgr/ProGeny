@@ -363,11 +363,11 @@ do.call(legend, c(list(x = "bottomright"), hr_leg))
 
 **ProGeny** now supports creating EEPs from stellar tracks, broadly replicating that functionality of **Iso**.
 
-Example track of 20 solar mass star created by MESA
+Example track of 1 solar mass star created by MESA
 
 ```{r}
-track = read.table(system.file("extdata", 'track001p0.eep',
-  package="ProGeny"))
+data(track001p0)
+track = track001p0
 ```
 
 Pick primaries (using defaults and available columns)

@@ -1,26 +1,14 @@
 \name{mist_mesa_tracks}
 \alias{mist_mesa_tracks}
-\alias{track000p1.eep}
-\alias{track001p0.eep}
-\alias{track020p0.eep}
-\alias{track300p0.eep}
+\alias{track000p1}
+\alias{track001p0}
+\alias{track020p0}
+\alias{track300p0}
 \title{Bundled MIST v1.2 MESA EEP Stellar Tracks}
 \description{
-Example MIST v1.2 evolutionary tracks from MESA, stored in
+Example MIST v1.2 EEP tracks from MESA, stored in
 \code{inst/extdata} as EEP tables for four initial stellar masses:
 \code{0.1}, \code{1}, \code{20}, and \code{300}~\eqn{M_\odot}.
-}
-\details{
-The bundled files are:
-\itemize{
-  \item \code{track000p1.eep}: 0.1~\eqn{M_\odot}
-  \item \code{track001p0.eep}: 1~\eqn{M_\odot}
-  \item \code{track020p0.eep}: 20~\eqn{M_\odot}
-  \item \code{track300p0.eep}: 300~\eqn{M_\odot}
-}
-
-These are plain-text, whitespace-delimited tables with a header row.
-Column naming and definitions follow the MIST README tables documentation.
 }
 \format{
 Each file is a tabular dataset with columns:
@@ -43,9 +31,34 @@ Each file is a tabular dataset with columns:
   \item{\code{center_c12}}{Central mass fraction of \eqn{^{12}\mathrm{C}}.}
   \item{\code{phase}}{Integer evolutionary phase flag (MIST phase coding).}
 }
+}
+\details{
+The bundled files are:
+\itemize{
+  \item \code{track000p1}: 0.1~\eqn{M_\odot}
+  \item \code{track001p0}: 1~\eqn{M_\odot}
+  \item \code{track020p0}: 20~\eqn{M_\odot}
+  \item \code{track300p0}: 300~\eqn{M_\odot}
+}
 
-Phase codes present in these bundled tracks are:
-\code{-1}, \code{0}, \code{2}, \code{3}, \code{4}, \code{5}, \code{6}, and \code{9}.
+These are plain-text, whitespace-delimited tables with a header row.
+Column naming and definitions follow the MIST README tables documentation.
+}
+\section{Phase code mapping}{
+The integer column \code{label} in the EEP track maps EEP phases to coarse MIST-like phases as follows:
+\itemize{
+  \item{\code{-1}: Pre-Main Sequence (PreMS)}
+  \item{\code{0}: Main Sequence (ZAMS, IAMS)}
+  \item{\code{2}: Red Giant Branch (RGB, TAMS)}
+  \item{\code{3}: Core Helium Burning (RGBTip, ZACHeB)}
+  \item{\code{4}: Early AGB (TACHeB; if present)}
+  \item{\code{5}: TP-AGB (TPAGB; if present)}
+  \item{\code{6}: Post AGB (PostAGB; if present)}
+  \item{\code{7}: Central Star Planetary Nebula (CSPN; if present)}
+  \item{\code{8}: White Dwarf Central Star (WDCS; if present)}
+  \item{\code{9}: Wolf-Rayet (WR; if present)}
+}
+
 See the MIST README tables for full phase-code definitions.
 }
 \source{
